@@ -1,0 +1,87 @@
+package com.service.impl;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.dao.hibernate.BaseDao;
+import com.mode.Page;
+import com.service.StudentService;
+
+import util.MakeMap;
+import util.SQLHelp;
+import util.Tools;
+
+@Service("studentServiceHibernate")
+public class StudentServiceImplHibernate implements StudentService,Serializable {
+ 
+	private static final long serialVersionUID = 8304941820771045214L;
+	/**
+     * hibernate入口
+     */
+	@Autowired
+	private SessionFactory sessionFactory;
+    
+    @Autowired
+    protected BaseDao baseDao;
+
+	@Override
+	public List<Map> list(String id, String name, String timefrom, String timeto, Page page) {
+		String sql = "";
+		List<String> params = new ArrayList<String>();
+		sql += "select id,name,to_char(time,'yyyy-mm-dd hh24:mi:ss') time from student where 1=1 ";
+		if(Tools.isNull(id)){
+			sql += " and id like ? ";
+			params.add("%" + id + "%");
+		} 
+		if(Tools.isNull(name)){
+			sql += " and name like ? ";
+			params.add("%" + name + "%");
+		}
+		if(Tools.isNull(timefrom)){
+			sql += " and time >= " + SQLHelp.to_dateL();
+			params.add(timefrom);
+		}
+		if(Tools.isNull(timeto)){
+			sql += " and time <= " + SQLHelp.to_dateL();
+			params.add( timeto);
+		} 
+		
+		page.setNum(baseDao.count(sql, params.toArray()));
+		return baseDao.findPage(sql,page.getNowPage(),page.getEachPageNum(), params.toArray());
+	}
+
+	@Override
+	public int update(String id, String name, String time) {
+		int res = baseDao.executeSql(
+				"update student set name=?,time=to_date(?,'yyyy-mm-dd hh24:mi:ss') where id=?",
+				name,time,id  );
+		return res;
+	}
+	@Override
+	public int add(String name, String time) {
+		int res = 0;
+		res = baseDao.executeSql("insert into student values(lpad(SEQ_STUDENT.nextval,4, '0'),?," + SQLHelp.to_dateL() + ")", name, time);
+ 		return res;
+	}
+	@Override
+	public int delete(String id) {
+		int res = 0;
+		res = baseDao.executeSql("delete from student where id=? ", id);
+ 		return res;
+	}
+	@Override
+	public Map get(String id) {
+ 		return  baseDao.findOne("select id,name,to_char(time,'yyyy-mm-dd hh24:mi:ss') time from student where id=? ", id);
+	}
+
+}
