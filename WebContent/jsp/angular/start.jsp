@@ -178,8 +178,6 @@ ng-pending: 任何为满足$asyncValidators的情况 -->
 <div class="panel-body">
 <input type="text" ng-model="myUrl"/>
 <input type="text" ng-model="myText"/>  ->
-<div self-directive my-url="myUrl" my-text="myText">
-</div>
 <!-- <self-directive></self-directive>  -->
 </div> 
 <script type="text/javascript">
@@ -315,9 +313,9 @@ app.controller('showController', function($scope, $http, $timeout, Items) {
 class='{menu-true: $index==selectedRow}' >   
 <!-- class='menu-{{colorClick}}' -->
 		<td>{{$index + 1}}</td>   <!--  $index 在表格中显示出行号， -->
-		<td>{{item.id}}</td>    
-		<td>{{item.username}}</td>  
-		<td>{{item.key}}</td>  
+		<td>{{item.ID}}</td>    
+		<td>{{item.NAME}}</td>  
+		<td>{{item.TIME}}</td>  
 	    <td>  <a class="btn" href="javascript:void(0)" onclick="ajaxDelete(${item.ID });"> 删除</a>  </td>
 	    <td>  <img ng-src="/BaseSSM/include/img/{{imgsrc}}" />  </td>
 </tr> 
@@ -364,8 +362,8 @@ app.controller('tableController', function($scope, $rootScope, $http) {
 			'username': 'auser'
 		}
 	}).then(function successCallback(response) {
-		$scope.httplist = response.data;
-		$rootScope.httplist = response.data;
+		$scope.httplist = response.data.res;
+		$rootScope.httplist = response.data.res;
 		
 		//data= {"id":"test","key":"key","username":"username"}
 	}, function errorCallback(response) {
