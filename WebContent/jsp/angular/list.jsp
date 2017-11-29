@@ -68,8 +68,9 @@
 				<%@ include file="/include/tablefoot_angular.jsp" %>  
 
 	</table>  
-	{{httplist}}<br>
-	{{PAGE}}
+	data.res={{httplist}}<br>
+	data.PAGE={{PAGE}}<br>
+	testPromiseQ = {{testPromiseQ}}
 </div>
  
 

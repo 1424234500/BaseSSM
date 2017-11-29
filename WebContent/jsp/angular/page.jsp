@@ -50,6 +50,15 @@ app.controller('listCtrl', function ($scope,$rootScope, $route, serviceTest, pro
 	$('#timefrom').datetimepicker();
 	$('#timeto').datetimepicker();
 
+	serviceTest.testPromiseQ().then(
+		function(res){
+			$scope.testPromiseQ = "$q/promise: res=" + res;
+		},
+		function(err){
+			$scope.testPromiseQ = "$q/promise: err=" + err;
+		}
+	);
+	
 	$scope.search = {};	//查询
     $scope.orderType = 'id';
     $scope.order = '-';
@@ -205,7 +214,7 @@ app.factory('factoryTest',function($http){
     return factory;
 });
 // 自定义服务
-app.service('serviceTest',function($http){
+app.service('serviceTest',function($http, $q){
 	var service = {};
 	service.name = 'serviceTest.name ';
 	service.url = function(url, params){
@@ -219,6 +228,19 @@ app.service('serviceTest',function($http){
 			params: params, 
 		}) ;
 	};
+	
+	service.testPromiseQ = function () {
+          var defered = $q.defer();
+          $http.get("/BaseSSM/angular/list.do")
+              .success(function (data) {
+                  defered.resolve(data.res);
+              })
+              .error(function (err) {
+                  defered.reject(err);
+              });
+          return defered.promise; // 把defered对象中的promise对象返回出来
+      };
+      
 	service.list = function(params){
 		return $http({
 			method: 'GET',
