@@ -93,7 +93,7 @@ app.controller('myCtrl', function($scope,$rootScope,$timeout, $interval){
 	$rootScope.bindFun = function(){
 		return $rootScope.name * 10;
 	};
- 	//监控数据watch true/false 对象/引用监听？
+ 	//监控数据watch true/false 对象/引用监听？ 'name'
  	$rootScope.$watch($rootScope.bindFun, function(newValue, oldValue, scope){//最后参数scope无效？都是用的myCtrl访问域里的两个scope/root
  	    //$watch函数时把 items写成了一个字符串。这样做是可以 的，因为 $watch 函数既可以接受一个函数（就像我们前面做的），也可以接受一个字符串。 如果把一个字符串传递给了 $watch 函数，它将会在被调用的 $scope 作用域中当成表达 式来执行。
  	    $scope.discount = newValue > 100 ? newValue/2 : "没有折扣";  
