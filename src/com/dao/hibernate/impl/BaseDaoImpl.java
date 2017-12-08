@@ -21,6 +21,7 @@ import org.springframework.stereotype.Repository;
 
 import com.dao.hibernate.BaseDao;
 
+import util.SQLHelp;
 import util.Tools;
 
  
@@ -92,7 +93,7 @@ public class BaseDaoImpl implements BaseDao  {
 			}
 		}
 		
-		out(Tools.makeSql(q.getQueryString(), params)); 
+		out(SQLHelp.makeSql(q.getQueryString(), params)); 
 	}
 	@Override
 	public List<Map> findPage(String sql, int page, int rows, Object... params) {

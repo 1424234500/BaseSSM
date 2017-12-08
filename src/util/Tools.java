@@ -18,7 +18,47 @@ import java.util.Map;
 public class Tools {
 
  
+	private static int toolong = 350; 
+	public static String tooLongCut(String str) {
+	//	if (str.length() > toolong)
+	//		return   "len." + str.length() + " size." + Tools.calcSize(str.length()) + str.substring(0, toolong);
+		return str;
+	}
+	//通过字符串长度，计算大概的 流量大小 MB KB B char=B
+	public static String calcSize(int length) {
+		return calcSize((long)length);
+	}
+	public static String calcSize(long length) {
+		long m = length/(1024*1024);
+		long k = length%(1024*1024)/1024;
+		long b = length%(1024*1024)%1024;
+		return m>0?  m+"."+k/100+"MB" : k>0? k+"."+b/100+"KB" : b+"B";
+	}
+
+	/**
+	 * 把对象集合组装为字符串
+	 * @param objs
+	 * @return
+	 */
+	public static String getString(Object... objs) {
+		if (objs == null)
+			return "[null]";
+		String res = "[";
+		for (Object s : objs) {
+			res += (s == null? "null":s.toString()) + ", ";
+		}
+		res = res.substring(0, res.length() - 2);
+		res += "]";
+		return res;
+	}
 	
+
+	public static String cutString(String str, int i) {
+		if(str != null && str.length() > i){
+			str = str.substring(0, i);
+		}
+		return str;
+	}
 	/***
 	 * 字符串为null -> "" 否则不变
 	 * @param str
@@ -48,25 +88,32 @@ public class Tools {
 	public static void out(Object...objects){
 		out(objects2string(objects));
 	} 
-	public static String i2s(int[] arr){
+	public static String ints2string(int[] arr){
 		String res = "[ ";
 		for(int str: arr){
 			res += str + ", ";
 		}
-		res += " ]";
-		return res;
-	}
-	public static String s2s(String[] strs){
-		String res = "[ ";
-		for(String str: strs){
-			res += str + ", ";
+		if(arr != null && arr.length > 0){
+			res = res.substring(0, res.length() - 2);
 		}
 		res += " ]";
 		return res;
 	}
+	public static String strings2string(String[] strs){
+		String res = "[ ";
+		for(String str: strs){
+			res += str + ", ";
+		}
+		if(strs != null && strs.length > 0){
+			res = res.substring(0, res.length() - 2);
+		}
+		res += " ]";
+
+		return res;
+	}
 	public static String objects2string(Object...objects) {
 		String[] res = objects2strings(objects);
-		return s2s(res);
+		return strings2string(res);
 	}
 	public static String[] objects2strings(Object...objects) {
 		if(objects == null)return null;
@@ -117,17 +164,7 @@ public class Tools {
 		}
 		return true;
 	}
-	public static void outList(List<Map<String, Object>> homeworks) {
-		if(homeworks != null){
-			out("------------------------");
-			for(int i = 0; i < homeworks.size(); i++){
-				out(homeworks.get(i).toString());
-			}
-			out("-------------------");
-		}else{
-			out("list is null ");
-		}
-	}
+ 
 
 	
 	/**
@@ -225,20 +262,7 @@ public class Tools {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		return format.format(new Date());
 	}
-
-	public static int Int(String time) {
-		// TODO 自动生成的方法存根
-		try {
-			int res = Integer.parseInt(time);
-			return res;
-		} catch (Exception e) {
-			// TODO: handle exception
-			return -1;
-		}
-	}
-
-
-
+ 
 	
 	/**
 	 * 获取随机数，从到，补齐位数
@@ -281,52 +305,7 @@ public class Tools {
 		 }
 		return res;
 	}
-
-	// /sdcard/mycc/record/100-101020120120120.amr return amr
-		public static String getFileTypeByLocalPath(String localpath){
-			String res = "null";
-
-			if(localpath == null){
-			}else{
-				String[] ss=localpath.split("/");
-				if(ss.length > 0){
-					localpath = ss[ss.length - 1];	//0120.amr
-					ss=localpath.split("\\.");
-					if(ss.length > 0){
-						res = ss[ss.length - 1];	//0120.amr
-					}
-				}
-			}
-			return res;
-		}
-		public static String getFileNameOnlyByLocalPath(String localpath){
-			String res = "null";
-
-			if(localpath == null){
-			}else{
-				String[] ss=localpath.split("/");
-				if(ss.length > 0){
-					localpath = ss[ss.length - 1];	//0120.amr
-					res=localpath.substring(0,localpath.lastIndexOf("\\."));
-					 
-				}
-			}
-			return res;
-		}
-	// /sdcard/mycc/record/100-101020120120120.amr return asdfa.amr
-		public static String getFileNameByLocalPath(String localpath){
-			String res = "null";
-
-			if(localpath == null){
-			}else{
-				String[] ss=localpath.split("/");
-				if(ss.length > 0){
-					res = ss[ss.length - 1];	//0120.amr
-				}
-			}
-			return res;
-		}
-	
+ 
 	public static String getTimeSequence(){
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		String res = sdf.format(new Date());
@@ -405,23 +384,7 @@ public class Tools {
 		return color2string(c.getRed(),c.getGreen(),c.getBlue());
 	}
 
-	private static int toolong = 350; 
-	public static String tooLongCut(String str) {
-	//	if (str.length() > toolong)
-	//		return   "len." + str.length() + " size." + Tools.calcSize(str.length()) + str.substring(0, toolong);
-		return str;
-	}
-	//通过字符串长度，计算大概的 流量大小 MB KB B char=B
-	public static String calcSize(int length) {
-		return calcSize((long)length);
-	}
-	public static String calcSize(long length) {
-		long m = length/(1024*1024);
-		long k = length%(1024*1024)/1024;
-		long b = length%(1024*1024)%1024;
-		return m>0?  m+"."+k/100+"MB" : k>0? k+"."+b/100+"KB" : b+"B";
-	}
-
+ 
 	public static String getServerIp(String localIp) {
 		String ip = localIp;
 		if (ip != null) {
@@ -437,22 +400,7 @@ public class Tools {
 
  
 	 
-	/**
-	 * 把对象集合组装为字符串
-	 * @param objs
-	 * @return
-	 */
-	public static String getString(Object... objs) {
-		if (objs == null)
-			return "[null]";
-		String res = "[";
-		for (Object s : objs) {
-			res += (s == null? "null":s.toString()) + ", ";
-		}
-		res = res.substring(0, res.length() - 2);
-		res += "]";
-		return res;
-	}
+	 
 
 	public static String getTimeYYYYMMDD() {
 		   Date d = new Date();  
@@ -460,41 +408,6 @@ public class Tools {
 	       return sdf.format(d);  
 	}
 
-	
-	/**
-	 * sql占位符替换拼接参数 生成sql  仅作参考sql语句使用 易被sql注入
-	 */
-	public static String makeSql(String sql, Object...params){
-		if(sql.length() <= 0)return sql;
-		if(sql.charAt(sql.length() - 1) != ' '){	//最后面加空格 因为split最后的符号不分
-			sql = sql + " ";
-		}
-		
-		int needLen = sql.split("\\?").length - 1; 
-		int realLen = 0;
-		if (params != null &&  params.length > 0) {
-			realLen = params.length;
-		} 
-		if(needLen != realLen){
-			sql = "Error! "
-					+ "\nsql: " + sql  
-					+ "\nparams: " + Tools.getString(params) 
-					+ "\n占位符个数[" + needLen + "]与实际参数个数[" + realLen + "]不同";
-		}else if(needLen > 0){//sf s where id=? and name=? order by ? 。
-			int t = -1;
-			for (int i = 0; i < params.length; i++) {
-				t = sql.indexOf("?"); 
-				sql = sql.substring(0, t) + "'" + params[i] + "'" + sql.substring(t+1);
-			}
-		}
-		return sql;
-	}
-
-	public static String cutString(String str, int i) {
-		if(str != null && str.length() > i){
-			str = str.substring(0, i);
-		}
-		return str;
-	}
+ 
 		
 }

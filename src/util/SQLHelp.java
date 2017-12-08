@@ -92,5 +92,35 @@ public class SQLHelp{
 	
 	
 	
+	
+	/**
+	 * sql占位符替换拼接参数 生成sql  仅作参考sql语句使用 易被sql注入
+	 */
+	public static String makeSql(String sql, Object...params){
+		if(sql.length() <= 0)return sql;
+		if(sql.charAt(sql.length() - 1) != ' '){	//最后面加空格 因为split最后的符号不分
+			sql = sql + " ";
+		}
+		
+		int needLen = sql.split("\\?").length - 1; 
+		int realLen = 0;
+		if (params != null &&  params.length > 0) {
+			realLen = params.length;
+		} 
+		if(needLen != realLen){
+			sql = "Error! "
+					+ "\nsql: " + sql  
+					+ "\nparams: " + Tools.objects2string(params) 
+					+ "\n占位符个数[" + needLen + "]与实际参数个数[" + realLen + "]不同";
+		}else if(needLen > 0){//sf s where id=? and name=? order by ? 。
+			int t = -1;
+			for (int i = 0; i < params.length; i++) {
+				t = sql.indexOf("?"); 
+				sql = sql.substring(0, t) + "'" + params[i] + "'" + sql.substring(t+1);
+			}
+		}
+		return sql;
+	}
+	
 	 
 }

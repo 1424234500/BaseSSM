@@ -3,6 +3,7 @@ package com.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,60 @@ public class AngularControll extends BaseControll{
 	@Qualifier("studentServiceHibernate") 
 	StudentService studentServiceHibernate;
 
+	
+
+	
+	@RequestMapping("/statis.do") 
+	public void statis(HttpServletRequest request, HttpServletResponse response) throws IOException { 
+		
+		   
+		List<Map> list = baseService.find("SELECT t.xs x,count(*) y FROM ( SELECT s.*,to_char(s.time, 'MM') xs FROM student s) t group by t.xs");
+		list = MapListHelp.turnListMap(list);
+		log(list);
+		//共x轴 多线数据 
+		//x1, x2, x3, x4
+		//y1, y2, y3, y4 
+		//y5, y6, y7, y8
+		
+		//线条名字集合
+		List<String> lineNames = new ArrayList<String>();
+		lineNames.add("线条1");
+		lineNames.add("线条2");
+		
+
+		Map xNames = new HashMap();
+		line1.put("name", "线条2");
+		line1.put("type", "bar");
+		line1.put("data", list.get(1)); 
+		//每个线条的数据 和 配置
+		List<Map> lines = new ArrayList<Map>();
+		Map line1 = new HashMap();
+		line1.put("name", "线条1");
+		line1.put("type", "line");
+		line1.put("data", list.get(1)); 
+		Map line2 = new HashMap();
+		line1.put("name", "线条2");
+		line1.put("type", "bar");
+		line1.put("data", list.get(1)); 
+		lines.add(line1);
+		lines.add(line2);
+		
+		Map option = MapListHelp.getMap()
+				.put("title", "每月注册人数统计")  
+				.put("lineNames", lineNames) 
+				.put("lines", lines) 
+				.build();
+		
+		log(list);
+
+		Map res = MapListHelp.getMap()
+				.put("res", "true")
+				.put("option", option) 
+				.put("info",WebHelp.getRequestMap(request)).build(); 
+		log(res);
+		writeJson(response, res);
+	}	
+	
 	
 	@RequestMapping("/login.do") 
 	public void login(HttpServletRequest request, HttpServletResponse response) throws IOException { 
