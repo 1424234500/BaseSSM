@@ -1,20 +1,15 @@
 package com.controller;
  
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -25,26 +20,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.mode.Page;
-import com.service.BaseService;
 import com.service.FileService;
-import com.sun.xml.internal.ws.api.config.management.policy.ManagementAssertion.Setting;
 
 import util.FileUtil;
-import util.MapListHelp;
 import util.MyJson;
 import util.SQLHelp;
 import util.Tools;
-import util.WebHelp;
+import util.WebHelp; 
 
 
 @Controller
@@ -157,7 +146,7 @@ public class FileControll extends BaseControll{
             long deta = endtime - starttime;//下载写入耗时deta 大小size 名字name 路径path
             //记录文件上传下载情况 并打印
             // id,fileid,type(up/down),costtime(ms),time
-            log("down file", name, path, Tools.getStringByTime(deta),Tools.getStringBySize(size) );
+            log("down file", name, path, Tools.calcTime(deta),Tools.calcSize(size) );
             fileService.fileUpDown(id, "down", deta+"" ); 
 
         } catch (Exception e1) {  
@@ -209,7 +198,7 @@ public class FileControll extends BaseControll{
             // id,fileid,type(up/down),costtime(ms),time
             String key = fileService.upload(getUser(request).getId(), name, path, about); 
             res = key.equals("0")?0:1;
-            log("up file", name, path, Tools.getStringByTime(deta) , Tools.getStringBySize(size));
+            log("up file", name, path, Tools.calcTime(deta) , Tools.calcSize(size));
 
             fileService.fileUpDown(key, "up", deta+""); 
         } catch (Exception e1) {  

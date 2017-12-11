@@ -5,21 +5,37 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.NamedThreadLocal;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.mode.LoginUser;
+import com.service.LogService;
 
+import util.Tools;
 import util.WebHelp;
 
 /**
  * 拦截器 日志 登录/访问权限 事务  监控所有访问地址和参数打印 
+ * 实现应用之性能监控
+ * 拦截器是实现成单例的，因此不管用户请求多少次都只访问同一个拦截器实现，即线程不安全。
+ * 解决方案是：使用ThreadLocal，它是线程绑定的变量，提供线程局部变量（一个线程一个ThreadLocal，
+ * A线程的ThreadLocal只能看到A线程的ThreadLocal，不能看到B线程的ThreadLocal）。
  * @author Walker
  *
  */
 public class LogInterceptors implements HandlerInterceptor{  
 	static public Logger logger = LoggerFactory.getLogger("Log"); 
+
+    @Autowired
+	@Qualifier("logService") 
+    LogService logService;
+    
+	// 统计应用性能
+    private NamedThreadLocal<Long> startTimeThreadLocal = new NamedThreadLocal<>("ThreadLocal-Action-Stop-Start-Time");
 
 	
     /** 
@@ -27,7 +43,22 @@ public class LogInterceptors implements HandlerInterceptor{
      * 可以用来释放资源 
      */   
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object method, Exception e)    throws Exception {  
-    	// logger.info("==============执行顺序: 3、afterCompletion================");      
+    	// logger.info("==============执行顺序: 3、afterCompletion================");    
+        //结束时间   统计应用的性能 
+        long endTime = System.currentTimeMillis();
+        // 得到线程绑定的局部变量（开始时间）
+        long beginTime = startTimeThreadLocal.get(); 
+        long time = endTime - beginTime;
+        // 此处认为处理时间超过500毫秒的请求为慢请求
+        logger.info("--------stop " + Tools.calcTime(time));
+ 
+        String requestUri = request.getRequestURI();  
+        String contextPath = request.getContextPath();  
+        String url = requestUri.substring(contextPath.length());  //[/student/listm]
+        String params = WebHelp.getRequestMap(request).toString();
+        
+        logService.exeStatis(url, params, time);
+
     }  
     /** 
      * 该方法在目标方法调用之后，渲染视图之前被调用； 
@@ -43,10 +74,14 @@ public class LogInterceptors implements HandlerInterceptor{
      * 该方法在目标方法调用之前被调用； 
      * 若返回TURE,则继续调用后续的拦截器和目标方法 
      * 若返回FALSE,则不会调用后续的拦截器和目标方法 
+     * 
      *  
      */  
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object method) throws Exception {  
         //logger.info("==============执行顺序: 1、preHandle================");    
+ 
+        // 设置开始时间  线程绑定变量（该数据只有当前请求的线程可见）
+        startTimeThreadLocal.set(System.currentTimeMillis());
  
         String requestUri = request.getRequestURI();  
         String contextPath = request.getContextPath();  
@@ -62,6 +97,7 @@ public class LogInterceptors implements HandlerInterceptor{
         	}catch(Exception e){ }
         }
         //日志 记录 输出       
+        logger.info("++++++++ ");
 	    logger.info("[" + url + "] [" + cla + "." + name + "]" + WebHelp.getRequestMap(request).toString());
  
         return true;  

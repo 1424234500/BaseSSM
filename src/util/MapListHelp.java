@@ -84,6 +84,9 @@ public class MapListHelp {
 		li = turnListMap(li);
 		Tools.out(li);
 		
+		 
+		
+		
 	}
 	
 	
@@ -94,12 +97,27 @@ public class MapListHelp {
 	public static MakeMap getMap(){
 		return new MakeMap();
 	}
-	 
+	public static MakeMap map(){
+		return new MakeMap();
+	}
+	public static MakeLinkMap getLinkMap(){
+		return new MakeLinkMap();
+	} 
 	/**
 	 * 获取ArrayList
 	 * @return
 	 */
-	public static List<Map> getList(){
+	public static MakeList getList(){
+		return new MakeList();
+	}
+	public static MakeList array(){
+		return new MakeList();
+	}
+	/**
+	 * 获取ArrayList
+	 * @return
+	 */
+	public static List<Map> getListMap(){
 		return new ArrayList<Map>();
 	}
 	/**
@@ -173,7 +191,7 @@ public class MapListHelp {
 	 * @param list2
 	 * @return
 	 */
-	public static List<Map> listAdd( List<Map> list1, List<Map> list2) {
+	public static List  listAdd( List  list1, List  list2) {
 		if(list1 != null ){
 			if(list2 != null){
 				for( int i = 0;i < list2.size(); i++){
@@ -187,6 +205,9 @@ public class MapListHelp {
 		return list1;
 	}
  
+	public static List<List<String>> toArrayAndTurn(List<Map> list){
+		return turnListString(toArray(list));
+	}
 	
 	public static List<List<String>> toArray(List<Map> list){
 		List<List<String>> res = new ArrayList<List<String>>();
@@ -247,7 +268,7 @@ public class MapListHelp {
 			int cc = 0;
 			for (Object key : set) {
 				Tools.out(key);
-				Map col = getMap().build();
+				Map col = getLinkMap().build();
 				for(int i = 0; i < rowSize; i++){
 					col.put("col"+i, getList(list, i, ""+key));
 				}

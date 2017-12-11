@@ -1,7 +1,6 @@
 package com.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,13 +16,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.mode.LoginUser;
 import com.mode.Page;
 import com.service.StudentService;
 
-import util.MakeMap;
 import util.MapListHelp;
-import util.MyJson;
 import util.Tools;
 import util.WebHelp;
 
@@ -42,53 +38,60 @@ public class AngularControll extends BaseControll{
 	
 
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping("/statis.do") 
 	public void statis(HttpServletRequest request, HttpServletResponse response) throws IOException { 
+		  
+//		        legend: {      data: ['线条1', '线条2']   },
+//		        xAxis: {  data: xNames  }, 
+//		        series: [   
+//		                 { name: lineName,    type: 'line',   data: lineValues,  },
+//		                 { name: lineName,    type: 'line',   data: lineValues,  }, 
 		
-		   
-		List<Map> list = baseService.find("SELECT t.xs x,count(*) y FROM ( SELECT s.*,to_char(s.time, 'MM') xs FROM student s) t group by t.xs");
-		list = MapListHelp.turnListMap(list);
-		log(list);
+		//x1, x2, x3, x4
+		List listXs = MapListHelp.toArrayAndTurn(baseService.find("select lpad(level, 2, '0') lev from dual connect by level <=12")).get(0);
+		List listLineNames = MapListHelp.array().build();
+		int yearFrom = Tools.parseInt(request.getParameter("TIMEFROM"));
+		int yearTo = Tools.parseInt(request.getParameter("TIMETO")); 
+		List listSeries = MapListHelp.array().build(); 
+		for(int i = yearFrom; i <= yearTo; i++){
+			//yi-1, yi-2, yi-3, yi-4
+			listSeries = MapListHelp.listAdd(listSeries,  MapListHelp.toArrayAndTurn(baseService.find(
+					"SELECT nvl(t1.y, '0') y FROM ( SELECT t.xs x,count(*) y FROM ( SELECT s.*,to_char(s.time, 'MM') xs FROM student s where to_char(s.time, 'yyyy')=?  ) t group by t.xs ) t1,(select lpad(level, 2, '0') lev from dual connect by level <=12   ) t2 where t1.x(+) = t2.lev order by t2.lev  "
+					, i)) ); 
+			listLineNames.add(i + ""); 
+		}
 		//共x轴 多线数据 
 		//x1, x2, x3, x4
 		//y1, y2, y3, y4 
-		//y5, y6, y7, y8
-		
-		//线条名字集合
-		List<String> lineNames = new ArrayList<String>();
-		lineNames.add("线条1");
-		lineNames.add("线条2");
-		
-
-		Map xNames = new HashMap();
-		line1.put("name", "线条2");
-		line1.put("type", "bar");
-		line1.put("data", list.get(1)); 
-		//每个线条的数据 和 配置
-		List<Map> lines = new ArrayList<Map>();
-		Map line1 = new HashMap();
-		line1.put("name", "线条1");
-		line1.put("type", "line");
-		line1.put("data", list.get(1)); 
-		Map line2 = new HashMap();
-		line1.put("name", "线条2");
-		line1.put("type", "bar");
-		line1.put("data", list.get(1)); 
-		lines.add(line1);
-		lines.add(line2);
-		
-		Map option = MapListHelp.getMap()
-				.put("title", "每月注册人数统计")  
-				.put("lineNames", lineNames) 
-				.put("lines", lines) 
+		//y5, y6, y7, y8   
+		String type = "bar";	
+		Map title = MapListHelp.map().put("text", "注册统计").build();		//标题
+		Map legend = MapListHelp.map().put("data", listLineNames).build();   //线条名字集合
+		Map xAxis = MapListHelp.map().put("data", listXs).build();  	//x坐标集合 多线条共x轴
+		List series = MapListHelp.array().build();
+		for(int i = 0; i < listSeries.size(); i++){
+			//type = i / 2 == 0 ? "bar" : "line"; 
+			series.add(MapListHelp.map()
+					.put("name", listLineNames.get(i))	//该线条的名字
+					.put("type", type)					//该线条的显示方式line bar pie
+					.put("data", listSeries.get(i))			//该线条的y值集合
+					.build()
+				);
+		} 
+		Map option = MapListHelp.map()
+				.put("title", title)  
+				.put("legend", legend) 
+				.put("xAxis", xAxis) 
+				.put("yAxis", new Object()) //必须要有yAxis属性 否则报错YAxis 0 not found
+				.put("series", series) 
 				.build();
-		
-		log(list);
+		 
 
 		Map res = MapListHelp.getMap()
 				.put("res", "true")
 				.put("option", option) 
-				.put("info",WebHelp.getRequestMap(request)).build(); 
+				.put("info", WebHelp.getRequestMap(request)).build(); 
 		log(res);
 		writeJson(response, res);
 	}	

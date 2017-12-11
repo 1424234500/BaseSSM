@@ -24,17 +24,23 @@ public class Tools {
 	//		return   "len." + str.length() + " size." + Tools.calcSize(str.length()) + str.substring(0, toolong);
 		return str;
 	}
-	//通过字符串长度，计算大概的 流量大小 MB KB B char=B
-	public static String calcSize(int length) {
-		return calcSize((long)length);
-	}
-	public static String calcSize(long length) {
-		long m = length/(1024*1024);
-		long k = length%(1024*1024)/1024;
-		long b = length%(1024*1024)%1024;
-		return m>0?  m+"."+k/100+"MB" : k>0? k+"."+b/100+"KB" : b+"B";
+	//通过字符串长度，计算大概的 流量大小 MB KB B char=B 
+	public static String calcSize(int filesize) {
+		return calcSize(filesize);
 	}
 
+	public static String calcSize(long filesize) {
+		return filesize > 1024 * 1024 * 1024 ? (float) (10 * filesize / (1024 * 1024 * 1024))
+				/ 10 + "G" : (filesize > 1024 * 1024 ? filesize / 1024 / 1024 + "M"
+						: filesize / 1024 + "K");
+	}
+
+	public static String calcTime(long filesize) {
+		return filesize > 60 * 1000 ? (float) (10 * filesize / (60 * 1000))
+				/ 10 + "M " + filesize % (60 * 1000) / 1000 + "S "
+				: (filesize > 1000 ? filesize / 1000 + "S " + filesize
+						% 1000 + "Ms " : filesize + "Ms ");
+	}
 	/**
 	 * 把对象集合组装为字符串
 	 * @param objs
@@ -238,25 +244,7 @@ public class Tools {
 		return (int) (Math.random() * 10);
 	}
 
- 	public static String getStringBySize(int filesize) {
-		return filesize > 1024 * 1024 * 1024 ? (float) (10 * filesize / (1024 * 1024 * 1024))
-				/ 10 + "G"
-				: (filesize > 1024 * 1024 ? filesize / 1024 / 1024 + "M"
-						: filesize / 1024 + "K");
-	}
-
-	public static String getStringBySize(long filesize) {
-		return filesize > 1024 * 1024 * 1024 ? (float) (10 * filesize / (1024 * 1024 * 1024))
-				/ 10 + "G" : (filesize > 1024 * 1024 ? filesize / 1024 / 1024 + "M"
-						: filesize / 1024 + "K");
-	}
-
-	public static String getStringByTime(long filesize) {
-		return filesize > 60 * 1000 ? (float) (10 * filesize / (60 * 1000))
-				/ 10 + "M " + filesize % (60 * 1000) / 1000 + "S "
-				: (filesize > 1000 ? filesize / 1000 + "S " + filesize
-						% 1000 + "Ms " : filesize + "Ms ");
-	}
+ 	
 
 	public static String getDate() {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");

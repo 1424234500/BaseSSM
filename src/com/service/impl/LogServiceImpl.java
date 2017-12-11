@@ -41,6 +41,16 @@ public class LogServiceImpl implements LogService,Serializable {
 				,userid,url,ip,host,port,params
 				);
 	}
- 
+	@Override
+	public void exeStatis(String url, String params, long costtime) {
+		int res = 0;
+		params = Tools.cutString(params, 180);
+		res = baseDao.executeSql("insert into log_time"
+				+ "(id, url, params, time, costtime) "
+				+ "values"
+				+ "(seq_log_time.nextval, ?, ?, sysdate, ?) "
+				,url, params, costtime
+				);
+	}
 
 }
