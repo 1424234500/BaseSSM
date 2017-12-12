@@ -71,5 +71,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/struts2-core-2.1.6.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tomcat-jni-9.0.0.M9.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xbean-spring-4.5.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jedis-2.9.0.jar"/>
 	<classpathentry kind="output" path="WebContent/WEB-INF/classes"/>
 </classpath>
