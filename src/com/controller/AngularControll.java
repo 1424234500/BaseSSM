@@ -82,8 +82,9 @@ public class AngularControll extends BaseControll{
 		Map option = MapListHelp.map()
 				.put("title", title)  
 				.put("legend", legend) 
+				.put("tooltip", new Object()) //若无则不能预览
 				.put("xAxis", xAxis) 
-				.put("yAxis", new Object()) //必须要有yAxis属性 否则报错YAxis 0 not found
+				.put("yAxis", new Object()) //若无则报错YAxis 0 not found
 				.put("series", series) 
 				.build();
 		 

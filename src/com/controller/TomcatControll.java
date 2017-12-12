@@ -35,14 +35,20 @@ public class TomcatControll extends BaseControll{
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping("/statis.do") 
 	public void statis(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		int yearFrom = Tools.parseInt(request.getParameter("TIMEFROM"));
-		int yearTo = Tools.parseInt(request.getParameter("TIMETO")); 
+		String url = request.getParameter("URL"); 
 		
-	 	List list = MapListHelp.toArrayAndTurn(baseService.find("SELECT url,cast(avg(costtime/1000) as number(8,3)) time FROM log_time where 1=1 group by url order by avg(costtime) ")) ;
-		List listLineNames = MapListHelp.array().add("action").build();
+	 	List list = null;
+	 	if(Tools.isNull(url)){
+	 		list = MapListHelp.toArrayAndTurn(baseService.find("SELECT lev, nvl(time, '0')  FROM  ( SELECT hour, cast(avg(costtime)/1000 as number(8, 3)) time FROM (  SELECT  to_char(lt.time, 'hh24') hour, lt.costtime FROM log_time lt where 1=1 and lt.url=? )group by hour order by avg(costtime) ) t1,  ( select lpad(level, 2, '0') lev from dual connect by level <= 24    ) t2 where t1.hour(+) = t2.lev  ORDER BY lev", url)) ;
+	 	}else{
+	 		list = MapListHelp.toArrayAndTurn(baseService.find("SELECT url,cast(avg(costtime/1000) as number(8,3)) time FROM log_time where 1=1 group by url order by avg(costtime) ")) ;
+	 	} 
+		 
+	 	 
+	 	List listLineNames = MapListHelp.array().add("action").build();
 		List listSeries =  MapListHelp.array().add((List) list.get(1)).build();
 		String type = "bar";	 
-		Map title = MapListHelp.map().put("text", "操作耗时").build();		//标题
+		Map title = MapListHelp.map().put("text", "操作耗时统计").build();		//标题
 		Map legend = MapListHelp.map().put("data", listLineNames).build();   //线条名字集合
 		Map xAxis = MapListHelp.map().put("data", (List) list.get(0)).build();  	//x坐标集合 多线条共x轴
 		List series = MapListHelp.array().build();
@@ -52,14 +58,15 @@ public class TomcatControll extends BaseControll{
 					.put("name", listLineNames.get(i))	//该线条的名字
 					.put("type", type)					//该线条的显示方式line bar pie
 					.put("data", listSeries.get(i))			//该线条的y值集合
-					.build()
+					.build() 
 				);
 		} 
 		Map option = MapListHelp.map()
 				.put("title", title)  
-				.put("legend", legend) 
+				.put("legend", legend)		
+				.put("tooltip", new Object())  
 				.put("xAxis", xAxis) 
-				.put("yAxis", new Object()) //必须要有yAxis属性 否则报错YAxis 0 not found
+				.put("yAxis", new Object()) //若无报错YAxis 0 not found
 				.put("series", series) 
 				.build();
 		 
@@ -72,7 +79,52 @@ public class TomcatControll extends BaseControll{
 		writeJson(response, res);
 	}	
 	
-	 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping("/statiscount.do") 
+	public void statiscount(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String url = request.getParameter("URL"); 
+		
+	 	List list = null;
+	 	if(Tools.isNull(url)){
+	 		list = MapListHelp.toArrayAndTurn(baseService.find("  SELECT lev, nvl(count, '0') xadfasdfa FROM  ( SELECT hour, count(url) count FROM (  SELECT  to_char(lt.time, 'hh24') hour, lt.url FROM log_time lt where 1=1 and lt.url=?  ) group by hour ) t1,  ( select lpad(level, 2, '0') lev from dual connect by level <= 24    ) t2 where t1.hour(+) = t2.lev  ORDER BY lev", url)) ;
+	 	}else{
+	 		list = MapListHelp.toArrayAndTurn(baseService.find("SELECT url,count(url)  FROM log_time where 1=1 group by url order by count(url) ")) ;
+	 	}  
+		
+	 	 
+	 	List listLineNames = MapListHelp.array().add("action").build();
+		List listSeries =  MapListHelp.array().add((List) list.get(1)).build();
+		String type = "bar";	 
+		Map title = MapListHelp.map().put("text", "操作频率统计").build();		//标题
+		Map legend = MapListHelp.map().put("data", listLineNames).build();   //线条名字集合
+		Map xAxis = MapListHelp.map().put("data", (List) list.get(0)).build();  	//x坐标集合 多线条共x轴
+		List series = MapListHelp.array().build();
+		for(int i = 0; i < listSeries.size(); i++){
+			//type = i / 2 == 0 ? "bar" : "line"; 
+			series.add(MapListHelp.map()
+					.put("name", listLineNames.get(i))	//该线条的名字
+					.put("type", type)					//该线条的显示方式line bar pie
+					.put("data", listSeries.get(i))			//该线条的y值集合
+					.build() 
+				);
+		} 
+		Map option = MapListHelp.map()
+				.put("title", title)  
+				.put("legend", legend)		
+				.put("tooltip", new Object()) 
+				.put("xAxis", xAxis) 
+				.put("yAxis", new Object()) //若无报错YAxis 0 not found
+				.put("series", series) 
+				.build();
+		 
+
+		Map res = MapListHelp.getMap()
+				.put("res", "true")
+				.put("option", option) 
+				.put("info", WebHelp.getRequestMap(request)).build(); 
+		log(res);
+		writeJson(response, res);
+	}	
 	
 	
 	static public Logger logger = LoggerFactory.getLogger(TomcatControll.class); 
