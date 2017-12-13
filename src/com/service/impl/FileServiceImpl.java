@@ -33,7 +33,6 @@ public class FileServiceImpl implements FileService,Serializable {
 
 	@Override
 	public void scan() {
-		logger.info("扫描同步上传文件");
 		//删除表中中不存在文件的记录
 		final List<Map> list = baseDao.find("select * from fileinfo");
 		for(int i = 0; i < list.size(); i++){

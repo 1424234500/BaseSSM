@@ -126,10 +126,11 @@ public class Tools {
 		String[] objs = new  String[objects.length] ;
 		for(int i = 0; i < objects.length; i++){
 			if(objects[i] != null)
-				objs[i] = objects[i].toString();
+				objs[i] = objects[i] + "";
 			else
 				objs[i] = "null!";
 		}
+		
 		return objs;
 	}
 	 

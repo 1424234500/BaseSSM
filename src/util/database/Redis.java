@@ -100,16 +100,22 @@ public class Redis extends Jedis {
 	/**
 	 * 存储所有 添加到redis的map的key值集合
 	 */
-	Set<String> keys;
+	private Set<String> keys;
 	public Set<String> getKeys(){
 		return keys;
+	}
+	public void clearKeys(){
+		for(String key : keys){
+			this.del(key);
+		}
+		keys.clear();
 	}
 	/**
 	 * 添加一个指定key/id的map
 	 */
-	public String setMap(String key, Map<String, Object> map){
+	public String setMap(String key, Map<String, String> map){
 		keys.add(key);
-		return this.hmset(key, MapListHelp.map2ssmap(map)); 
+		return this.hmset(key, (map)); 
 	}
 	/**
 	 * 移除一个指定key 
@@ -121,8 +127,8 @@ public class Redis extends Jedis {
 	/**
 	 * 获取指定key的map 
 	 */
-	public Map<String, Object> getMap(String key){
-		return MapListHelp.map2map(this.hgetAll(key));
+	public Map<String, String> getMap(String key){
+		return  this.hgetAll(key);
 	}
 	/**
 	* 添加一个list，指定list中的map的keyName/id列值为键值
@@ -142,9 +148,11 @@ public class Redis extends Jedis {
 		}
 		return res;
 	}
+	
 	public boolean existsMap(String key){
-		return this.exists(key);
+		return super.exists(key);
 	}
+	
 	
 	/**
 	 * 显示redis所有数据
@@ -203,16 +211,12 @@ public class Redis extends Jedis {
 		keys = new HashSet<String>();
 	}
 	
-	private static Redis redis;
-	public static Redis getInstance() {
-		if (redis == null) {
-			synchronized (Redis.class) {
-				if (redis == null) {
-					redis = new Redis();
-				}
-			}
+	private static Redis instance; 
+	public static  Redis getInstance() {
+		if (instance == null) {
+			instance = new Redis();
 		}
-		return redis;
+		return instance;
 	}
 	 
 }

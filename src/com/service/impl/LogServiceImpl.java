@@ -1,37 +1,31 @@
 package com.service.impl;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.dao.hibernate.BaseDao;
-import com.mode.Page;
 import com.service.LogService;
-import com.service.StudentService;
 
-import util.MakeMap;
 import util.MapListHelp;
-import util.SQLHelp;
 import util.Tools;
-import util.database.Redis;
-@SuppressWarnings("unchecked")
+import util.database.Redis; 
 
 @Service("logService")
+@Scope("prototype") 
 public class LogServiceImpl implements LogService,Serializable {
 	private static final long serialVersionUID = 8304941820771045214L;
- 
+	static public Logger logger = LoggerFactory.getLogger(LogServiceImpl.class); 
+
     @Autowired
     protected BaseDao baseDao;
+    
     //info:
     //id,userid,time,url,ip,mac,port,about
 	@Override
@@ -52,20 +46,19 @@ public class LogServiceImpl implements LogService,Serializable {
 	public void exeStatis(String url, String params, long costtime) {
 		int res = 0;
 		
-		Redis redis = Redis.getInstance();
 		if(redis.existsMap(url)){ 
-			Map map = redis.getMap(url);
-			map.put("costtime", Tools.parseLong(MapListHelp.getMap(map, "costtime")) + costtime);
-			map.put("count", Tools.parseInt(MapListHelp.getMap(map, "count")) + 1);
+			Map<String, String> map = redis.getMap(url);
+			map.put("costtime", (Tools.parseLong(map.get("costtime")) + costtime) + "");
+			map.put("count", (Tools.parseInt(map.get("count")) + 1) + "");
 			redis.setMap(url, map); 
 		}else{
-			redis.setMap(url, MapListHelp.map()
+			redis.setMap(url, MapListHelp.map2ssmap(MapListHelp.map()
 					.put("url", url)
 					.put("costtime", costtime)
 					.put("count", 1)
-					.build());
+					.build()));
 		}
-		  
+		redis.showHash();
 //		res = baseDao.executeSql("insert into log_time"
 //				+ "(id, url, count, time, costtime) "
 //				+ "values"
@@ -75,26 +68,26 @@ public class LogServiceImpl implements LogService,Serializable {
 	}
 
 
+	static Redis redis = Redis.getInstance();
 
 	@Override
 	public void saveStatis() { 
-		Redis redis = Redis.getInstance();
+		redis.showHash();
+
 		Set<String> keys = redis.getKeys();
-		for(String key : keys){
-			if(redis.existsMap(key)){ 
-				Map map = redis.getMap(key); 
-				int res = baseDao.executeSql("insert into log_time"
-						+ "(id, url, count, time, costtime) "
-						+ "values"
-						+ "(seq_log_time.nextval, ?, ?, sysdate, ?) "
-						,map.get("url"), map.get("count"), map.get("costtime") 
-					);
-				if(res > 0){
-					redis.removeMap(key);
+		if(keys != null && !keys.isEmpty())
+			for(String key : keys){
+				if(redis.existsMap(key)){ 
+					Map map = redis.getMap(key); 
+					int res = baseDao.executeSql("insert into log_time"
+							+ "(id, url, count, time, costtime) "
+							+ "values"
+							+ "(seq_log_time.nextval, ?, ?, sysdate, ?) "
+							,map.get("url"), map.get("count"), map.get("costtime") 
+						); 
 				}
 			}
-		}
-	
+		redis.clearKeys();
 		
 	}
 

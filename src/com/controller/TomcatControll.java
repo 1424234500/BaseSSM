@@ -46,11 +46,11 @@ public class TomcatControll extends BaseControll{
 		 
 	 	 
 	 	List listLineNames = MapListHelp.array().add("action").build();
-		List listSeries =  MapListHelp.array().add((List) list.get(1)).build();
+		List listSeries =  MapListHelp.array().add(list.size() > 0 ? (List) list.get(1) : new Object()).build();
 		String type = "bar";	 
 		Map title = MapListHelp.map().put("text", "操作耗时统计").build();		//标题
 		Map legend = MapListHelp.map().put("data", listLineNames).build();   //线条名字集合
-		Map xAxis = MapListHelp.map().put("data", (List) list.get(0)).build();  	//x坐标集合 多线条共x轴
+		Map xAxis = MapListHelp.map().put("data", list.size() > 0 ? (List) list.get(0) : new Object()).build();  	//x坐标集合 多线条共x轴
 		List series = MapListHelp.array().build();
 		for(int i = 0; i < listSeries.size(); i++){
 			//type = i / 2 == 0 ? "bar" : "line"; 
@@ -93,11 +93,11 @@ public class TomcatControll extends BaseControll{
 		
 	 	 
 	 	List listLineNames = MapListHelp.array().add("action").build();
-		List listSeries =  MapListHelp.array().add((List) list.get(1)).build();
+		List listSeries =  MapListHelp.array().add(list.size() > 0 ? (List) list.get(1) : new Object()).build();
 		String type = "bar";	 
 		Map title = MapListHelp.map().put("text", "操作频率统计").build();		//标题
 		Map legend = MapListHelp.map().put("data", listLineNames).build();   //线条名字集合
-		Map xAxis = MapListHelp.map().put("data", (List) list.get(0)).build();  	//x坐标集合 多线条共x轴
+		Map xAxis = MapListHelp.map().put("data", list.size() > 0 ? (List) list.get(0) : new Object()).build();  	//x坐标集合 多线条共x轴
 		List series = MapListHelp.array().build();
 		for(int i = 0; i < listSeries.size(); i++){
 			//type = i / 2 == 0 ? "bar" : "line"; 

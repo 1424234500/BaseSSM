@@ -188,7 +188,7 @@ public class MapListHelp {
 	public static Map<String, String> map2ssmap(Map<String, Object> map){
 		Map<String, String> res = new HashMap<String, String>();
 		for(String key : map.keySet()){
-			res.put(key, map.get(key).toString());
+			res.put(key, map.get(key) + "");
 		}
 		return res;
 	}
@@ -247,7 +247,7 @@ public class MapListHelp {
 	public static List<List<String>> toArray(List<Map> list){
 		List<List<String>> res = new ArrayList<List<String>>();
 		
-		if(list != null){
+		if(list != null && list.size() > 0){
 			Set set = list.get(0).keySet(); 
 			int colSize = set.size();	
 			int rowSize = list.size(); 
@@ -267,7 +267,7 @@ public class MapListHelp {
 		
 		List<List<String>> res = new ArrayList<List<String>>();
 		
-		if(list != null){ 
+		if(list != null && list.size() > 0){ 
 			int colSize = list.get(0).size();	
 			int rowSize = list.size();
 			for(int i = 0; i < colSize; i++){ 
@@ -296,7 +296,7 @@ public class MapListHelp {
 		
 		List<Map> res = new ArrayList<Map>();
 		
-		if(list != null){
+		if(list != null && list.size() > 0){
 			Set set = list.get(0).keySet(); 
 			int colSize = set.size();	
 			int rowSize = list.size();
