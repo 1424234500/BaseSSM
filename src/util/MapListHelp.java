@@ -7,6 +7,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -167,8 +168,42 @@ public class MapListHelp {
 			return map.get(name).toString();
 		}
 	}
- 
-	
+	/**
+	 * 转换Map<String, Object> -> Map<String, Double>
+	 * @param map
+	 * @return
+	 */
+	public static Map<String, Double> map2sdmap(Map<String, Object> map){
+		Map<String, Double> res = new HashMap<String, Double>();
+		for(String key : map.keySet()){
+			res.put(key, (Double)(map.get(key)) );
+		}
+		return res;
+	}
+	/**
+	 * 转换Map<String, Object> -> Map<String, String>
+	 * @param map
+	 * @return
+	 */
+	public static Map<String, String> map2ssmap(Map<String, Object> map){
+		Map<String, String> res = new HashMap<String, String>();
+		for(String key : map.keySet()){
+			res.put(key, map.get(key).toString());
+		}
+		return res;
+	}
+	/**
+	 * 转换Map<String, Object> <- Map<String, String>
+	 * @param map
+	 * @return
+	 */
+	public static Map<String, Object> map2map(Map<String, String> map){
+		Map<String, Object> res = new HashMap<String, Object>();
+		for(String key : map.keySet()){
+			res.put(key, map.get(key));
+		}
+		return res;
+	}
 
 	/**
 	 * List<Map> 转换为 可读的String
@@ -204,7 +239,7 @@ public class MapListHelp {
 		
 		return list1;
 	}
- 
+	
 	public static List<List<String>> toArrayAndTurn(List<Map> list){
 		return turnListString(toArray(list));
 	}
@@ -279,6 +314,46 @@ public class MapListHelp {
 		}
 		
 		return res;
+	}
+	
+	public static List<Map> testList(){
+		List<Map> res = new ArrayList<Map>();
+		
+		for(int i = 0; i < 4; i++){
+			res.add(
+					map()
+					.put("id", i)
+					.put("name", "name-" + i)
+					.build()
+					);
+		}
+		
+		return res;
+	}
+	
+	public static Map<String, String> testSSMap(){
+		Map<String, String> res = new LinkedHashMap<>();
+		for(int i = 0; i < 3; i++){ 
+			res.put("id", "id" + i); 
+			res.put("name", "name" + i); 
+		}
+		return res;		
+	}
+	public static Map<String, Object> testSOMap(){
+		Map<String, Object> res = new LinkedHashMap<>();
+		for(int i = 0; i < 3; i++){ 
+			res.put("id", "id" + i); 
+			res.put("name", "name" + i); 
+		}
+		return res;		
+	}
+	public static Map<String, Double> testSDMap(){
+		Map<String, Double> res = new LinkedHashMap<>();
+		for(int i = 0; i < 3; i++){ 
+			res.put("id",  i * 1.0); 
+			res.put("name", i * 2.0); 
+		}
+		return res;		
 	}
 	 
 }

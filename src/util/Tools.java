@@ -278,7 +278,34 @@ public class Tools {
 		}
 		return -1;
 	}
-	
+	public static long parseLong(String num) {
+		long res = 0;
+		 if(num == null){
+			 res = 0;
+		 }else{
+			 try{
+				 res = Long.parseLong(num);
+			 }catch(Exception e){
+				 Tools.out("解析:" + num + "数字失败");
+				 res = 0;
+			 }
+		 }
+		return res;
+	}
+	public static double parseDouble(String num) {
+		double res = 0;
+		 if(num == null){
+			 res = 0;
+		 }else{
+			 try{
+				 res = Double.parseDouble(num);
+			 }catch(Exception e){
+				 Tools.out("解析:" + num + "数字失败");
+				 res = 0;
+			 }
+		 }
+		return res;
+	}
 	public static int parseInt(String num) {
 		int res = 0;
 		 if(num == null){

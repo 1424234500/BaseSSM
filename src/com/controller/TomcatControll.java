@@ -39,9 +39,9 @@ public class TomcatControll extends BaseControll{
 		
 	 	List list = null;
 	 	if(Tools.isNull(url)){
-	 		list = MapListHelp.toArrayAndTurn(baseService.find("SELECT lev, nvl(time, '0')  FROM  ( SELECT hour, cast(avg(costtime)/1000 as number(8, 3)) time FROM (  SELECT  to_char(lt.time, 'hh24') hour, lt.costtime FROM log_time lt where 1=1 and lt.url=? )group by hour order by avg(costtime) ) t1,  ( select lpad(level, 2, '0') lev from dual connect by level <= 24    ) t2 where t1.hour(+) = t2.lev  ORDER BY lev", url)) ;
+	 		list = MapListHelp.toArrayAndTurn(baseService.find(" SELECT lev, nvl(time, '0') time FROM  ( SELECT hour, cast(sum(costtime)/sum(count)/1000 as number(8, 3)) time FROM (  SELECT  to_char(lt.time, 'hh24') hour, lt.count, lt.costtime FROM log_time lt where 1=1 and lt.url=?  )group by hour   ) t1,  ( select lpad(level, 2, '0') lev from dual connect by level <= 24    ) t2 where t1.hour(+) = t2.lev  ORDER BY lev ", url)) ;
 	 	}else{
-	 		list = MapListHelp.toArrayAndTurn(baseService.find("SELECT url,cast(avg(costtime/1000) as number(8,3)) time FROM log_time where 1=1 group by url order by avg(costtime) ")) ;
+	 		list = MapListHelp.toArrayAndTurn(baseService.find("SELECT url,cast(sum(costtime)/sum(count)/1000 as number(8, 3)) time FROM log_time where 1=1 group by url order by sum(costtime)/sum(count) ")) ;
 	 	} 
 		 
 	 	 
@@ -86,9 +86,9 @@ public class TomcatControll extends BaseControll{
 		
 	 	List list = null;
 	 	if(Tools.isNull(url)){
-	 		list = MapListHelp.toArrayAndTurn(baseService.find("  SELECT lev, nvl(count, '0') xadfasdfa FROM  ( SELECT hour, count(url) count FROM (  SELECT  to_char(lt.time, 'hh24') hour, lt.url FROM log_time lt where 1=1 and lt.url=?  ) group by hour ) t1,  ( select lpad(level, 2, '0') lev from dual connect by level <= 24    ) t2 where t1.hour(+) = t2.lev  ORDER BY lev", url)) ;
+	 		list = MapListHelp.toArrayAndTurn(baseService.find("  SELECT lev, nvl(count, '0') sumcount FROM  ( SELECT hour, sum(count) count FROM (  SELECT  to_char(lt.time, 'hh24') hour, lt.url, lt.count FROM log_time lt where 1=1 and lt.url=?  )group by hour ) t1,  ( select lpad(level, 2, '0') lev from dual connect by level <= 24    ) t2 where t1.hour(+) = t2.lev  ORDER BY lev ", url)) ;
 	 	}else{
-	 		list = MapListHelp.toArrayAndTurn(baseService.find("SELECT url,count(url)  FROM log_time where 1=1 group by url order by count(url) ")) ;
+	 		list = MapListHelp.toArrayAndTurn(baseService.find(" SELECT url,sum(count) sumcount FROM log_time where 1=1 group by url order by sum(count) ")) ;
 	 	}  
 		
 	 	 

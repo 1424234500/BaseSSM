@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.service.FileService;
+import com.service.LogService;
 
 import util.Tools;
 import util.WebHelp;
@@ -30,12 +31,19 @@ public class TimerTask {
 	@Qualifier("fileService") 
 	FileService fileService;
 	
-	@Scheduled(cron = "0/600 * * * * ?") //每分钟
+	@Autowired
+	@Qualifier("logService") 
+	LogService logService;
+	
+	@Scheduled(cron = "0/60 * * * * ?") //每分钟
 	public void eachMinute() {
 	    logger.info("[eachMinute][每分钟监测任务]");
 	    
 	    //刷新上传文件集合的 文件数据到 内存数据库？ 文件管理系统 展示文件 介绍（图片），
 	    fileService.scan();
+	    
+	    //刷新redis到oracle
+	    logService.saveStatis();
 	    
 	}
 
