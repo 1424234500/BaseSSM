@@ -10,12 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.dao.Redis;
 import com.dao.hibernate.BaseDao;
 import com.service.LogService;
 
 import util.MapListHelp;
 import util.Tools;
-import util.database.Redis;
 
 @Service("logService")
 @Scope("prototype") 

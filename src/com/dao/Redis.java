@@ -1,12 +1,10 @@
-package util.database;
+package com.dao;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.springframework.stereotype.Repository;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -103,10 +101,10 @@ public class Redis   {
 		return res;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void close(Jedis jedis){
 		if(jedis != null){
-			this.pool.returnResource(jedis);
-			//jedis.close();
+			jedis.close();
 		}
 	}
 	

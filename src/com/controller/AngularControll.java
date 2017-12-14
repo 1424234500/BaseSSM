@@ -146,7 +146,13 @@ public class AngularControll extends BaseControll{
 		log(list, page);
 		writeJson(response, list, page);
 	}
-	
+	@RequestMapping("/listrecent.do")
+	public void listRecent(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String count = request.getParameter("count"); 
+		 
+		List<Map> list = baseService.find("select * from (select s.*, rownum num from student s) where num < ? order by time desc ", count);
+		writeJson(response, list);
+	} 
 	
 	static public Logger logger = LoggerFactory.getLogger(AngularControll.class); 
 
