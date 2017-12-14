@@ -2,89 +2,21 @@ package util.database;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.stereotype.Repository;
+
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
+import util.Fun;
 import util.MapListHelp;
 import util.Tools;
+ 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class Redis extends Jedis {
-	public static void main(String[] args) { 
-		
-		Redis redis = Redis.getInstance();  
-
-//		redis.set("key", "test set/get key value");
-//		
-//		String listKey = "list_test";
-//		redis.listPush(listKey, 1, 2, 3);
-//		List<String> list = redis.listGet(listKey, 0, 10000); 
-//		Tools.out(listKey,list);
-//		
-//		String mapKey = "map_test";
-//		redis.mapSet(mapKey, MapListHelp.testSOMap());
-//		Map map = redis.mapGet(mapKey);
-//		Tools.out(mapKey, map);
-//		
-//		String setKey = "set_test";
-//		redis.setAdd(setKey, MapListHelp.testSSMap());
-//		Set set = redis.setGet(setKey );
-//		Tools.out(setKey, set);
-//		
-//		String zsetKey = "zset_test";
-//		redis.zsetAdd(zsetKey, MapListHelp.testSDMap());
-//		Set zset = redis.zsetGet(zsetKey, 0, 2);
-//		Tools.out(zsetKey, zset);
-//		 
-//		redis.setList("id", MapListHelp.testList());
-//		Tools.out(redis.getList());
-		
-		redis.show();
-		redis.showHash();
-	} 
-
-	//hash string-string键值对//////////////////////////////////////////
-	
-	public String mapSet(String key, Map<String, Object> map){ 
-		return this.hmset(key, MapListHelp.map2ssmap(map)); 
-	}
-	public Map<String, Object> mapGet(String key){
-		return MapListHelp.map2map(this.hgetAll(key));
-	}
-	
-	//list<string> 类似于stack栈 可重复//////////////////////////////////////////
-	
-	public long listPush(String key, Object... values){
-		this.lpush(key, Tools.objects2strings(values));
-		return this.llen(key);
-	}
-	public long listPop(String key){
-		this.lpop(key); 
-		return this.llen(key);
-	}
-	public List<String> listGet(String key, long start, long end){
-		return this.lrange(key, start, end); 
-	}
-	
-	//zset 且每个member绑定一个double score->序  不可重复//////////////////////////////////////////
-
-	public long zsetAdd(String key, Map<String, Double> map){
-		return this.zadd(key,  (map)); 
-	} 
-	public Set<String> zsetGet(String key, long start, long end) {
-		return this.zrange(key, start, end);
-	}
-	//set 不可重复//////////////////////////////////////////
-
-	public long setAdd(String key, Object...members){
-		return this.sadd(key, Tools.objects2strings(members)); 
-	}
-	public Set<String> setGet(String key) {
-		return this.smembers(key) ;
-	}
-	
+public class Redis   { 
 	/**
 	 * Redis数据结构 ---- 数据库结构[ id:01, name: walker, age: 18 ]
 	 * set get key - value
@@ -104,31 +36,43 @@ public class Redis extends Jedis {
 	public Set<String> getKeys(){
 		return keys;
 	}
-	public void clearKeys(){
+	public void clearKeys(){ 
+		Jedis jedis = this.getJedis();
 		for(String key : keys){
-			this.del(key);
+			jedis.del(key);
 		}
-		keys.clear();
+		close(jedis);
+		this.keys.clear();
 	}
 	/**
 	 * 添加一个指定key/id的map
 	 */
 	public String setMap(String key, Map<String, String> map){
+		Jedis jedis = this.getJedis();
+		String res = jedis.hmset(key, (map));
+		close(jedis);
 		keys.add(key);
-		return this.hmset(key, (map)); 
+		return res;
+		
 	}
 	/**
 	 * 移除一个指定key 
 	 */
 	public long removeMap(String key){
+		Jedis jedis = this.getJedis();
 		keys.remove(key);
-		return this.del(key);
+		long res = jedis.del(key);
+		close(jedis);
+		return res;
 	}
 	/**
 	 * 获取指定key的map 
 	 */
 	public Map<String, String> getMap(String key){
-		return  this.hgetAll(key);
+		Jedis jedis = this.getJedis();
+		Map<String, String> res = jedis.hgetAll(key);
+		close(jedis);
+		return res;
 	}
 	/**
 	* 添加一个list，指定list中的map的keyName/id列值为键值
@@ -142,75 +86,101 @@ public class Redis extends Jedis {
 	 * 获取所有存储的map  list<map>
 	 */
 	public List getList(){
+		Jedis jedis = this.getJedis();
+
 		List res = new ArrayList();
 		for(String key : keys){
-			res.add(this.hgetAll(key));
+			res.add(jedis.hgetAll(key));
 		}
+		close(jedis);
 		return res;
 	}
 	
 	public boolean existsMap(String key){
-		return super.exists(key);
+		Jedis jedis = this.getJedis();
+		boolean res = jedis.exists(key);
+		close(jedis);
+		return res;
 	}
 	
+	public void close(Jedis jedis){
+		if(jedis != null){
+			this.pool.returnResource(jedis);
+			//jedis.close();
+		}
+	}
 	
 	/**
 	 * 显示redis所有数据
 	 */
 	public void show(){
-		Tools.out("-----------Redis show-----------------");
-
+		out("-----------Redis show-----------------");
+		Jedis jedis = this.getJedis();
 		//获取所有key 各种类型
-		Set<String> set = this.keys("*");
+		Set<String> set = jedis.keys("*");
 		for(String key : set){
-			String type = this.type(key);
-			Tools.out("key:" + key + ", type:" + type + "  ");
+			String type = jedis.type(key);
+			out("key:" + key + ", type:" + type + "  ");
 			if(type.equals("string")){
-				Tools.out(this.get(key));
+				out(jedis.get(key));
 			}else if(type.equals("list")){
-				Tools.out(this.lrange(key, 0, -1));
+				out(jedis.lrange(key, 0, -1));
 			}else if(type.equals("hash")){
-				Tools.out(this.hgetAll(key));
+				out(jedis.hgetAll(key));
 			}else if(type.equals("set")){
-				Tools.out(this.smembers(key));
+				out(jedis.smembers(key));
 			}else if(type.equals("zset")){
-				Tools.out(this.zrange(key, 0, -1)); 
+				out(jedis.zrange(key, 0, -1)); 
 			}
-			Tools.out("#############");
-			
+			out("#############");
 		}
-		 
-		Tools.out("--------------------------------------");
+		close(jedis);
+		out("--------------------------------------");
 	}
 	
 	public void showHash(){
-		Tools.out("-----------Redis show-----------------");
-
+		out("-----------Redis showHash-----------------");
+		Jedis jedis = this.getJedis();
 		//获取所有key 各种类型
-		Set<String> set = this.keys("*");
+		Set<String> set = jedis.keys("*"); 
 		for(String key : set){
-			String type = this.type(key);
-			//Tools.out("key:" + key + ", type:" + type + "  "); 
+			String type = jedis.type(key);
+			//out("key:" + key + ", type:" + type + "  "); 
 			if(type.equals("hash")){	
-				Tools.out(key, this.hgetAll(key));
+				out(key, jedis.hgetAll(key));
 			}  
-			
-		}
-		 
-		Tools.out("--------------------------------------");
-	}
-	
-	
-	
+		} 
 
-	// 连接本地的 Redis 服务 
-	//private Jedis jedis;
-	private Redis(){
-		super("localhost");
-		//jedis = new Jedis("localhost");
-		keys = new HashSet<String>();
+		out("--------------------------------------");
 	}
 	
+	
+	public void doJedis(Fun<Jedis> fun){
+		Jedis jedis = this.getJedis();
+		if(fun != null){
+			fun.make(jedis);
+		}
+		close(jedis);
+	}
+	public Jedis getJedis(){
+		return pool.getResource();
+	}
+ 
+	public Redis(){ 
+		JedisPoolConfig config = new JedisPoolConfig();
+        // 设置最大连接数
+		config.setMaxTotal(100);
+		config.setMaxWaitMillis(1000); 
+        // 设置空闲连接
+        config.setMaxIdle(10); 
+        
+		pool = new JedisPool(config, "localhost");
+ 
+		keys = new HashSet<String>();
+		out("redis init -----------------------" + cc++);
+	}
+	static int cc = 0;
+	private JedisPool pool;
 	private static Redis instance; 
 	public static  Redis getInstance() {
 		if (instance == null) {
@@ -218,5 +188,8 @@ public class Redis extends Jedis {
 		}
 		return instance;
 	}
-	 
-}
+
+	public void out(Object...objs){
+		Tools.out(objs);
+	}
+}	

@@ -22,7 +22,7 @@ public class TimerTask {
 	
 	@Scheduled(cron = "0 59 23 ? * *") //每天
 	public void EveryDay() {
-	    logger.info("[EveryDay 23:59][每天结束任务]");
+	    logger.info("[eachDay 23:59][每天任务]");
 	}
 
 	
@@ -35,9 +35,15 @@ public class TimerTask {
 	@Qualifier("logService") 
 	LogService logService;
 	
+	@Scheduled(cron = "0 0/60 * * * ?") //每小时
+	public void EveryHour() {
+	    logger.info("[eachHour 59m][每小时任务]");
+	}
+
+	
 	@Scheduled(cron = "0/60 * * * * ?") //每分钟
 	public void eachMinute() {
-	    logger.info("[eachMinute][每分钟监测任务]");
+	    logger.info("[eachMinute 0/60 * * * * ?][每分钟任务]");
 	    
 		logger.info("扫描同步上传文件"); 
 	    //刷新上传文件集合的 文件数据到 内存数据库？ 文件管理系统 展示文件 介绍（图片），

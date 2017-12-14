@@ -15,7 +15,7 @@ import com.service.LogService;
 
 import util.MapListHelp;
 import util.Tools;
-import util.database.Redis; 
+import util.database.Redis;
 
 @Service("logService")
 @Scope("prototype") 
@@ -24,7 +24,10 @@ public class LogServiceImpl implements LogService,Serializable {
 	static public Logger logger = LoggerFactory.getLogger(LogServiceImpl.class); 
 
     @Autowired
-    protected BaseDao baseDao;
+    protected BaseDao baseDao;    
+ 
+    
+ 
     
     //info:
     //id,userid,time,url,ip,mac,port,about
@@ -44,8 +47,8 @@ public class LogServiceImpl implements LogService,Serializable {
 	
 	@Override
 	public void exeStatis(String url, String params, long costtime) {
-		int res = 0;
-		
+		Redis redis = Redis.getInstance();
+
 		if(redis.existsMap(url)){ 
 			Map<String, String> map = redis.getMap(url);
 			map.put("costtime", (Tools.parseLong(map.get("costtime")) + costtime) + "");
@@ -57,23 +60,15 @@ public class LogServiceImpl implements LogService,Serializable {
 					.put("costtime", costtime)
 					.put("count", 1)
 					.build()));
-		}
-		redis.showHash();
-//		res = baseDao.executeSql("insert into log_time"
-//				+ "(id, url, count, time, costtime) "
-//				+ "values"
-//				+ "(seq_log_time.nextval, ?, '1', sysdate, ?) "
-//				,url, costtime
-//				);
+		} 
+		//redis.show();
 	}
 
 
-	static Redis redis = Redis.getInstance();
-
 	@Override
 	public void saveStatis() { 
-		redis.showHash();
-
+		Redis redis = Redis.getInstance();
+		//redis.show();
 		Set<String> keys = redis.getKeys();
 		if(keys != null && !keys.isEmpty())
 			for(String key : keys){
@@ -88,7 +83,7 @@ public class LogServiceImpl implements LogService,Serializable {
 				}
 			}
 		redis.clearKeys();
-		
+		//redis.show();
 	}
 
 }
