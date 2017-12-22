@@ -23,6 +23,10 @@ public interface FileService  {
 	 * 文件上传或者下载记录 fileId up/down 耗时detaTime
 	 */
 	public int fileUpDown(String fileId, String type, String detaTime);
+	/**
+	 * 初始化文件目录
+	 */
+	public void initDirs();
 	
 	
 	

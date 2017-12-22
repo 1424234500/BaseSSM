@@ -30,6 +30,7 @@ import com.mode.Page;
 import com.service.FileService;
 
 import util.FileUtil;
+import util.MapListHelp;
 import util.MyJson;
 import util.SQLHelp;
 import util.Tools;
@@ -44,16 +45,16 @@ public class FileControll extends BaseControll{
 	@Qualifier("fileService") 
 	protected FileService fileService;
 	
+	static int cacheSize = 512;
 	
 	@RequestMapping("/list.do")
-	public String list(HttpServletRequest request, Map<String,Object> map) {
+	public void list(HttpServletRequest request, HttpServletResponse response) throws IOException { 
 		String id = request.getParameter("id");
 		String name = request.getParameter("name");
 		String timefrom = request.getParameter("timefrom");
 		String timeto = request.getParameter("timeto");
  
 		Page page = Page.getPage(request);
-		map.putAll(WebHelp.getRequestMap(request));
 
 		List<String> params = new ArrayList<String>();
 		String sql = "select id,(select count(*) from file_down_up where fileid=f.id and type='down') count,name,upuserid,type,file_size(filesize) filesize,to_char(uptime," + SQLHelp.getTimeFormatL() + ") uptime, to_char(changetime," + SQLHelp.getTimeFormatL() + ") changetime,about from fileinfo f where 1=1 ";
@@ -73,41 +74,41 @@ public class FileControll extends BaseControll{
 			sql += " and uptime <= " + SQLHelp.to_dateL();
 			params.add( timeto);
 		} 
-	    List<Map> res = baseService.findPage(page, sql, params.toArray() ); 
-	    map.put("res", res); 
-		map.put("PAGE", page);
-		return "file/list";
+	    List<Map> res = baseService.findPage(page, sql, params.toArray() );
+	    log(res, page);
+	    writeJson(response, res, page);
 	} 
 	
 
 	
 	@RequestMapping("/delete.do")
-	public void delete(HttpServletRequest request,  PrintWriter pw){
+	public void delete(HttpServletRequest request, HttpServletResponse response) throws IOException { 
 		String id = request.getParameter("id");  
 
-		int res = 0;
+		int count = 0;
 		String path = baseService.getString("select path from fileinfo where id=?", id);
-		res = baseService.executeSql("delete from fileinfo where id=?", id);
+		count = baseService.executeSql("delete from fileinfo where id=?", id);
 		FileUtil.delete(path);
-		
-	    pw.write("" + res);
+	    Map res = MapListHelp.getMap().put("res", count).build();
+		writeJson(response, res);
 	}
 	
 	@RequestMapping("/update.do")
-	public void update(HttpServletRequest request,  PrintWriter pw){
-		String id = request.getParameter("id"); 
-		String about = request.getParameter("about"); 
+	public void update(HttpServletRequest request, HttpServletResponse response) throws IOException { 
+		String id = request.getParameter("ID"); 
+		String about = request.getParameter("ABOUT"); 
 	    
-		int res = baseService.executeSql("update fileinfo set about=? where id=? ", about, id);
-		pw.write("" + res);
+		int count = baseService.executeSql("update fileinfo set about=? where id=? ", about, id);
+		Map res = MapListHelp.getMap().put("res", count).build();
+		writeJson(response, res);	
 	}
 
 	@RequestMapping("/get.do")
-	public void get(HttpServletRequest request,  PrintWriter pw){
+	public void get(HttpServletRequest request, HttpServletResponse response) throws IOException { 
 		String id = request.getParameter("id");  
 
 		Map map = baseService.findOne("select * from fileinfo where id=? ", id );
-	    pw.write("" + MyJson.makeJson("obj", map));
+		writeJson(response, map);	
 	}
 	 /**  
      * 文件下载功能  
@@ -132,7 +133,7 @@ public class FileControll extends BaseControll{
         InputStream in = null;
         try {    
             // 一次读多个字节  
-            byte[] tempbytes = new byte[512];  
+            byte[] tempbytes = new byte[cacheSize];  
             long size = 0;
             int len = 0;   
             in = new FileInputStream(new File(path));   
@@ -182,7 +183,7 @@ public class FileControll extends BaseControll{
         InputStream in = null;
         try {    
             // 一次读多个字节  
-            byte[] tempbytes = new byte[512];  
+            byte[] tempbytes = new byte[cacheSize];  
             long size = 0;
             int len = 0;  
             in = file.getInputStream();  

@@ -100,7 +100,8 @@ public abstract class BaseControll {
 	 * 登录用户获取LoginUser
 	 */
 	public LoginUser getUser(HttpServletRequest request){
-		return (LoginUser) request.getSession().getAttribute("SY_LOGINUSER");
+		LoginUser lu = (LoginUser) request.getSession().getAttribute("SY_LOGINUSER");
+		return lu == null? LoginUser.getUser().setId("").setUsername("none") : lu;
 	}
 	/**
 	 * 实现日志打印工具

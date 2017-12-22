@@ -31,6 +31,12 @@ public class FileServiceImpl implements FileService,Serializable {
     //info:
 //文件管理 fileinfo: id,name,upuserid,filesize,type,path,uptime,createtime,changetime,about
 
+    
+	@Override
+	public void initDirs() {
+		FileUtil.mkdir( UtilTools.getDir());
+	}
+    
 	@Override
 	public void scan() {
 		//删除表中中不存在文件的记录

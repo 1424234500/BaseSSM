@@ -120,7 +120,8 @@ public class BaseDaoImpl implements BaseDao  {
 	public String getString(String sql, Object... params) {
 		SQLQuery q = getCurrentSession().createSQLQuery(sql);
 		setParams(q, params);
-		return   q.uniqueResult().toString();
+		Object res = q.uniqueResult();
+		return  res == null ? "" : res.toString();
 	}
 	
 
