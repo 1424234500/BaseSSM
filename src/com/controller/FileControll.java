@@ -49,10 +49,10 @@ public class FileControll extends BaseControll{
 	
 	@RequestMapping("/list.do")
 	public void list(HttpServletRequest request, HttpServletResponse response) throws IOException { 
-		String id = request.getParameter("id");
-		String name = request.getParameter("name");
-		String timefrom = request.getParameter("timefrom");
-		String timeto = request.getParameter("timeto");
+		String id = request.getParameter("ID");
+		String name = request.getParameter("NAME");
+		String timefrom = request.getParameter("TIMEFROM");
+		String timeto = request.getParameter("TIMETO");
  
 		Page page = Page.getPage(request);
 

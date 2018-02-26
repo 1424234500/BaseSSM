@@ -49,7 +49,7 @@ public class LogServiceImpl implements LogService,Serializable {
 	public void exeStatis(String url, String params, long costtime) {
 		Redis redis = Redis.getInstance();
 
-		if(redis.existsMap(url)){ 
+		if(redis != null && redis.existsMap(url)){ 
 			Map<String, String> map = redis.getMap(url);
 			map.put("costtime", (Tools.parseLong(map.get("costtime")) + costtime) + "");
 			map.put("count", (Tools.parseInt(map.get("count")) + 1) + "");
