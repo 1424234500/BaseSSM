@@ -34,7 +34,7 @@ public class FileServiceImpl implements FileService,Serializable {
     
 	@Override
 	public void initDirs() {
-		FileUtil.mkdir( UtilTools.getDir());
+		FileUtil.mkdir( UtilTools.getUploadDir());
 	}
     
 	@Override
@@ -48,7 +48,7 @@ public class FileServiceImpl implements FileService,Serializable {
 			}
 		} 
 		//添加其它文件到表中
-		List<File> lf = FileUtil.showDirAsync(UtilTools.getDir(), new Fun<File>() {
+		List<File> lf = FileUtil.showDirAsync(UtilTools.getScanDirs(), new Fun<File>() {
 			@Override
 			public void make(File obj) {
 				if(obj.isFile()){

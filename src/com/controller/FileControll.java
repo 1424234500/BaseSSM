@@ -116,7 +116,7 @@ public class FileControll extends BaseControll{
      * @param response  
      * @throws Exception  
      */  
-    @RequestMapping("/down.do")  
+    @RequestMapping("/download.do")  
     public void down(HttpServletRequest request,HttpServletResponse response) throws Exception{  
     	long starttime = System.currentTimeMillis();
 
@@ -175,7 +175,7 @@ public class FileControll extends BaseControll{
          
         String name = file.getOriginalFilename();
         String newName = Tools.getTimeSequence() + "-" + name;
-        String dir = UtilTools.getDir();
+        String dir = UtilTools.getUploadDir();
         String path = dir + newName;
         FileOutputStream out = new FileOutputStream(path);
         int res = 0; 
