@@ -12,7 +12,6 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.mode.LoginUser;
 import com.service.LogService;
 
 import util.Tools;

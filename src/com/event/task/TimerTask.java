@@ -10,9 +10,6 @@ import org.springframework.stereotype.Component;
 import com.service.FileService;
 import com.service.LogService;
 
-import util.Tools;
-import util.WebHelp;
-
 /**
  * 定时器任务
  */
