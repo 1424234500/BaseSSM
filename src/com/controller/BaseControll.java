@@ -2,6 +2,8 @@ package com.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -14,12 +16,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.dao.hibernate.BaseDao;
 import com.mode.LoginUser;
-import com.mode.Page;
 import com.service.BaseService;
 
 import util.MapListHelp;
-import util.MyJson;
+import util.Tools;
+import util.database.SqlHelp;
+import util.FileUtil;
+import util.JsonUtil;
 
 
 /**
@@ -37,7 +42,7 @@ public abstract class BaseControll {
 	@Autowired
 	@Qualifier("baseService") 
 	protected BaseService baseService;
-	
+ 
 	/**
 	 * 普通跳转模式，request获取参数，map写入参数<request.setAttrbute()>，或者request.getSession().setAttrbute()写入session
 	 */
@@ -71,17 +76,20 @@ public abstract class BaseControll {
 	
 
 	public void writeJson(HttpServletResponse response, String key, List list) throws IOException{
-		writeJson(response, MyJson.makeJson(key, list) ); 
+		writeJson(response, JsonUtil.makeJson(key, list) ); 
 	}
 	public void writeJson(HttpServletResponse response, String key, Map map) throws IOException{
-		writeJson(response, MyJson.makeJson(key, map) ); 
+		writeJson(response, JsonUtil.makeJson(key, map) ); 
 	}
 
+	public void writeJson(HttpServletResponse response, Object[] list) throws IOException{
+		writeJson(response, JsonUtil.makeJson("res", list) ); 
+	}
 	public void writeJson(HttpServletResponse response, List list) throws IOException{
-		writeJson(response, MyJson.makeJson(list) ); 
+		writeJson(response, JsonUtil.makeJson(list) ); 
 	}
 	public void writeJson(HttpServletResponse response, Map map) throws IOException{
-		writeJson(response, MyJson.makeJson(map) ); 
+		writeJson(response, JsonUtil.makeJson(map) ); 
 	}
 	public void writeJson(HttpServletResponse response, List<Map> list, Page page) throws IOException{
 		Map res = MapListHelp.getMap().put("res", list).put("PAGE", page).build();
@@ -96,6 +104,7 @@ public abstract class BaseControll {
 	public Page getPage(HttpServletRequest request){
 		return new Page(request);
 	}
+	
 	/**
 	 * 登录用户获取LoginUser
 	 */
@@ -103,11 +112,148 @@ public abstract class BaseControll {
 		LoginUser lu = (LoginUser) request.getSession().getAttribute("SY_LOGINUSER");
 		return lu == null? LoginUser.getUser().setId("").setUsername("none") : lu;
 	}
+	
+	
+	public Logger loggerChild = null; 
+	public String tableName = "";
+	public String getTableName(){
+		return tableName;
+	}
+	public void setTableName(String tableName){
+		this.tableName = tableName;
+	}
+	public void setLogger(Class<?> clazz){
+		this.loggerChild = LoggerFactory.getLogger(clazz);
+	}
+	/**
+	 * 设置默认操作表 实现默认增删查改 单主键
+	 * 设置子类日志系统
+	 * @param clazz
+	 * @param tableName
+	 */ 
+	public BaseControll(Class<?> clazz, String tableName){
+		this.setTableName(tableName);
+		this.setLogger(clazz);
+	}
 	/**
 	 * 实现日志打印工具
 	 * @param str
 	 */
-	public abstract void log(Object...objs);
+	public void log(Object...objs){
+		if(loggerChild != null)
+			loggerChild.info(Tools.getString(objs));
+		else
+			logger.info(Tools.getString(objs));
+	}
 	
+	
+	/**
+	 * 获取list add update 时的 需要的 传过来的所有 该表的字段param map 表字段列名 大写为准
+	 * @param request
+	 * @return
+	 * @throws Exception 
+	 */
+	@SuppressWarnings("rawtypes")
+	public Map getTableParam(HttpServletRequest request) throws Exception{
+		if(!Tools.isNull(this.tableName))
+			throw new Exception("没有配置表");
+		List<String> res = baseService.getColumns(this.tableName); 
+		return WebHelp.getParam(request, res);
+	}
+	public String getValue(HttpServletRequest request, String key) throws Exception{
+		return WebHelp.getKey(request, key);
+	}
+	/**
+	 * 获取表键名
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	public String getTableKeyName(HttpServletRequest request) throws Exception{
+		if(!Tools.isNull(this.tableName))
+			throw new Exception("没有配置表");
+		List<String> res = baseService.getColumns(this.tableName); 
+		if(res.size() <= 0)
+			throw new Exception("该表 " + this.tableName + " 没有列 ");
+		return res.get(0);
+	}
+	@SuppressWarnings("rawtypes")
+	@RequestMapping("/list.do")
+	public void list(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map<String, Object> map = this.getTableParam(request);
+		Page page = Page.getPage(request);
+
+		List<String> params = new ArrayList<String>();
+		
+		String sql = "select * from " + this.tableName + " where 1=1 ";
+		
+		for(String key : map.keySet()){
+			String value = MapListHelp.getMap(map, key);
+			if (Tools.isNull(value)) {
+				sql += " and " + key + " like ? ";
+				params.add("%" + value + "%");
+			}
+		}
+		 
+		List<Map> res = baseService.findPage(page, sql, params.toArray());
+		log(res.size(), res, page);
+		writeJson(response, res, page);
+	}
+
+	@SuppressWarnings("rawtypes")
+	@RequestMapping("/delete.do")
+	public void delete(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		String key = this.getTableKeyName(request);
+		String value = this.getValue(request, key);
+
+		int count = baseService.executeSql("delete from " + this.tableName + " where " + key + "=?", value);
+		Map res = MapListHelp.getMap().put("res", count).build();
+		writeJson(response, res);
+	}
+
+	@SuppressWarnings("rawtypes")
+	@RequestMapping("/add.do")
+	public void add(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map map = this.getTableParam(request);
+
+		int count = baseService.executeSql("insert into " + this.tableName + "(" + SqlHelp.makeMapKeys(map) + ") values(" + SqlHelp.makeMapPosis(map) + ")  ", map.values().toArray());
+		Map res = MapListHelp.getMap().put("res", count).build();
+		writeJson(response, res);
+	}
+
+	@SuppressWarnings("rawtypes")
+	@RequestMapping("/update.do")
+	public void update(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map map = this.getTableParam(request);
+		String key = this.getTableKeyName(request);
+		String value = this.getValue(request, key); 
+		String cols = SqlHelp.makeMapKeyPosis(map);
+		List<String> params = new ArrayList<String>(map.values());
+		params.add(value);
+		int count = baseService.executeSql("update " + this.tableName + " set " + cols + " where " + key + "=?", params.toArray());
+		Map res = MapListHelp.getMap().put("res", count).build();
+		writeJson(response, res);
+	}
+
+	@SuppressWarnings("rawtypes")
+	@RequestMapping("/get.do")
+	public void get(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String key = this.getTableKeyName(request);
+		String value = this.getValue(request, key);
+		
+		Map map = baseService.findOne("select * from " + this.tableName + " where " + key + "=?", value);
+		writeJson(response, map);
+	}
+	
+	
+	@RequestMapping("/cols.do")
+	public void cols(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		if(!Tools.isNull(this.tableName))return;
+		List<String> res = baseService.getColumns(this.tableName);
+		writeJson(response, res.toArray());
+	} 
+	
+
 	
 }

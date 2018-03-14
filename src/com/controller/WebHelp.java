@@ -1,0 +1,62 @@
+package com.controller;
+
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import util.Tools;
+
+/**
+ * servlet request response printwriter 帮助工具
+ * @author Walker
+ *
+ */
+public class WebHelp {
+
+	/**
+	 * 获取request所有参数Map
+	 * @param request
+	 * @return Map
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map getRequestMap(HttpServletRequest request){
+		Map res = new HashMap();
+		Enumeration enu=request.getParameterNames();  
+		while(enu.hasMoreElements()){  
+			String name=(String)enu.nextElement();  
+			String value = WebHelp.getKey(request, name);
+			res.put(name, value);
+		}
+		return res;
+	}
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map getParam(HttpServletRequest request, List<String> colNames){
+		Map res = new HashMap();
+		for(String key : colNames){
+			res.put(key, WebHelp.getKey(request, key));
+		}
+		return res;
+	}
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map getKeyParam(HttpServletRequest request, String keyName){
+		Map res = new HashMap();
+		res.put(keyName, request.getParameter(keyName));
+		return res;
+	}
+	@SuppressWarnings({ })
+	public static String getKey(HttpServletRequest request, String name){
+		String value = request.getParameter(name);
+		if(!Tools.isNull(value)){	//兼容全小写
+			value = request.getParameter(name.toLowerCase());
+		}
+		if(!Tools.isNull(value)){	//兼容全大写
+			value = request.getParameter(name.toUpperCase());
+		}
+		return value;
+	}
+	
+	
+}

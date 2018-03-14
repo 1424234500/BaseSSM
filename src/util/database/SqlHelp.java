@@ -1,14 +1,15 @@
-package util;
+package util.database;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import util.Tools;
 
 /**
  * 数据库sql语句帮助
  * @author Walker
  * 2017年9月18日17:33:25
  */
-public class SQLHelp{ 
+public class SqlHelp{ 
 	 
 	
 	/**
@@ -91,8 +92,59 @@ public class SQLHelp{
 	}
 	
 	
-	
-	
+	/**
+	 * ?, ?, ?
+	 */
+	public static String makeMapPosis(Map map){
+		return makePosition("?", map.size());
+	}
+	/**
+	 * id, value, name
+	 */
+	public static String makeMapKeys(Map map){
+		String res = "";
+		for(Object key : map.keySet()){
+			res = res + key + ", ";
+		}
+		res = res.substring(0, res.length() - 2);
+		return res;
+	}
+	/**
+	 * id=?, value=?, name=?
+	 */
+	public static String makeMapKeyPosis(Map map){
+		String res = "";
+		for(Object key : map.keySet()){
+			res = res + key + "=?, ";
+		}
+		res = res.substring(0, res.length() - 2);
+		return res;
+	}
+	/**
+	 * id1, value2, name3
+	 */
+	public static String makeMapValues(Map map){
+		String res = "";
+		for(Object key : map.keySet()){
+			res = res + (map.get(key)).toString() + ", ";
+		}
+		res = res.substring(0, res.length() - 2);
+		return res;
+	}
+	public static int getMapSize(Map map){
+		return map.size();
+	}
+	/**
+	 * 设置n个问号 ？ 占位符
+	 */
+	public static String makePosition(String posi, int num){
+		String res = "";
+		for(int i = 0; i < num - 1; i++){
+			res = res + posi + ", ";
+		}
+		res = res + posi;
+		return res;
+	}
 	/**
 	 * sql占位符替换拼接参数 生成sql  仅作参考sql语句使用 易被sql注入
 	 */
@@ -116,7 +168,7 @@ public class SQLHelp{
 			int t = -1;
 			for (int i = 0; i < params.length; i++) {
 				t = sql.indexOf("?"); 
-				sql = sql.substring(0, t) + "'" + params[i] + "'" + sql.substring(t+1);
+				sql = sql.substring(0, t) + (params[i]==null?"null":"'" + params[i] + "'") + sql.substring(t+1);
 			}
 		}
 		return sql;

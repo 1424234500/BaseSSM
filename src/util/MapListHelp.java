@@ -33,48 +33,55 @@ public class MapListHelp {
 		
 		ArrayList<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		
-		Map map = getMap().put("key1", "value1").put(null, "value null").build();
+		Map map = getMap().put("key1", "value1").put(null, "value null").put("value null", null).build();
 		Map map2 = getMap().put("key2", "value2").build();
+		  
+		Map map22 = getMap().put("key2", "value2").build();
 		Map map3 = map;
+		Tools.out("map.keySet 键集合",map.keySet());
+		Tools.out("map.entrySet 键值集合",map.entrySet());
+		//for (Map.Entry<String, Object> entry : map.entrySet()) 
 		
 		list.add(map); 
 		list.add(map2); 
-		Tools.out(list);
+		Tools.out("hash map键值可null 无序",list);
 		Tools.out("map==map", map==map, "map.equals(map)", map.equals(map),
 				"map==map2", map==map2, "map.equals(map2)", map.equals(map2),
-				"map==map3", map==map3, "map.equals(map3)", map.equals(map3)
+				"map==map3", map==map3, "map.equals(map3)", map.equals(map3),
+				"map2==map22", map2==map22, "map2.equals(map22) equals有效值判断=", map2.equals(map22)
 				);
 		list.add(map); 
 		list.add(map3); 
 		Tools.out(list);
-		
+
 		HashSet<Map> set = new HashSet<Map>();
 		set.add(map);
 		set.add(map2);
-		Tools.out(set);
+		Tools.out("set 不同map", set);
 		set.add(map);
 		set.add(map3);
-		Tools.out(set);
+		set.add(map22);
+		Tools.out("set 相同引用map equals判断不重复", set);
 		 
 		HashMap<String, Object> hmap = new HashMap<>();
 		hmap.put(null, "valueNull");
 		hmap.put("keynull", null);
 		hmap.put("key1", "value1");
 		
-		Tools.out(hmap); 
+		Tools.out("hash", hmap); 
  
 
 		Hashtable<String, Object> htable = new Hashtable<>();
-	//	htable.put(null, "valueNull");
-	//	htable.put("keynull", null);
+//		htable.put(null, "valueNull");
+//		htable.put("keynull", null);
 		htable.put("key1", "value1");
 		
-		Tools.out(htable); 
+		Tools.out("table 键值", htable); 
 		
 		Tools.out("-----------"); 
 		
 		List<Map> li = new ArrayList<Map>();
-		for(int i = 0; i < 10; i++){
+		for(int i = 0; i < 2; i++){
 			Map mm = getMap()
 					.put("id", "id-" + i)
 					.put("name", "name-" + i)
@@ -89,6 +96,11 @@ public class MapListHelp {
 		
 		
 	}
+	
+	public static int getMapSize(Map map){
+		return map.keySet().size();
+	}
+	
 	
 	
 	/**
@@ -302,7 +314,7 @@ public class MapListHelp {
 			int rowSize = list.size();
 			int cc = 0;
 			for (Object key : set) {
-				Tools.out(key);
+//				Tools.out(key);
 				Map col = getLinkMap().build();
 				for(int i = 0; i < rowSize; i++){
 					col.put("col"+i, getList(list, i, ""+key));

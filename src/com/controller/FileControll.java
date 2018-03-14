@@ -26,20 +26,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.mode.Page;
 import com.service.FileService;
 
 import util.FileUtil;
 import util.MapListHelp;
-import util.MyJson;
-import util.SQLHelp;
+import util.JsonUtil;
 import util.Tools;
-import util.WebHelp; 
+import util.database.SqlHelp; 
 
 
 @Controller
 @RequestMapping("/file")
 public class FileControll extends BaseControll{
+	public FileControll() {
+		super(FileControll.class, "");
+		// TODO Auto-generated constructor stub
+	}
+
+
 	static public Logger logger = LoggerFactory.getLogger(FileControll.class); 
 	@Autowired
 	@Qualifier("fileService") 
@@ -57,7 +61,7 @@ public class FileControll extends BaseControll{
 		Page page = Page.getPage(request);
 
 		List<String> params = new ArrayList<String>();
-		String sql = "select id,(select count(*) from file_down_up where fileid=f.id and type='down') count,name,upuserid,type,file_size(filesize) filesize,to_char(uptime," + SQLHelp.getTimeFormatL() + ") uptime, to_char(changetime," + SQLHelp.getTimeFormatL() + ") changetime,about from fileinfo f where 1=1 ";
+		String sql = "select id,(select count(*) from file_down_up where fileid=f.id and type='down') count,name,upuserid,type,file_size(filesize) filesize,to_char(uptime," + SqlHelp.getTimeFormatL() + ") uptime, to_char(changetime," + SqlHelp.getTimeFormatL() + ") changetime,about from fileinfo f where 1=1 ";
 		if(Tools.isNull(id)){
 			sql += " and id like ? ";
 			params.add("%" + id + "%");
@@ -67,11 +71,11 @@ public class FileControll extends BaseControll{
 			params.add("%" + name + "%");
 		}
 		if(Tools.isNull(timefrom)){
-			sql += " and uptime >= " + SQLHelp.to_dateL();
+			sql += " and uptime >= " + SqlHelp.to_dateL();
 			params.add(timefrom);
 		}
 		if(Tools.isNull(timeto)){
-			sql += " and uptime <= " + SQLHelp.to_dateL();
+			sql += " and uptime <= " + SqlHelp.to_dateL();
 			params.add( timeto);
 		} 
 	    List<Map> res = baseService.findPage(page, sql, params.toArray() );

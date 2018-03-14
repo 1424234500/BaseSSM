@@ -13,6 +13,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.jdbc.Work;
+import org.hibernate.repackage.cglib.asm.Type;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,26 +22,31 @@ import org.springframework.stereotype.Repository;
 
 import com.dao.hibernate.BaseDao;
 
-import util.SQLHelp;
 import util.Tools;
+import util.database.SqlHelp;
 
  
 @Repository("baseDao")
 public class BaseDaoImpl implements BaseDao  {
-
+	static public Logger logger = LoggerFactory.getLogger("Hibernate"); 
+	public void out(String str){
+		logger.info(str);
+	}
+	
 	@Autowired
 	private SessionFactory sessionFactory;
 
 	/**
-	 * 获得当前事物的session
-	 * 
+	 * 获得当前事务的session
 	 * @return org.hibernate.Session
 	 */
 	public Session getCurrentSession() {
 		return sessionFactory.getCurrentSession();
 	}
 
-	 
+	/**
+	 * 获取列名集合的第一种方式
+	 */
 	public List<String> findColumns(String sql){
 		final String sqlStr=sql;
 		final List<String> list=new ArrayList<String>();
@@ -70,7 +76,7 @@ public class BaseDaoImpl implements BaseDao  {
 	}
 	@Override
 	public Map findOne(String sql, Object... params) {
-		SQLQuery q = getCurrentSession().createSQLQuery(sql);
+		SQLQuery q = getCurrentSession().createSQLQuery("select * from (" + sql + ") where rownum <= 1 ");
 		setParams(q, params);
 		List<Map> list = q.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
 		Map res = null;
@@ -81,20 +87,7 @@ public class BaseDaoImpl implements BaseDao  {
 		}
 		return res;
 	}
-	static public Logger logger = LoggerFactory.getLogger("Hibernate"); 
-	public void out(String str){
-		logger.info(str);
-	}
 	
-	public void setParams(SQLQuery q, Object...params){
-		if (params != null &&  params.length > 0) {
-			for (int i = 0; i < params.length; i++) {
-				q.setParameter(i, params[i]);
-			}
-		}
-		
-		out(SQLHelp.makeSql(q.getQueryString(), params)); 
-	}
 	@Override
 	public List<Map> findPage(String sql, int page, int rows, Object... params) {
 		SQLQuery q = getCurrentSession().createSQLQuery(sql);
@@ -124,5 +117,37 @@ public class BaseDaoImpl implements BaseDao  {
 		return  res == null ? "" : res.toString();
 	}
 	
+	
+	public List<String> getColumns(String tableName){
+		String sql = "";
+		//oracle
+		sql = "SELECT COLUMN_NAME FROM ALL_TAB_COLUMNS WHERE TABLE_NAME = upper('" + tableName + "') ORDER BY COLUMN_ID";
+		//sqlserver
+		//select name from syscolumns where id=object_id('表名');
+		//mysql
+		//select COLUMN_NAME from information_schema.columns where table_name='tablename'
+		
+		SQLQuery q = getCurrentSession().createSQLQuery(sql);
+		setParams(q);
+		List<Map> list = q.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
+		List<String> res = new ArrayList<String>();
+		
+		if(list != null){
+			for(Map map : list){
+				res.add(map.get("COLUMN_NAME").toString());
+			}
+		}
+		
+		return res;
+	}
 
+	
+	public void setParams(SQLQuery q, Object...params){
+		if (params != null &&  params.length > 0) {
+			for (int i = 0; i < params.length; i++) {
+				q.setParameter(i, params[i]);
+			}
+		}
+		out(SqlHelp.makeSql(q.getQueryString(), params)); 
+	}
 }

@@ -13,11 +13,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.mode.Page;
 import com.service.StudentService;
 
-import util.MyJson;
-import util.WebHelp;
+import util.JsonUtil;
 
 
 /**
@@ -100,7 +98,7 @@ public class StudentControll {
 
 		Map map = studentServiceHibernate.get(id );
 		
-	    pw.write("" + MyJson.makeJson("obj", map));
+	    pw.write("" + JsonUtil.makeJson("obj", map));
 	}
 	   
 	 
@@ -169,7 +167,7 @@ public class StudentControll {
 
 		Map map = studentServiceMybatis.get(id );
 		
-	    pw.write("" + MyJson.makeJson("obj", map));
+	    pw.write("" + JsonUtil.makeJson("obj", map));
 	}
 	    
 	 

@@ -12,13 +12,13 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.controller.Page;
 import com.dao.mybatis.BaseMapper;
-import com.mode.Page;
 import com.service.StudentService;
 
 import util.MapListHelp;
-import util.SQLHelp;
 import util.Tools;
+import util.database.SqlHelp;
 
 @Service("studentServiceMybatis")
 public class StudentServiceImplMybatis implements StudentService, Serializable {
@@ -37,9 +37,9 @@ public class StudentServiceImplMybatis implements StudentService, Serializable {
 	@Override
 	public List<Map> list(String id, String name, String timefrom, String timeto, Page page) {
 		if(!Tools.isNull(name)) name = "";
-		else name = SQLHelp.like(name);
+		else name = SqlHelp.like(name);
 		if(!Tools.isNull(id)) id = "";
-		else  id = SQLHelp.like(id);
+		else  id = SqlHelp.like(id);
 		
 		Map map = MapListHelp.getMap()
 				.put("name", name)
@@ -49,7 +49,7 @@ public class StudentServiceImplMybatis implements StudentService, Serializable {
 				.put("pagestart", page.getStart())
 				.put("pagestop", page.getStop())
 				.build();  
-		page.setNum(baseMapper.count(map));
+		page.setNUM(baseMapper.count(map));
 		return baseMapper.find(map);
 	}
 

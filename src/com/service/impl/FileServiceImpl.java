@@ -18,8 +18,8 @@ import com.service.FileService;
 import util.FileUtil;
 import util.Fun;
 import util.MapListHelp;
-import util.SQLHelp;
 import util.Tools;
+import util.database.SqlHelp;
 
 @Service("fileService")
 public class FileServiceImpl implements FileService,Serializable {
@@ -68,7 +68,7 @@ public class FileServiceImpl implements FileService,Serializable {
 						String about = "扫描出";
 						baseDao.executeSql("insert into fileinfo"
 								+ "(id,                   uptime, name,filesize,  type,path,changetime               ,about ) values "
-								+ "(SEQ_fileinfo.Nextval, sysdate,?    ,?      ,  ?   ,?    ,"+ SQLHelp.to_dateL() +",?   ) "
+								+ "(SEQ_fileinfo.Nextval, sysdate,?    ,?      ,  ?   ,?    ,"+ SqlHelp.to_dateL() +",?   ) "
 								                                 ,name ,filesize ,type,path,changetime               ,about    );
 						logger.info("添加文件记录：" + name);
 					}
@@ -88,7 +88,7 @@ public class FileServiceImpl implements FileService,Serializable {
 		String key = baseDao.getString("select SEQ_fileinfo.Nextval from dual");
 		int res = baseDao.executeSql("insert into fileinfo"
 				+ "(id,                   uptime, name,filesize,  type,path,changetime               ,about,upuserid ) values "
-				+ "(?, sysdate,?    ,?      ,  ?   ,?    ,"+ SQLHelp.to_dateL() +",?, ?   ) "
+				+ "(?, sysdate,?    ,?      ,  ?   ,?    ,"+ SqlHelp.to_dateL() +",?, ?   ) "
 				                                 , key, name ,filesize ,type,path,changetime               ,about, id   );
 		if(res == 1){
 			return key;

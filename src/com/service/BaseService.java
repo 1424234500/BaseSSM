@@ -3,7 +3,7 @@ package com.service;
 import java.util.List;
 import java.util.Map;
 
-import com.mode.Page;
+import com.controller.Page;
 
 /**
  * Hibernate专用
@@ -48,5 +48,7 @@ public interface BaseService {
 	 *  查询出来的结果为一个String
 	 */
 	public String getString(String sql, Object... params);
+
+	public List<String> getColumns(String tableName);
 
 }

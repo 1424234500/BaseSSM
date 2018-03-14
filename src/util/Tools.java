@@ -1,16 +1,12 @@
 package util;
 
 import java.awt.Color;
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 
@@ -41,8 +37,8 @@ public class Tools {
  
 	private static int toolong = 350; 
 	public static String tooLongCut(String str) {
-	//	if (str.length() > toolong)
-	//		return   "len." + str.length() + " size." + Tools.calcSize(str.length()) + str.substring(0, toolong);
+		if (str.length() > toolong)
+			return   "len." + str.length() + " size." + Tools.calcSize(str.length()) + str.substring(0, toolong);
 		return str;
 	}
 	//通过字符串长度，计算大概的 流量大小 MB KB B char=B 
@@ -438,12 +434,48 @@ public class Tools {
 	 
 	 
 
+/**
+ * 获取指定格式的时间 yyyy-MM-dd 
+ */
+	public static String getTime(String format) {
+		   Date d = new Date();  
+	        SimpleDateFormat sdf = new SimpleDateFormat(format);  
+	       return sdf.format(d);  
+	}
+	
 	public static String getTimeYYYYMMDD() {
 		   Date d = new Date();  
 	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");  
 	       return sdf.format(d);  
 	}
 
- 
+	
+	
+	/**
+	 * 取得当月天数
+	 * */
+	public static int getDaysNow()
+	{
+		Calendar a = Calendar.getInstance();
+		a.set(Calendar.DATE, 1);//把日期设置为当月第一天
+		a.roll(Calendar.DATE, -1);//日期回滚一天，也就是最后一天
+		int maxDate = a.get(Calendar.DATE);
+		return maxDate;
+	}
+
+	/**
+	 * 得到指定月的天数
+	 * */
+	public static int getDays(String yyyymmdd) {
+		int year = parseInt(yyyymmdd.substring(0, 4));
+		int month = parseInt(yyyymmdd.substring(5, 7));
 		
+		Calendar a = Calendar.getInstance();
+		a.set(Calendar.YEAR, year);
+		a.set(Calendar.MONTH, month - 1);
+		a.set(Calendar.DATE, 1);//把日期设置为当月第一天
+		a.roll(Calendar.DATE, -1);//日期回滚一天，也就是最后一天
+		int maxDate = a.get(Calendar.DATE);
+		return maxDate;
+	}		
 }

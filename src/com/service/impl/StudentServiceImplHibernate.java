@@ -13,13 +13,13 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.controller.Page;
 import com.dao.hibernate.BaseDao;
-import com.mode.Page;
 import com.service.StudentService;
 
 import util.MakeMap;
-import util.SQLHelp;
 import util.Tools;
+import util.database.SqlHelp;
 
 @Service("studentServiceHibernate")
 public class StudentServiceImplHibernate implements StudentService,Serializable {
@@ -48,16 +48,16 @@ public class StudentServiceImplHibernate implements StudentService,Serializable 
 			params.add("%" + name + "%");
 		}
 		if(Tools.isNull(timefrom)){
-			sql += " and time >= " + SQLHelp.to_dateL();
+			sql += " and time >= " + SqlHelp.to_dateL();
 			params.add(timefrom);
 		}
 		if(Tools.isNull(timeto)){
-			sql += " and time <= " + SQLHelp.to_dateL();
+			sql += " and time <= " + SqlHelp.to_dateL();
 			params.add( timeto);
 		} 
 		
-		page.setNum(baseDao.count(sql, params.toArray()));
-		return baseDao.findPage(sql,page.getNowPage(),page.getEachPageNum(), params.toArray());
+		page.setNUM(baseDao.count(sql, params.toArray()));
+		return baseDao.findPage(sql,page.getNOWPAGE(),page.getPAGENUM(), params.toArray());
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class StudentServiceImplHibernate implements StudentService,Serializable 
 	@Override
 	public int add(String name, String time) {
 		int res = 0;
-		res = baseDao.executeSql("insert into student values(lpad(SEQ_STUDENT.nextval,4, '0'),?," + SQLHelp.to_dateL() + ")", name, time);
+		res = baseDao.executeSql("insert into student values(lpad(SEQ_STUDENT.nextval,4, '0'),?," + SqlHelp.to_dateL() + ")", name, time);
  		return res;
 	}
 	@Override

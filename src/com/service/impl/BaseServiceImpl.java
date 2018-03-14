@@ -13,14 +13,14 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.controller.Page;
 import com.dao.hibernate.BaseDao;
-import com.mode.Page;
 import com.service.BaseService;
 import com.service.StudentService;
 
 import util.MakeMap;
-import util.SQLHelp;
 import util.Tools;
+import util.database.SqlHelp;
 
 @Service("baseService")
 public class BaseServiceImpl implements BaseService,Serializable {
@@ -52,8 +52,8 @@ public class BaseServiceImpl implements BaseService,Serializable {
 
 	@Override
 	public List<Map> findPage(Page page, String sql, Object... params) {
-		page.setNum(baseDao.count(sql, params ));
-		return baseDao.findPage(sql,page.getNowPage(),page.getEachPageNum(), params );
+		page.setNUM(baseDao.count(sql, params ));
+		return baseDao.findPage(sql,page.getNOWPAGE(),page.getSHOWNUM(), params );
 	}
 
 	@Override
@@ -69,6 +69,11 @@ public class BaseServiceImpl implements BaseService,Serializable {
 	@Override
 	public String getString(String sql, Object... params) {
 		return baseDao.getString(sql, params);
+	}
+
+	@Override
+	public List<String> getColumns(String tableName) {
+		return baseDao.getColumns(tableName);
 	}
  
 

@@ -70,7 +70,7 @@ public interface BaseDao {
 	public Long count(String sql, Object... params);
 
 	/**
-	 * 
+	 * 查询结果为单字符串
 	 * 
 	 * @param sql
 	 *            SQL语句
@@ -80,4 +80,7 @@ public interface BaseDao {
 	 */
 	public String getString(String sql, Object... params);
 
+	
+	public List<String> getColumns(String tableName);
+	
 }

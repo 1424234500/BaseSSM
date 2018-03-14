@@ -16,12 +16,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.mode.Page;
 import com.service.StudentService;
 
 import util.MapListHelp;
 import util.Tools;
-import util.WebHelp;
 
 /** 
  * 测试AngularJs的后台
@@ -31,6 +29,11 @@ import util.WebHelp;
 @Controller
 @RequestMapping("/angular")
 public class AngularControll extends BaseControll{   
+	public AngularControll() {
+		super(AngularControll.class, "");
+		// TODO Auto-generated constructor stub
+	}
+
 	@Autowired
 	@Qualifier("studentServiceHibernate") 
 	StudentService studentServiceHibernate;
@@ -55,7 +58,7 @@ public class AngularControll extends BaseControll{
 		int yearTo = Tools.parseInt(request.getParameter("TIMETO")); 
 		List listSeries = MapListHelp.array().build(); 
 		for(int i = yearFrom; i <= yearTo; i++){
-			//yi-1, yi-2, yi-3, yi-4
+			//yi-1, yi-2, yi-3, yi-4 只查询y轴序列
 			listSeries = MapListHelp.listAdd(listSeries,  MapListHelp.toArrayAndTurn(baseService.find(
 					"SELECT nvl(t1.y, '0') y FROM ( SELECT t.xs x,count(*) y FROM ( SELECT s.*,to_char(s.time, 'MM') xs FROM student s where to_char(s.time, 'yyyy')=?  ) t group by t.xs ) t1,(select lpad(level, 2, '0') lev from dual connect by level <=12   ) t2 where t1.x(+) = t2.lev order by t2.lev  "
 					, i)) ); 

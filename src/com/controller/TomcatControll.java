@@ -16,12 +16,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.mode.Page;
 import com.service.StudentService;
 
 import util.MapListHelp;
 import util.Tools;
-import util.WebHelp;
 
 /** 
  * Tomcat监控后台
@@ -32,6 +30,10 @@ import util.WebHelp;
 @RequestMapping("/tomcat")
 public class TomcatControll extends BaseControll{    
   
+	public TomcatControll( ) {
+		super(TomcatControll.class, "");
+	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping("/statis.do") 
 	public void statis(HttpServletRequest request, HttpServletResponse response) throws IOException {

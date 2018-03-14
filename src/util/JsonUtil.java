@@ -15,11 +15,11 @@ import java.util.Map;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-// msg json {"cmd":"conn","value":"connok" }
 /*
+ * msg json {"cmd":"conn","value":"connok" }
  * Json map list 工具类
  */
-public class MyJson {
+public class JsonUtil {
 
 	 
 	public static String getString(String jsonstr, String name) {
@@ -44,13 +44,44 @@ public class MyJson {
 		return res;
 	}
 
-	public static void out(String str) {
+	public static List<Map<String, Object>> getList(String jsonstr, String name){
+		try {
+			JSONObject jo = JSONObject.fromObject(jsonstr);
+			return JsonUtil.jsonArrayToListMap(jo.getJSONArray(name));
+		} catch (Exception e) {
+			out("json get list error from " + jsonstr + " exception：" + e.toString());
+		}
+		return null;
 	}
 	 
-	public static JSONArray listMapToJSONArray(List<Map<String, Object>> list){
+	public static Map<String, Object> getMap(String jsonstr){
+		try {
+			JSONObject jo = JSONObject.fromObject(jsonstr);
+			
+			Iterator<String> nameItr = jo.keys();
+			Map<String, Object> map = new HashMap<String, Object>();
+			while (nameItr.hasNext()) {
+				String name = nameItr.next();
+				map.put(name, jo.get(name));
+			}
+			return map;
+		} catch (Exception e) {
+			out("json get map error from " + jsonstr + " exception：" + e.toString());
+		}
+		return null;
+	} 
+	public static JSONArray listToJSONArray(Object[] list){
 		JSONArray ja = new JSONArray();
 		if(list == null)return ja;
-		for(Map<String, Object> map: list){
+		for(Object map: list){
+			 ja.add(map);
+		} 
+		return ja;
+	}	
+	public static JSONArray listMapToJSONArray(List<Object> list){
+		JSONArray ja = new JSONArray();
+		if(list == null)return ja;
+		for(Object map: list){
 			 ja.add(  JSONObject.fromObject(map));
 //			for (Map.Entry<String, Object> entry : map.entrySet()) {   }
 		} 
@@ -75,21 +106,44 @@ public class MyJson {
 		return list;
 	}	
 
-	public static String makeJson(List<Map<String, Object>> list){
+	
+	public static String makeJson(String key, Object[] list){
 		String res = "";
 		try { 
-			res = MyJson.listMapToJSONArray(list).toString();
+			JSONObject jo = new JSONObject();
+			jo.put(key, JsonUtil.listToJSONArray(list));
+			res = jo.toString();
 		} catch (Exception e) {
 			e.printStackTrace(); 
 		}
 
 		return res;
 	}
-	public static String makeJson(String key, List<Map<String, Object>> list){
+	public static String makeJson(Object[] list){
+		String res = "";
+		try { 
+			res = JsonUtil.listToJSONArray(list).toString();
+		} catch (Exception e) {
+			e.printStackTrace(); 
+		}
+
+		return res;
+	}
+	public static String makeJson(List<Object> list){
+		String res = "";
+		try { 
+			res = JsonUtil.listMapToJSONArray(list).toString();
+		} catch (Exception e) {
+			e.printStackTrace(); 
+		}
+
+		return res;
+	}
+	public static String makeJson(String key, List<Object> list){
 		String res = "";
 		try {
 			JSONObject jo = new JSONObject();
-			jo.put(key, MyJson.listMapToJSONArray(list));
+			jo.put(key, JsonUtil.listMapToJSONArray(list));
 			res = jo.toString();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -97,25 +151,8 @@ public class MyJson {
 
 		return res;
 	}
-	public static List<Map<String, Object>> getList(String jsonstr){
-		try {
-			JSONObject jo = JSONObject.fromObject(jsonstr);
-			return MyJson.jsonArrayToListMap(jo.getJSONArray("result"));
-		} catch (Exception e) {
-			out("json get list error from " + jsonstr + " exception：" + e.toString());
-		}
-		return null;
-	}
-	public static List<Map<String, Object>> getList(String jsonstr, String name){
-		try {
-			JSONObject jo = JSONObject.fromObject(jsonstr);
-			return MyJson.jsonArrayToListMap(jo.getJSONArray(name));
-		} catch (Exception e) {
-			out("json get list error from " + jsonstr + " exception：" + e.toString());
-		}
-		return null;
-	}
-	
+
+ 
 	
 	public static String makeJson(String key, Map<String, Object> map){
 		String res = "";
@@ -144,4 +181,11 @@ public class MyJson {
 
 		return res;
 	}
+
+
+	public static void out(String str) {
+		
+	}
+	
+
 }
