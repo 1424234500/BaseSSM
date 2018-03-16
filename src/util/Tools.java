@@ -172,6 +172,7 @@ public class Tools {
 	  
  
   /**
+   * 有效 true
    * 都不为null 且不为” “
    * @param objects
    * @return 不为null且不为"" 返回true,都为有效字符串

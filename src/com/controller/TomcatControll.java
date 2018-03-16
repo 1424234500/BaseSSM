@@ -40,7 +40,7 @@ public class TomcatControll extends BaseControll{
 		String url = request.getParameter("URL"); 
 		
 	 	List list = null;
-	 	if(Tools.isNull(url)){
+	 	if(Tools.isNull(url) && !url.toLowerCase().equals("undefined") && !url.toLowerCase().equals("null")){
 	 		list = MapListHelp.toArrayAndTurn(baseService.find(" SELECT lev, nvl(time, '0') time FROM  ( SELECT hour, cast(sum(costtime)/sum(count)/1000 as number(8, 3)) time FROM (  SELECT  to_char(lt.time, 'hh24') hour, lt.count, lt.costtime FROM log_time lt where 1=1 and lt.url=?  )group by hour   ) t1,  ( select lpad(level, 2, '0') lev from dual connect by level <= 24    ) t2 where t1.hour(+) = t2.lev  ORDER BY lev ", url)) ;
 	 	}else{
 	 		list = MapListHelp.toArrayAndTurn(baseService.find("SELECT url,cast(sum(costtime)/sum(count)/1000 as number(8, 3)) time FROM log_time where 1=1 group by url order by url ")) ;
@@ -87,7 +87,7 @@ public class TomcatControll extends BaseControll{
 		String url = request.getParameter("URL"); 
 		
 	 	List list = null;
-	 	if(Tools.isNull(url)){
+	 	if(Tools.isNull(url) && !url.toLowerCase().equals("undefined") && !url.toLowerCase().equals("null")){
 	 		list = MapListHelp.toArrayAndTurn(baseService.find("  SELECT lev, nvl(count, '0') sumcount FROM  ( SELECT hour, sum(count) count FROM (  SELECT  to_char(lt.time, 'hh24') hour, lt.url, lt.count FROM log_time lt where 1=1 and lt.url=?  )group by hour ) t1,  ( select lpad(level, 2, '0') lev from dual connect by level <= 24    ) t2 where t1.hour(+) = t2.lev  ORDER BY lev ", url)) ;
 	 	}else{
 	 		list = MapListHelp.toArrayAndTurn(baseService.find(" SELECT url,sum(count) sumcount FROM log_time where 1=1 group by url order by url ")) ;

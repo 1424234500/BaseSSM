@@ -3,7 +3,6 @@ package com.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -16,15 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.dao.hibernate.BaseDao;
 import com.mode.LoginUser;
 import com.service.BaseService;
 
+import util.JsonUtil;
 import util.MapListHelp;
 import util.Tools;
 import util.database.SqlHelp;
-import util.FileUtil;
-import util.JsonUtil;
 
 
 /**
@@ -160,7 +157,7 @@ public abstract class BaseControll {
 		List<String> res = baseService.getColumns(this.tableName); 
 		return WebHelp.getParam(request, res);
 	}
-	public String getValue(HttpServletRequest request, String key) throws Exception{
+	public String getValue(HttpServletRequest request, String key) {
 		return WebHelp.getKey(request, key);
 	}
 	/**
@@ -180,6 +177,8 @@ public abstract class BaseControll {
 	@SuppressWarnings("rawtypes")
 	@RequestMapping("/list.do")
 	public void list(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		this.beforeDo(request, response);
+		
 		Map<String, Object> map = this.getTableParam(request);
 		Page page = Page.getPage(request);
 
@@ -203,6 +202,7 @@ public abstract class BaseControll {
 	@SuppressWarnings("rawtypes")
 	@RequestMapping("/delete.do")
 	public void delete(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		this.beforeDo(request, response);
 
 		String key = this.getTableKeyName(request);
 		String value = this.getValue(request, key);
@@ -215,6 +215,8 @@ public abstract class BaseControll {
 	@SuppressWarnings("rawtypes")
 	@RequestMapping("/add.do")
 	public void add(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		this.beforeDo(request, response);
+
 		Map map = this.getTableParam(request);
 
 		int count = baseService.executeSql("insert into " + this.tableName + "(" + SqlHelp.makeMapKeys(map) + ") values(" + SqlHelp.makeMapPosis(map) + ")  ", map.values().toArray());
@@ -225,6 +227,8 @@ public abstract class BaseControll {
 	@SuppressWarnings("rawtypes")
 	@RequestMapping("/update.do")
 	public void update(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		this.beforeDo(request, response);
+
 		Map map = this.getTableParam(request);
 		String key = this.getTableKeyName(request);
 		String value = this.getValue(request, key); 
@@ -239,6 +243,8 @@ public abstract class BaseControll {
 	@SuppressWarnings("rawtypes")
 	@RequestMapping("/get.do")
 	public void get(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		this.beforeDo(request, response);
+
 		String key = this.getTableKeyName(request);
 		String value = this.getValue(request, key);
 		
@@ -249,9 +255,18 @@ public abstract class BaseControll {
 	
 	@RequestMapping("/cols.do")
 	public void cols(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		this.beforeDo(request, response);
+
 		if(!Tools.isNull(this.tableName))return;
 		List<String> res = baseService.getColumns(this.tableName);
 		writeJson(response, res.toArray());
+	}
+	
+	void beforeDo(HttpServletRequest request, HttpServletResponse response) {
+		String tableName = this.getValue(request, "TABLE_NAME");
+		if(Tools.isNull(tableName)){
+			this.setTableName(tableName);
+		}
 	} 
 	
 

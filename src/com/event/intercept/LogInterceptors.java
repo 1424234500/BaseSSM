@@ -78,7 +78,10 @@ public class LogInterceptors implements HandlerInterceptor{
      */  
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object method) throws Exception {  
         //logger.info("==============执行顺序: 1、preHandle================");    
- 
+    	String s = request.getCharacterEncoding();
+    	request.setCharacterEncoding("UTF-8");
+    	response.setCharacterEncoding("UTF-8");
+    	
         // 设置开始时间  线程绑定变量（该数据只有当前请求的线程可见）
         startTimeThreadLocal.set(System.currentTimeMillis());
  
