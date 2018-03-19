@@ -24,14 +24,11 @@ import java.util.regex.Pattern;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.util.encoders.UrlBase64;
 
 import util.mode.Bean;
 
 public class Lang {
-	private static Log log = LogFactory.getLog(Lang.class);
 	private static Map<String, Object> objMap = new ConcurrentHashMap();
 	private static Map<String, Class> clsMap = new ConcurrentHashMap();
 	private static final char[] CHAR_MAP = new char[64];
@@ -52,7 +49,7 @@ public class Lang {
 			return cls;
 
 		} else if (className != null && className.trim().length() != 0) {
-			log.error("loadClass error, className is null. ");
+			out("loadClass error, className is null. ");
 			return null;
 		} else {
 			try {
@@ -334,7 +331,7 @@ public class Lang {
 		try {
 			return new String(Base64.decode(data), "UTF-8");
 		} catch (Exception arg1) {
-			log.error(arg1.getMessage(), arg1);
+			out(arg1.getMessage(), arg1);
 
 			return data;
 		}
@@ -385,7 +382,7 @@ public class Lang {
 		try {
 			return new String(hexTobyte(hexStr.getBytes()), "UTF-8");
 		} catch (UnsupportedEncodingException arg1) {
-			log.error(arg1.getMessage() + ": " + hexStr, arg1);
+			out(arg1.getMessage() + ": " + hexStr, arg1);
 			return "";
 		}
 	}
@@ -396,7 +393,7 @@ public class Lang {
 			return null == e ? false : e.toString().equalsIgnoreCase("true");
 
 		} catch (Exception arg1) {
-			log.error(arg1.getMessage() + ": " + jsCondition, arg1);
+			out(arg1.getMessage() + ": " + jsCondition, arg1);
 			return false;
 		}
 	}
@@ -413,7 +410,7 @@ public class Lang {
 		try {
 			out = engine1.eval(script);
 		} catch (Exception arg4) {
-			log.error(arg4.getMessage(), arg4);
+			out(arg4.getMessage(), arg4);
 		}
 		return out;
 	}
@@ -439,7 +436,7 @@ public class Lang {
 				out1 = String.valueOf(e1);
 			}
 		} catch (Exception arg6) {
-			log.error(arg6.getMessage(), arg6);
+			out(arg6.getMessage(), arg6);
 		}
 		return out1;
 	}
@@ -449,7 +446,7 @@ public class Lang {
 			DecimalFormat e = new DecimalFormat(pattern);
 			return e.format(Double.parseDouble(inputNumber));
 		} catch (Exception arg2) {
-			log.error("formatNumber error:" + inputNumber + " pattern:" + pattern, arg2);
+			out("formatNumber error:" + inputNumber + " pattern:" + pattern, arg2);
 			return inputNumber;
 		}
 	}
@@ -528,7 +525,7 @@ public class Lang {
 		try {
 			md5 = MessageDigest.getInstance("MD5");
 		} catch (Exception arg7) {
-			log.error(arg7);
+			out(arg7);
 			return "";
 		}
 		char[] charArray = str.toCharArray();
@@ -587,4 +584,9 @@ public class Lang {
 		}
 		return sb.toString();
 	}
+	
+	public static void out(Object ... obj){
+		Tools.out(obj);
+	}
+	
 }

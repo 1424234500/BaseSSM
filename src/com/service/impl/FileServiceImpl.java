@@ -17,7 +17,7 @@ import com.service.FileService;
 
 import util.FileUtil;
 import util.Fun;
-import util.MapListHelp;
+import util.DataHelp;
 import util.Tools;
 import util.database.SqlHelp;
 
@@ -42,9 +42,9 @@ public class FileServiceImpl implements FileService,Serializable {
 		//删除表中中不存在文件的记录
 		final List<Map> list = baseDao.find("select * from fileinfo");
 		for(int i = 0; i < list.size(); i++){
-			File file = new File(MapListHelp.getList(list, i, "PATH"));
+			File file = new File(DataHelp.getList(list, i, "PATH"));
 			if(!file.exists() || file.isDirectory()){
-				baseDao.executeSql("delete from fileinfo where id=?", MapListHelp.getList(list, i, "ID"));
+				baseDao.executeSql("delete from fileinfo where id=?", DataHelp.getList(list, i, "ID"));
 			}
 		} 
 		//添加其它文件到表中
@@ -54,7 +54,7 @@ public class FileServiceImpl implements FileService,Serializable {
 				if(obj.isFile()){
 					int flag = 0;
 					for(int i = 0; i < list.size(); i++){
-						if( obj.getPath().equals(MapListHelp.getList(list, i, "PATH"))){
+						if( obj.getPath().equals(DataHelp.getList(list, i, "PATH"))){
 							flag = 1;	//已存在该文件的记录
 							break;
 						} 

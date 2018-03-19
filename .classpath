@@ -73,5 +73,6 @@
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/xbean-spring-4.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/jedis-2.9.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/commons-pool2-2.4.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/json-20131018.jar"/>
 	<classpathentry kind="output" path="WebContent/WEB-INF/classes"/>
 </classpath>

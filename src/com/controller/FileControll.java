@@ -29,7 +29,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.service.FileService;
 
 import util.FileUtil;
-import util.MapListHelp;
+import util.DataHelp;
 import util.JsonUtil;
 import util.Tools;
 import util.database.SqlHelp; 
@@ -93,7 +93,7 @@ public class FileControll extends BaseControll{
 		String path = baseService.getString("select path from fileinfo where id=?", id);
 		count = baseService.executeSql("delete from fileinfo where id=?", id);
 		FileUtil.delete(path);
-	    Map res = MapListHelp.getMap().put("res", count).build();
+	    Map res = DataHelp.getMap().put("res", count).build();
 		writeJson(response, res);
 	}
 	
@@ -103,7 +103,7 @@ public class FileControll extends BaseControll{
 		String about = request.getParameter("ABOUT"); 
 	    
 		int count = baseService.executeSql("update fileinfo set about=? where id=? ", about, id);
-		Map res = MapListHelp.getMap().put("res", count).build();
+		Map res = DataHelp.getMap().put("res", count).build();
 		writeJson(response, res);	
 	}
 

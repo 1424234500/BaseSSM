@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import util.MapListHelp;
+import util.DataHelp;
 import util.Tools;
 
 @Controller
@@ -44,13 +44,13 @@ public class DinnerControl extends BaseControll {
 		int maxMonthDay = 31;
 		int monthFrom = Tools.parseInt(timeFrom.substring(5, 7));
 		int monthTo = Tools.parseInt(timeTo.substring(5, 7));
-		List listXs = MapListHelp.toArrayAndTurn(baseService.find("select lpad(level, 2, '0') lev from dual connect by level <=?", maxMonthDay)).get(0);
-		List listLineNames = MapListHelp.array().build();
+		List listXs = DataHelp.toArrayAndTurn(baseService.find("select lpad(level, 2, '0') lev from dual connect by level <=?", maxMonthDay)).get(0);
+		List listLineNames = DataHelp.array().build();
 
-		List listSeries = MapListHelp.array().build(); 
+		List listSeries = DataHelp.array().build(); 
 		for(int i = monthFrom; i <= monthTo; i++){
 			//yi-1, yi-2, yi-3, yi-4
-			listSeries = MapListHelp.listAdd(listSeries,  MapListHelp.toArrayAndTurn(baseService.find(
+			listSeries = DataHelp.listAdd(listSeries,  DataHelp.toArrayAndTurn(baseService.find(
 					" SELECT "
 //					+ " t2.lev x, "
 					+ " nvl(t1.y, '0') y "
@@ -65,20 +65,20 @@ public class DinnerControl extends BaseControll {
 		//y1, y2, y3, y4 
 		//y5, y6, y7, y8   
 		String type = "bar";	
-		Map title = MapListHelp.map().put("text", "day类型统计").build();		//标题
-		Map legend = MapListHelp.map().put("data", listLineNames).build();   //线条名字集合
-		Map xAxis = MapListHelp.map().put("data", listXs).build();  	//x坐标集合 多线条共x轴
-		List series = MapListHelp.array().build();
+		Map title = DataHelp.map().put("text", "day类型统计").build();		//标题
+		Map legend = DataHelp.map().put("data", listLineNames).build();   //线条名字集合
+		Map xAxis = DataHelp.map().put("data", listXs).build();  	//x坐标集合 多线条共x轴
+		List series = DataHelp.array().build();
 		for(int i = 0; i < listSeries.size(); i++){
 			//type = i / 2 == 0 ? "bar" : "line"; 
-			series.add(MapListHelp.map()
+			series.add(DataHelp.map()
 					.put("name", listLineNames.get(i))	//该线条的名字
 					.put("type", type)					//该线条的显示方式line bar pie
 					.put("data", listSeries.get(i))			//该线条的y值集合
 					.build()
 				);
 		} 
-		Map option = MapListHelp.map()
+		Map option = DataHelp.map()
 				.put("title", title)  
 				.put("legend", legend) 
 				.put("tooltip", new Object()) //若无则不能预览
@@ -88,7 +88,7 @@ public class DinnerControl extends BaseControll {
 				.build();
 		 
 
-		Map res = MapListHelp.getMap()
+		Map res = DataHelp.getMap()
 				.put("res", "true")
 				.put("option", option) 
 				.put("info", WebHelp.getRequestMap(request)).build(); 
