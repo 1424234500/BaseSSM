@@ -47,9 +47,9 @@ public class BaseDaoImpl implements BaseDao  {
 	/**
 	 * 获取列名集合的第一种方式
 	 */
-	public List<String> findColumns(String sql){
+	public List<Object> findColumns(String sql){
 		final String sqlStr=sql;
-		final List<String> list=new ArrayList<String>();
+		final List<Object> list=new ArrayList<Object>();
 		getCurrentSession().doWork( new Work() {  
 		    public void execute(Connection connection) {
 		    	try{
@@ -118,7 +118,7 @@ public class BaseDaoImpl implements BaseDao  {
 	}
 	
 	
-	public List<String> getColumns(String tableName){
+	public List<Object> getColumns(String tableName){
 		String sql = "";
 		//oracle
 		sql = "SELECT COLUMN_NAME FROM ALL_TAB_COLUMNS WHERE TABLE_NAME = upper('" + tableName + "') ORDER BY COLUMN_ID";
@@ -130,7 +130,7 @@ public class BaseDaoImpl implements BaseDao  {
 		SQLQuery q = getCurrentSession().createSQLQuery(sql);
 		setParams(q);
 		List<Map> list = q.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
-		List<String> res = new ArrayList<String>();
+		List<Object> res = new ArrayList<Object>();
 		
 		if(list != null){
 			for(Map map : list){

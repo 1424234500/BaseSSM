@@ -1,4 +1,9 @@
 package util;
+
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+
 /**
  * 如何写出无法维护的代码
  *
@@ -10,10 +15,85 @@ public class Test {
 	}
 	
 	Test(){
-		defineWord();
+//		defineWord();
+		
+		
+	}
+	public void testThread(){
+		final String name = "T-master";
+		ThreadUtil.execute(ThreadUtil.DefaultThread, new Runnable() {
+			public void run() {
+				int tt = 0;
+				while(true){
+					Tools.out(name, tt++);
+					ThreadUtil.sleep(1000);
+					if(tt > 30)
+						break;
+				}
+			}
+		});
 		
 		
 		
+		for(int i = 0; i < 1; i++){
+			final int name1 = i;
+			ThreadUtil.execute(ThreadUtil.DefaultThread, new Runnable() {
+				public void run() {
+					int tt = 0;
+					while(true){
+						Tools.out("T"+name1, Tools.getFill(name1, " - "), tt++);
+						ThreadUtil.sleep(200);
+						if(tt > 10)
+							break;
+					}
+				}
+			});
+		}
+		final LinkedBlockingDeque<Object> lbq = new LinkedBlockingDeque<>();
+
+		final String name2 = "T-master-2";
+		ThreadUtil.execute(ThreadUtil.SingleThread, new Runnable() {
+			public void run() {
+				int tt = 0;
+				while(true){
+					Tools.out("定时添加任务到队列", name2, tt++);
+					lbq.add("队列任务" + tt);
+					ThreadUtil.sleep(1000);
+					if(tt > 10)
+						break;
+				}
+			}
+		});
+
+//		　　add        增加一个元索                     如果队列已满，则抛出一个IIIegaISlabEepeplian异常
+//		　　remove   移除并返回队列头部的元素    如果队列为空，则抛出一个NoSuchElementException异常
+//		　　element  返回队列头部的元素             如果队列为空，则抛出一个NoSuchElementException异常
+//		　　offer       添加一个元素并返回true       如果队列已满，则返回false
+//		　　poll         移除并返问队列头部的元素    如果队列为空，则返回null
+//		　　peek       返回队列头部的元素             如果队列为空，则返回null
+//		　　put         添加一个元素                      如果队列满，则阻塞
+//		　　take        移除并返回队列头部的元素     如果队列为空，则阻塞
+		ThreadUtil.scheduleWithFixedDelay(new Runnable() {
+			@Override
+			public void run() {
+				if(lbq.peek() != null)
+				Tools.out("----执行任务", lbq.remove());
+				else
+					Tools.out("----无任务-----");
+			}
+		}, 3, 2, TimeUnit.SECONDS);
+		ThreadUtil.execute(ThreadUtil.SingleThread, new Runnable() {
+			public void run() {
+				int tt = 0;
+				while(true){
+					Tools.out("定时添加任务到队列1", name2, tt++);
+					lbq.add("任务！！---！" + tt);
+					ThreadUtil.sleep(10000);
+					if(tt > 10)
+						break;
+				}
+			}
+		});
 	}
 
 	int arr = 0;	//全局命名重用为私有

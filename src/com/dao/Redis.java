@@ -10,7 +10,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import util.Fun;
-import util.DataHelp;
+import util.MapListUtil;
 import util.Tools;
  
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -77,7 +77,7 @@ public class Redis   {
 	*/
 	public void setList(String keyName, List<Map> list){ 
 		for(int i = 0; i < list.size(); i++){
-			setMap(DataHelp.getList(list, i, keyName), list.get(i));
+			setMap(MapListUtil.getList(list, i, keyName), list.get(i));
 		}  
 	}
 	/**

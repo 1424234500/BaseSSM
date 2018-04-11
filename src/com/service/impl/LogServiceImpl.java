@@ -14,7 +14,7 @@ import com.dao.Redis;
 import com.dao.hibernate.BaseDao;
 import com.service.LogService;
 
-import util.DataHelp;
+import util.MapListUtil;
 import util.Tools;
 
 @Service("logService")
@@ -55,7 +55,7 @@ public class LogServiceImpl implements LogService,Serializable {
 			map.put("count", (Tools.parseInt(map.get("count")) + 1) + "");
 			redis.setMap(url, map); 
 		}else{
-			redis.setMap(url, DataHelp.map2ssmap(DataHelp.map()
+			redis.setMap(url, MapListUtil.map2ssmap(MapListUtil.map()
 					.put("url", url)
 					.put("costtime", costtime)
 					.put("count", 1)

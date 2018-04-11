@@ -16,7 +16,7 @@ import com.controller.Page;
 import com.dao.mybatis.BaseMapper;
 import com.service.StudentService;
 
-import util.DataHelp;
+import util.MapListUtil;
 import util.Tools;
 import util.database.SqlHelp;
 
@@ -41,7 +41,7 @@ public class StudentServiceImplMybatis implements StudentService, Serializable {
 		if(!Tools.isNull(id)) id = "";
 		else  id = SqlHelp.like(id);
 		
-		Map map = DataHelp.getMap()
+		Map map = MapListUtil.getMap()
 				.put("name", name)
 				.put("id", id)
 				.put("timefrom", timefrom)
@@ -55,7 +55,7 @@ public class StudentServiceImplMybatis implements StudentService, Serializable {
 
 	@Override
 	public int update(String id, String name, String time) {
-		Map map = DataHelp.getMap().put("name", name)
+		Map map = MapListUtil.getMap().put("name", name)
 				.put("id", id)
 				.put("time", time)
 				.build(); 
@@ -64,7 +64,7 @@ public class StudentServiceImplMybatis implements StudentService, Serializable {
 
 	@Override
 	public int delete(String id) {
-		Map map = DataHelp.getMap() 
+		Map map = MapListUtil.getMap() 
 				.put("id", id)
 				.build();
 		return baseMapper.delete(map);
@@ -72,7 +72,7 @@ public class StudentServiceImplMybatis implements StudentService, Serializable {
 
 	@Override
 	public Map get(String id) {
-		Map map = DataHelp.getMap() 
+		Map map = MapListUtil.getMap() 
 				.put("id", id)
 				.build();
 		List<Map> list = baseMapper.find(map);
@@ -87,7 +87,7 @@ public class StudentServiceImplMybatis implements StudentService, Serializable {
 
 	@Override
 	public int add(String name, String time) {
-		Map map = DataHelp.getMap() 
+		Map map = MapListUtil.getMap() 
 				.put("name", name)
 				.put("time", time)
 				.build();

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.service.StudentService;
 
-import util.DataHelp;
+import util.MapListUtil;
 import util.Tools;
 
 /** 
@@ -52,14 +52,14 @@ public class AngularControll extends BaseControll{
 //		                 { name: lineName,    type: 'line',   data: lineValues,  }, 
 		
 		//x1, x2, x3, x4
-		List listXs = DataHelp.toArrayAndTurn(baseService.find("select lpad(level, 2, '0') lev from dual connect by level <=12")).get(0);
-		List listLineNames = DataHelp.array().build();
+		List listXs = MapListUtil.toArrayAndTurn(baseService.find("select lpad(level, 2, '0') lev from dual connect by level <=12")).get(0);
+		List listLineNames = MapListUtil.array().build();
 		int yearFrom = Tools.parseInt(request.getParameter("TIMEFROM"));
 		int yearTo = Tools.parseInt(request.getParameter("TIMETO")); 
-		List listSeries = DataHelp.array().build(); 
+		List listSeries = MapListUtil.array().build(); 
 		for(int i = yearFrom; i <= yearTo; i++){
 			//yi-1, yi-2, yi-3, yi-4 只查询y轴序列
-			listSeries = DataHelp.listAdd(listSeries,  DataHelp.toArrayAndTurn(baseService.find(
+			listSeries = MapListUtil.listAdd(listSeries,  MapListUtil.toArrayAndTurn(baseService.find(
 					"SELECT nvl(t1.y, '0') y FROM ( SELECT t.xs x,count(*) y FROM ( SELECT s.*,to_char(s.time, 'MM') xs FROM student s where to_char(s.time, 'yyyy')=?  ) t group by t.xs ) t1,(select lpad(level, 2, '0') lev from dual connect by level <=12   ) t2 where t1.x(+) = t2.lev order by t2.lev  "
 					, i)) ); 
 			listLineNames.add(i + ""); 
@@ -69,20 +69,20 @@ public class AngularControll extends BaseControll{
 		//y1, y2, y3, y4 
 		//y5, y6, y7, y8   
 		String type = "bar";	
-		Map title = DataHelp.map().put("text", "注册统计").build();		//标题
-		Map legend = DataHelp.map().put("data", listLineNames).build();   //线条名字集合
-		Map xAxis = DataHelp.map().put("data", listXs).build();  	//x坐标集合 多线条共x轴
-		List series = DataHelp.array().build();
+		Map title = MapListUtil.map().put("text", "注册统计").build();		//标题
+		Map legend = MapListUtil.map().put("data", listLineNames).build();   //线条名字集合
+		Map xAxis = MapListUtil.map().put("data", listXs).build();  	//x坐标集合 多线条共x轴
+		List series = MapListUtil.array().build();
 		for(int i = 0; i < listSeries.size(); i++){
 			//type = i / 2 == 0 ? "bar" : "line"; 
-			series.add(DataHelp.map()
+			series.add(MapListUtil.map()
 					.put("name", listLineNames.get(i))	//该线条的名字
 					.put("type", type)					//该线条的显示方式line bar pie
 					.put("data", listSeries.get(i))			//该线条的y值集合
 					.build()
 				);
 		} 
-		Map option = DataHelp.map()
+		Map option = MapListUtil.map()
 				.put("title", title)  
 				.put("legend", legend) 
 				.put("tooltip", new Object()) //若无则不能预览
@@ -92,7 +92,7 @@ public class AngularControll extends BaseControll{
 				.build();
 		 
 
-		Map res = DataHelp.getMap()
+		Map res = MapListUtil.getMap()
 				.put("res", "true")
 				.put("option", option) 
 				.put("info", WebHelp.getRequestMap(request)).build(); 
@@ -103,7 +103,7 @@ public class AngularControll extends BaseControll{
 	
 	@RequestMapping("/login.do") 
 	public void login(HttpServletRequest request, HttpServletResponse response) throws IOException { 
-		Map res = DataHelp.getMap().put("res", "true").put("info",WebHelp.getRequestMap(request)).build(); 
+		Map res = MapListUtil.getMap().put("res", "true").put("info",WebHelp.getRequestMap(request)).build(); 
 		log(res);
 		writeJson(response, res);
 	}	
@@ -116,9 +116,9 @@ public class AngularControll extends BaseControll{
 	    
 	    Map res = null;
 	    if(studentServiceHibernate.get(id).isEmpty()){
-	    	res = DataHelp.getMap().put("res",studentServiceHibernate.add(name, time)).build();
+	    	res = MapListUtil.getMap().put("res",studentServiceHibernate.add(name, time)).build();
 	    }else{
-	    	res = DataHelp.getMap().put("res",studentServiceHibernate.update(id, name, time)).build();
+	    	res = MapListUtil.getMap().put("res",studentServiceHibernate.update(id, name, time)).build();
 	    }
 		writeJson(response, res);
 	}
@@ -126,7 +126,7 @@ public class AngularControll extends BaseControll{
 	public void delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String id = request.getParameter("ID");
 	    
-	    Map res = DataHelp.getMap().put("res",studentServiceHibernate.delete(id)).build();
+	    Map res = MapListUtil.getMap().put("res",studentServiceHibernate.delete(id)).build();
 		writeJson(response, res);
 	}	
 	@RequestMapping("/get.do")

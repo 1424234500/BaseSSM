@@ -1,5 +1,3 @@
-
-// Warning: No line numbers available in class file
 package util;
 
 import java.lang.annotation.Documented;

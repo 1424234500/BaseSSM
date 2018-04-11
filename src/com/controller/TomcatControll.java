@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.service.StudentService;
 
-import util.DataHelp;
+import util.MapListUtil;
 import util.Tools;
 
 /** 
@@ -41,29 +41,29 @@ public class TomcatControll extends BaseControll{
 		
 	 	List list = null;
 	 	if(Tools.isNull(url) && !url.toLowerCase().equals("undefined") && !url.toLowerCase().equals("null")){
-	 		list = DataHelp.toArrayAndTurn(baseService.find(" SELECT lev, nvl(time, '0') time FROM  ( SELECT hour, cast(sum(costtime)/sum(count)/1000 as number(8, 3)) time FROM (  SELECT  to_char(lt.time, 'hh24') hour, lt.count, lt.costtime FROM log_time lt where 1=1 and lt.url=?  )group by hour   ) t1,  ( select lpad(level, 2, '0') lev from dual connect by level <= 24    ) t2 where t1.hour(+) = t2.lev  ORDER BY lev ", url)) ;
+	 		list = MapListUtil.toArrayAndTurn(baseService.find(" SELECT lev, nvl(time, '0') time FROM  ( SELECT hour, cast(sum(costtime)/sum(count)/1000 as number(8, 3)) time FROM (  SELECT  to_char(lt.time, 'hh24') hour, lt.count, lt.costtime FROM log_time lt where 1=1 and lt.url=?  )group by hour   ) t1,  ( select lpad(level, 2, '0') lev from dual connect by level <= 24    ) t2 where t1.hour(+) = t2.lev  ORDER BY lev ", url)) ;
 	 	}else{
-	 		list = DataHelp.toArrayAndTurn(baseService.find("SELECT url,cast(sum(costtime)/sum(count)/1000 as number(8, 3)) time FROM log_time where 1=1 group by url order by url ")) ;
+	 		list = MapListUtil.toArrayAndTurn(baseService.find("SELECT url,cast(sum(costtime)/sum(count)/1000 as number(8, 3)) time FROM log_time where 1=1 group by url order by url ")) ;
 	 	} 
 		 
 	 	 
-	 	List listLineNames = DataHelp.array().add("action").build();
-		List listSeries =  DataHelp.array().add(list.size() > 0 ? (List) list.get(1) : new Object()).build();
+	 	List listLineNames = MapListUtil.array().add("action").build();
+		List listSeries =  MapListUtil.array().add(list.size() > 0 ? (List) list.get(1) : new Object()).build();
 		String type = "bar";	 
-		Map title = DataHelp.map().put("text", "操作耗时统计").build();		//标题
-		Map legend = DataHelp.map().put("data", listLineNames).build();   //线条名字集合
-		Map xAxis = DataHelp.map().put("data", list.size() > 0 ? (List) list.get(0) : new Object()).build();  	//x坐标集合 多线条共x轴
-		List series = DataHelp.array().build();
+		Map title = MapListUtil.map().put("text", "操作耗时统计").build();		//标题
+		Map legend = MapListUtil.map().put("data", listLineNames).build();   //线条名字集合
+		Map xAxis = MapListUtil.map().put("data", list.size() > 0 ? (List) list.get(0) : new Object()).build();  	//x坐标集合 多线条共x轴
+		List series = MapListUtil.array().build();
 		for(int i = 0; i < listSeries.size(); i++){
 			//type = i / 2 == 0 ? "bar" : "line"; 
-			series.add(DataHelp.map()
+			series.add(MapListUtil.map()
 					.put("name", listLineNames.get(i))	//该线条的名字
 					.put("type", type)					//该线条的显示方式line bar pie
 					.put("data", listSeries.get(i))			//该线条的y值集合
 					.build() 
 				);
 		} 
-		Map option = DataHelp.map()
+		Map option = MapListUtil.map()
 				.put("title", title)  
 				.put("legend", legend)		
 				.put("tooltip", new Object())  
@@ -73,7 +73,7 @@ public class TomcatControll extends BaseControll{
 				.build();
 		 
 
-		Map res = DataHelp.getMap()
+		Map res = MapListUtil.getMap()
 				.put("res", "true")
 				.put("option", option) 
 				.put("info", WebHelp.getRequestMap(request)).build(); 
@@ -88,29 +88,29 @@ public class TomcatControll extends BaseControll{
 		
 	 	List list = null;
 	 	if(Tools.isNull(url) && !url.toLowerCase().equals("undefined") && !url.toLowerCase().equals("null")){
-	 		list = DataHelp.toArrayAndTurn(baseService.find("  SELECT lev, nvl(count, '0') sumcount FROM  ( SELECT hour, sum(count) count FROM (  SELECT  to_char(lt.time, 'hh24') hour, lt.url, lt.count FROM log_time lt where 1=1 and lt.url=?  )group by hour ) t1,  ( select lpad(level, 2, '0') lev from dual connect by level <= 24    ) t2 where t1.hour(+) = t2.lev  ORDER BY lev ", url)) ;
+	 		list = MapListUtil.toArrayAndTurn(baseService.find("  SELECT lev, nvl(count, '0') sumcount FROM  ( SELECT hour, sum(count) count FROM (  SELECT  to_char(lt.time, 'hh24') hour, lt.url, lt.count FROM log_time lt where 1=1 and lt.url=?  )group by hour ) t1,  ( select lpad(level, 2, '0') lev from dual connect by level <= 24    ) t2 where t1.hour(+) = t2.lev  ORDER BY lev ", url)) ;
 	 	}else{
-	 		list = DataHelp.toArrayAndTurn(baseService.find(" SELECT url,sum(count) sumcount FROM log_time where 1=1 group by url order by url ")) ;
+	 		list = MapListUtil.toArrayAndTurn(baseService.find(" SELECT url,sum(count) sumcount FROM log_time where 1=1 group by url order by url ")) ;
 	 	}  
 		
 	 	 
-	 	List listLineNames = DataHelp.array().add("action").build();
-		List listSeries =  DataHelp.array().add(list.size() > 0 ? (List) list.get(1) : new Object()).build();
+	 	List listLineNames = MapListUtil.array().add("action").build();
+		List listSeries =  MapListUtil.array().add(list.size() > 0 ? (List) list.get(1) : new Object()).build();
 		String type = "bar";	 
-		Map title = DataHelp.map().put("text", "操作频率统计").build();		//标题
-		Map legend = DataHelp.map().put("data", listLineNames).build();   //线条名字集合
-		Map xAxis = DataHelp.map().put("data", list.size() > 0 ? (List) list.get(0) : new Object()).build();  	//x坐标集合 多线条共x轴
-		List series = DataHelp.array().build();
+		Map title = MapListUtil.map().put("text", "操作频率统计").build();		//标题
+		Map legend = MapListUtil.map().put("data", listLineNames).build();   //线条名字集合
+		Map xAxis = MapListUtil.map().put("data", list.size() > 0 ? (List) list.get(0) : new Object()).build();  	//x坐标集合 多线条共x轴
+		List series = MapListUtil.array().build();
 		for(int i = 0; i < listSeries.size(); i++){
 			//type = i / 2 == 0 ? "bar" : "line"; 
-			series.add(DataHelp.map()
+			series.add(MapListUtil.map()
 					.put("name", listLineNames.get(i))	//该线条的名字
 					.put("type", type)					//该线条的显示方式line bar pie
 					.put("data", listSeries.get(i))			//该线条的y值集合
 					.build() 
 				);
 		} 
-		Map option = DataHelp.map()
+		Map option = MapListUtil.map()
 				.put("title", title)  
 				.put("legend", legend)		
 				.put("tooltip", new Object()) 
@@ -120,7 +120,7 @@ public class TomcatControll extends BaseControll{
 				.build();
 		 
 
-		Map res = DataHelp.getMap()
+		Map res = MapListUtil.getMap()
 				.put("res", "true")
 				.put("option", option) 
 				.put("info", WebHelp.getRequestMap(request)).build(); 

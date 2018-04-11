@@ -72,7 +72,7 @@ public class BaseServiceImpl implements BaseService,Serializable {
 	}
 
 	@Override
-	public List<String> getColumns(String tableName) {
+	public List<Object> getColumns(String tableName) {
 		return baseDao.getColumns(tableName);
 	}
  

@@ -49,6 +49,6 @@ public interface BaseService {
 	 */
 	public String getString(String sql, Object... params);
 
-	public List<String> getColumns(String tableName);
+	public List<Object> getColumns(String tableName);
 
 }

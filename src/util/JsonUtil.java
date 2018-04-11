@@ -7,185 +7,215 @@ import java.util.List;
 import java.util.Map;
 
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-
-
-
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
-/*
- * msg json {"cmd":"conn","value":"connok" }
- * Json map list 工具类
+/**
+ * org.json.tools
  */
+
+
 public class JsonUtil {
 
-	 
-	public static String getString(String jsonstr, String name) {
-		String res = "";
-		try {
-			JSONObject jb = JSONObject.fromObject(jsonstr);
-			res = jb.getString(name);
-		} catch (Exception e) {
-			out("json get error from " + jsonstr + " exception：" + e.toString());
-		}
-		return res;
-	}
 
-	public static int getInt(String jsonstr, String name) {
-		int res = -1;
-		try {
-			JSONObject jb = JSONObject.fromObject(jsonstr);
-			res = jb.getInt(name);
-		} catch (Exception e) {
-			out("json get error from " + jsonstr + " exception：" + e.toString());
-		}
-		return res;
-	}
+    public static String makeJson(Object obj) {
+        String res = "";
+        try {
+            JSONObject jo = new JSONObject(obj);
+            res = jo.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+    public static String makeJson(List<Object> list) {
+        String res = "";
+        try {
+            JSONArray ja = new JSONArray(list);
+            res = ja.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
 
-	public static List<Map<String, Object>> getList(String jsonstr, String name){
-		try {
-			JSONObject jo = JSONObject.fromObject(jsonstr);
-			return JsonUtil.jsonArrayToListMap(jo.getJSONArray(name));
-		} catch (Exception e) {
-			out("json get list error from " + jsonstr + " exception：" + e.toString());
-		}
-		return null;
-	}
-	 
-	public static Map<String, Object> getMap(String jsonstr){
-		try {
-			JSONObject jo = JSONObject.fromObject(jsonstr);
-			
-			Iterator<String> nameItr = jo.keys();
-			Map<String, Object> map = new HashMap<String, Object>();
-			while (nameItr.hasNext()) {
-				String name = nameItr.next();
-				map.put(name, jo.get(name));
-			}
-			return map;
-		} catch (Exception e) {
-			out("json get map error from " + jsonstr + " exception：" + e.toString());
-		}
-		return null;
-	} 
-	public static JSONArray listToJSONArray(Object[] list){
-		JSONArray ja = new JSONArray();
-		if(list == null)return ja;
-		for(Object map: list){
-			 ja.add(map);
-		} 
-		return ja;
-	}	
-	public static JSONArray listMapToJSONArray(List<Object> list){
-		JSONArray ja = new JSONArray();
-		if(list == null)return ja;
-		for(Object map: list){
-			 ja.add(  JSONObject.fromObject(map));
-//			for (Map.Entry<String, Object> entry : map.entrySet()) {   }
-		} 
-		return ja;
-	}	
-	public static List<Map<String, Object>>   jsonArrayToListMap(JSONArray jsonArray){
-		List<Map<String, Object>> list = new  ArrayList<Map<String, Object>>();
-		String name;
+    public static String makeJson(Object cmd, Object obj) {
+        String res = "";
+        try {
+            JSONObject jomap = new JSONObject(obj);
 
-		for(int i = 0; i < jsonArray.size(); i++){
-			JSONObject jo = jsonArray.getJSONObject(i);
-			
-			Iterator<String> nameItr = jo.keys();
-			Map<String, Object> map = new HashMap<String, Object>();
-			while (nameItr.hasNext()) {
-				name = nameItr.next();
-				map.put(name, jo.getString(name));
-			}
-			list.add(map);
-		}
-		 
-		return list;
-	}	
+            JSONObject jo = new JSONObject();
+            jo.put("cmd", cmd);
+            jo.put("result", jomap);
+            res = jo.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+    public static String makeJson(Object cmd, List<Object> list) {
+        String res = "";
+        try {
+            JSONObject jo = new JSONObject();
+            jo.put("cmd", cmd);
+            jo.put("result", JsonUtil.listMapToJSONArray(list));
+            res = jo.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	
-	public static String makeJson(String key, Object[] list){
-		String res = "";
-		try { 
-			JSONObject jo = new JSONObject();
-			jo.put(key, JsonUtil.listToJSONArray(list));
-			res = jo.toString();
-		} catch (Exception e) {
-			e.printStackTrace(); 
-		}
+        return res;
+    }
 
-		return res;
-	}
-	public static String makeJson(Object[] list){
-		String res = "";
-		try { 
-			res = JsonUtil.listToJSONArray(list).toString();
-		} catch (Exception e) {
-			e.printStackTrace(); 
-		}
+    // msg json {"cmd":"conn","value":"connok" }
+    public static String makeJson(Object cmd, Object... values) {
+        String res = "";
+        try {
+            JSONObject jo = new JSONObject();
+            jo.put("cmd", cmd);
+            int i = 0;
+            for (Object value : values) {
+                jo.put("value" + i++, value);
+            }
+            res = jo.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
 
-		return res;
-	}
-	public static String makeJson(List<Object> list){
-		String res = "";
-		try { 
-			res = JsonUtil.listMapToJSONArray(list).toString();
-		} catch (Exception e) {
-			e.printStackTrace(); 
-		}
+    public static List<Map<String, Object>> getList(String jsonstr, String name) {
+        try {
+            JSONObject jo = new JSONObject(jsonstr);
+            return JsonUtil.jsonArrayToListMap(jo.getJSONArray(name));
+        } catch (Exception e) {
+            out("json get list error from " + jsonstr + " exception：" + e.toString());
+        }
+        return null;
+    }
 
-		return res;
-	}
-	public static String makeJson(String key, List<Object> list){
-		String res = "";
-		try {
-			JSONObject jo = new JSONObject();
-			jo.put(key, JsonUtil.listMapToJSONArray(list));
-			res = jo.toString();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    public static String getValue0(String jsonstr) {
+        return getString(jsonstr, "value0");
+    }
 
-		return res;
-	}
+    public static String getValue1(String jsonstr) {
+        return getString(jsonstr, "value1");
+    }
 
- 
-	
-	public static String makeJson(String key, Map<String, Object> map){
-		String res = "";
-		try {
-			JSONObject jomap = new JSONObject();
-			jomap.putAll(map);
-			
-			JSONObject jo = new JSONObject();
-			jo.put(key, jomap);
-			res = jo.toString();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    public static String getValue2(String jsonstr) {
+        return getString(jsonstr, "value2");
+    }
 
-		return res;
-	} 
-	public static String makeJson(Map<String, Object> map){
-		String res = "";
-		try {
-			JSONObject jomap = new JSONObject();
-			jomap.putAll(map);
-			res = jomap.toString();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    public static String getValue3(String jsonstr) {
+        return getString(jsonstr, "value3");
+    }
 
-		return res;
-	}
+    public static String getValueI(String jsonstr, int i) {
+        return getString(jsonstr, "value" + i);
+    }
+
+    public static int getCmd(String jsonstr) {
+        return getInt(jsonstr, "cmd");
+    }
+
+    public static String getString(String jsonstr, String name) {
+        String res = "";
+        try {
+            JSONObject jo = new JSONObject(jsonstr);
+            res = jo.getString(name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    public static int getInt(String jsonstr, String name) {
+        int res = -1;
+        try {
+            JSONObject jo = new JSONObject(jsonstr);
+            res = jo.getInt(name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
 
 
-	public static void out(String str) {
-		
-	}
-	
+    public static JSONArray listMapToJSONArray(List<Object> list) {
+        if (list == null) return new JSONArray();
+        return new JSONArray(list);
+    }
 
+    public static List<Map<String, Object>> jsonArrayToListMap(JSONArray jsonArray) {
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        String name;
+
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jo = jsonArray.getJSONObject(i);
+
+                Iterator<String> nameItr = jo.keys();
+                Map<String, Object> map = new HashMap<String, Object>();
+                while (nameItr.hasNext()) {
+                    name = nameItr.next();
+                    map.put(name, jo.getString(name));
+                }
+                list.add(map);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+
+    public static List<Map<String, Object>> getListType(String jsonstr) {
+        List<Map<String, Object>> res = new ArrayList<>();
+
+        try {
+            JSONObject jo = new JSONObject(jsonstr);
+            res = JsonUtil.jsonArrayToListMap(jo.getJSONArray("listtype"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    public static List<Map<String, Object>> getList(String jsonstr) {
+        List<Map<String, Object>> res = new ArrayList<>();
+        try {
+            JSONObject jo = new JSONObject(jsonstr);
+            res = JsonUtil.jsonArrayToListMap(jo.getJSONArray("list"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+
+    public static Map<String, Object> getMap(String jsonstr) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        try {
+            JSONObject jo = new JSONObject(jsonstr).getJSONObject("result");
+            String name;
+            Iterator<String> nameItr = jo.keys();
+            while (nameItr.hasNext()) {
+                name = nameItr.next();
+                map.put(name, jo.getString(name));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+
+    public static List<Map<?, ?>> orderListMap(List<Map<?, ?>> list) {
+        return list;
+    }
+
+
+    public static void out(String str) {
+
+    }
 }

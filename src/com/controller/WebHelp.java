@@ -33,9 +33,9 @@ public class WebHelp {
 		return res;
 	}
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Map getParam(HttpServletRequest request, List<String> colNames){
+	public static Map getParam(HttpServletRequest request, List<Object> colNames){
 		Map res = new HashMap();
-		for(String key : colNames){
+		for(Object key : colNames){
 			res.put(key, WebHelp.getKey(request, key));
 		}
 		return res;
@@ -47,13 +47,13 @@ public class WebHelp {
 		return res;
 	}
 	@SuppressWarnings({ })
-	public static String getKey(HttpServletRequest request, String name){
-		String value = request.getParameter(name);
+	public static String getKey(HttpServletRequest request, Object name){
+		String value = request.getParameter((String)name);
 		if(!Tools.isNull(value)){	//兼容全小写
-			value = request.getParameter(name.toLowerCase());
+			value = request.getParameter(((String)name).toLowerCase());
 		}
 		if(!Tools.isNull(value)){	//兼容全大写
-			value = request.getParameter(name.toUpperCase());
+			value = request.getParameter(((String)name).toUpperCase());
 		}
 		return value;
 	}

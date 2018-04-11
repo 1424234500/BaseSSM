@@ -149,7 +149,7 @@ public class FileUtil {
 			if(funFileOrDir != null){
 				 funFileOrDir.make(file);
 			 } 
-			ThreadHelp.thread(new Fun<Long>() {
+			ThreadUtil.thread(new Fun<Long>() {
 				public void make(Long obj) {
 					longErgodic(file, files, funFileOrDir);//把遍历得到的东西存放在files里面
 				}

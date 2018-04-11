@@ -19,7 +19,7 @@ import java.util.Set;
  * @author Walker
  *
  */
-public class MapListHelp {
+public class MapListUtil {
 
 	public static void main(String[] argc){
 		testListSetMap();

@@ -19,7 +19,7 @@ import com.mode.LoginUser;
 import com.service.BaseService;
 
 import util.JsonUtil;
-import util.MapListHelp;
+import util.MapListUtil;
 import util.Tools;
 import util.database.SqlHelp;
 
@@ -89,7 +89,7 @@ public abstract class BaseControll {
 		writeJson(response, JsonUtil.makeJson(map) ); 
 	}
 	public void writeJson(HttpServletResponse response, List<Map> list, Page page) throws IOException{
-		Map res = MapListHelp.getMap().put("res", list).put("PAGE", page).build();
+		Map res = MapListUtil.getMap().put("res", list).put("PAGE", page).build();
 		writeJson(response, res);
 	}
 	public void writeJson(HttpServletResponse response, String jsonStr) throws IOException{
@@ -154,7 +154,7 @@ public abstract class BaseControll {
 	public Map getTableParam(HttpServletRequest request) throws Exception{
 		if(!Tools.isNull(this.tableName))
 			throw new Exception("没有配置表");
-		List<String> res = baseService.getColumns(this.tableName); 
+		List<Object> res = baseService.getColumns(this.tableName); 
 		return WebHelp.getParam(request, res);
 	}
 	public String getValue(HttpServletRequest request, String key) {
@@ -169,10 +169,10 @@ public abstract class BaseControll {
 	public String getTableKeyName(HttpServletRequest request) throws Exception{
 		if(!Tools.isNull(this.tableName))
 			throw new Exception("没有配置表");
-		List<String> res = baseService.getColumns(this.tableName); 
+		List<Object> res = baseService.getColumns(this.tableName); 
 		if(res.size() <= 0)
 			throw new Exception("该表 " + this.tableName + " 没有列 ");
-		return res.get(0);
+		return (String)res.get(0);
 	}
 	@SuppressWarnings("rawtypes")
 	@RequestMapping("/list.do")
@@ -187,7 +187,7 @@ public abstract class BaseControll {
 		String sql = "select * from " + this.tableName + " where 1=1 ";
 		
 		for(String key : map.keySet()){
-			String value = MapListHelp.getMap(map, key);
+			String value = MapListUtil.getMap(map, key);
 			if (Tools.isNull(value)) {
 				sql += " and " + key + " like ? ";
 				params.add("%" + value + "%");
@@ -208,7 +208,7 @@ public abstract class BaseControll {
 		String value = this.getValue(request, key);
 
 		int count = baseService.executeSql("delete from " + this.tableName + " where " + key + "=?", value);
-		Map res = MapListHelp.getMap().put("res", count).build();
+		Map res = MapListUtil.getMap().put("res", count).build();
 		writeJson(response, res);
 	}
 
@@ -220,7 +220,7 @@ public abstract class BaseControll {
 		Map map = this.getTableParam(request);
 
 		int count = baseService.executeSql("insert into " + this.tableName + "(" + SqlHelp.makeMapKeys(map) + ") values(" + SqlHelp.makeMapPosis(map) + ")  ", map.values().toArray());
-		Map res = MapListHelp.getMap().put("res", count).build();
+		Map res = MapListUtil.getMap().put("res", count).build();
 		writeJson(response, res);
 	}
 
@@ -236,7 +236,7 @@ public abstract class BaseControll {
 		List<String> params = new ArrayList<String>(map.values());
 		params.add(value);
 		int count = baseService.executeSql("update " + this.tableName + " set " + cols + " where " + key + "=?", params.toArray());
-		Map res = MapListHelp.getMap().put("res", count).build();
+		Map res = MapListUtil.getMap().put("res", count).build();
 		writeJson(response, res);
 	}
 
@@ -258,8 +258,8 @@ public abstract class BaseControll {
 		this.beforeDo(request, response);
 
 		if(!Tools.isNull(this.tableName))return;
-		List<String> res = baseService.getColumns(this.tableName);
-		writeJson(response, res.toArray());
+		List<Object> res = baseService.getColumns(this.tableName);
+		writeJson(response, res);
 	}
 	
 	void beforeDo(HttpServletRequest request, HttpServletResponse response) {

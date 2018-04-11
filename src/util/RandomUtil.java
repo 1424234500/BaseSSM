@@ -9,7 +9,7 @@ import java.util.Random;
  * @author Alvinte
  *
  */
-public class UniqueRandom {
+public class RandomUtil {
  
  
 	public static int[] getSequence  (int size, int start){

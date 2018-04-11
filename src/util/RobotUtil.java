@@ -19,10 +19,10 @@ import java.io.IOException;
  * @author Walker
  *
  */
-public class RobotHelp {
-	private static volatile RobotHelp robotHelp = null;
+public class RobotUtil {
+	private static volatile RobotUtil robotHelp = null;
 	public  Robot robot = null;
-    private RobotHelp(){
+    private RobotUtil(){
     	try { 
     		robot = new Robot(); 
     	} 
@@ -30,11 +30,11 @@ public class RobotHelp {
     		e.printStackTrace(); 
 		} 
     }
-    public static RobotHelp getSingleton(){
+    public static RobotUtil getSingleton(){
         if(robotHelp == null){
-            synchronized (RobotHelp.class){
+            synchronized (RobotUtil.class){
                 if(robotHelp == null){
-                	robotHelp = new RobotHelp();
+                	robotHelp = new RobotUtil();
                 }
             }
         }
