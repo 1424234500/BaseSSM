@@ -1,17 +1,70 @@
 package util.socket;
 
-
 /**
  * socket 连接实例
  * 
  * socket信息引用
  * 服务端信息详情
+ * @param <SOCK>
  */
-public class ToClient{
+public class ToClient<SOCK>{
+					//同时建立索引在数据结构中ServerImpl
+	String sysKey;	//所属系统
+	String key;		//客户编号
+	
+	SOCK socket;
+	
+	
+	
+	public ToClient(SOCK sock){
+		this.socket = sock;
+	}
+	public boolean like(SOCK sock){
+		return this.socket == sock;
+	}
 
-	String key;	
-	//所属系统 所属调用者 eg: 283813u1983shfh128  服务端
-	//				   283813u1983shfh128-123123123 服务端所对应的客户端
+
+	public String getSysKey() {
+		return sysKey;
+	}
+
+
+
+	public void setSysKey(String sysKey) {
+		this.sysKey = sysKey;
+	}
+
+
+
+	public String getKey() {
+		return key;
+	}
+
+
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+
+
+	public SOCK getSocket() {
+		return socket;
+	}
+
+
+
+	public void setSocket(SOCK socket) {
+		this.socket = socket;
+	}
+
+
+
+	@Override
+	public String toString() {
+		return "ToClient [sysKey=" + sysKey + ", key=" + key + ", socket=" + socket + "]";
+	}
+	
 	
 	
 	

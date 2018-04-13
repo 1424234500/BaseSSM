@@ -157,11 +157,14 @@ public class MapListUtil {
 	 * @return
 	 */
 	public static String getList(List<Map> list, int i, String name){
+		return getList(list, i, name, "null");
+	}
+	public static String getList(List<Map> list, int i, String name, String defaultValue){
 		if(list == null) return "list is null";
 		if(i < 0)return "i < 0";
 		if(i >= list.size())return "i > list size";
 		if(list.get(i).get(name) == null){
-			return "null";
+			return defaultValue;
 		}else{
 			return list.get(i).get(name).toString();
 		}
@@ -173,9 +176,19 @@ public class MapListUtil {
 	 * @return
 	 */
 	public static String getMap(Map map, String name){
+		return getMap(map, name, "");
+	}
+
+	/**
+	 * 获取map的name列
+	 * @param map
+	 * @param name
+	 * @return
+	 */
+	public static String getMap(Map map, String name, String defaultValue){
 		if(map == null)return "map is null";
 		if(map.get(name) == null){
-			return "";
+			return defaultValue;
 		}else{
 			return map.get(name).toString();
 		}

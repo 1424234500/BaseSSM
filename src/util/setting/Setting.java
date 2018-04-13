@@ -56,7 +56,7 @@ public class Setting {
 	
 	/**
 	 * 设置并写入文件 若为空”“则不处理
-	 * @param key
+	 * @param msgType
 	 * @param value
 	 */
 	public static void saveManyProperty(String...keyValues){

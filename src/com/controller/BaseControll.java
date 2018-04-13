@@ -138,9 +138,9 @@ public abstract class BaseControll {
 	 */
 	public void log(Object...objs){
 		if(loggerChild != null)
-			loggerChild.info(Tools.getString(objs));
+			loggerChild.info(Tools.objects2string(objs));
 		else
-			logger.info(Tools.getString(objs));
+			logger.info(Tools.objects2string(objs));
 	}
 	
 	

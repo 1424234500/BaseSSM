@@ -9,35 +9,32 @@ package util.socket;
  * 
  */
 
-public interface Server{
+public interface Server <Arg> {
 //	? extends Test
-
 	/**
 	 * socket 写入 发送
-	 * 收到一个 服务端服务请求  转发给对应key的 客户端
+	 * 收到一个 服务端服务请求  转发给对应对象的 客户端
 	 * 把msg信息系统 用户转发出去
 	 */
-	public void send(String sysKey, String key, Msg msg);
+	public void send(Arg obj, String str);
 	
 	/**
 	 * socket 接收 到消息 回调 key客户发了msg消息过来
 	 */
-	public void onReceive(String sysKey, String key, Msg msg);
+	public void onReceive(Arg obj, String str);
 	
 	/**
 	 * socket 新连接
 	 */
-	public <Arg> void onNewConnection(Arg obj);
+	public void onNewConnection(Arg obj);
 	
+	 
 	/**
-	 * socket 启动完成
+	 * socket 断开了连接
 	 */
-	public <Arg> void onStart(Arg obj);
+	public void onDisConnection(Arg obj);
 	
-	/**
-	 * socket 关闭完成
-	 */
-	public <Arg> void onStop(Arg obj);
+	 
 	
 	
 	
@@ -45,9 +42,14 @@ public interface Server{
 	public boolean start();
 	public boolean pause();
 	public boolean stop();
+
+	
+	
+	public void setSendCallback(SendCallback sendCallback);
+
+
 	
 	
 	
 	
-	public <T> void make(T obj) ;
 } 

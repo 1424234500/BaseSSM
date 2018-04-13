@@ -1,23 +1,28 @@
 package util.socket;
 
+import java.net.Socket;
+
 public class Stest {
 
 	public static void main(String[] args) {
 		
-		Server s = new ServerImpl(){
+		Server server = new ServerImpl() {
 
 			@Override
-			public <Arg> void onStart(Arg obj) {
-				
+			public boolean start() {
+				// TODO Auto-generated method stub
+				return false;
 			}
 
 			@Override
-			public <Arg> void onStop(Arg obj) {
-				
+			public boolean stop() {
+				// TODO Auto-generated method stub
+				return false;
 			}
-			
 		};
+		FrameSocket fs = new FrameSocket(server);
 		
+		fs.start();
 		
 	}
 

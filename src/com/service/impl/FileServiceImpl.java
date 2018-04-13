@@ -64,7 +64,7 @@ public class FileServiceImpl implements FileService,Serializable {
 						String filesize = ""+obj.length();
 						String type = FileUtil.getFileType(name);
 						String path = obj.getPath();
-						String changetime = Tools.dateFormatL(new Date(obj.lastModified()));
+						String changetime = Tools.formatL(new Date(obj.lastModified()));
 						String about = "扫描出";
 						baseDao.executeSql("insert into fileinfo"
 								+ "(id,                   uptime, name,filesize,  type,path,changetime               ,about ) values "
@@ -83,7 +83,7 @@ public class FileServiceImpl implements FileService,Serializable {
 		File file = new File(path);
 		String filesize = ""+file.length();
 		String type = FileUtil.getFileType(name);
-		String changetime = Tools.dateFormatL(new Date(file.lastModified()));
+		String changetime = Tools.formatL(new Date(file.lastModified()));
 		about = Tools.cutString(about, 500);
 		String key = baseDao.getString("select SEQ_fileinfo.Nextval from dual");
 		int res = baseDao.executeSql("insert into fileinfo"

@@ -225,7 +225,7 @@ public class FileControll extends BaseControll{
 	
 	@Override
 	public void log(Object... objs) {
-		 logger.info(Tools.getString(objs));
+		 logger.info(Tools.objects2string(objs));
 	}
     
 }

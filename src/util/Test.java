@@ -13,7 +13,21 @@ public class Test {
 	public static void main(String[] args) {
 		new Test();
 	}
-	
+
+	public static void testInt(){
+		int a = 32768;//15
+		int aa = a*a;//30
+		out(aa, "30");
+		out(aa-1+aa, "31-1");//31-1
+		out(aa+aa-1, "31-1 flow 不影响");//31-1
+		out(aa+aa, "31");//31
+		out(-aa+1-aa, "-31+1");//-31+1
+		out(-aa-aa, "-31");//-31
+		out(-aa-aa-1, "-31-1");//-31
+			
+		out("-31", -2*aa, "31-1", aa*2-1);
+		out(aa*4);//33
+	}
 	Test(){
 //		defineWord();
 		
@@ -114,6 +128,9 @@ public class Test {
 
 		isValid(-1);
 		
+	}
+	public static void out(Object...objects){
+		Tools.out(objects);
 	}
 	boolean isValid(int x){
 		 /* 给 i 加 1 */
