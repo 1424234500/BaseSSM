@@ -40,16 +40,12 @@ public interface Server <Arg> {
 	
 	
 	public boolean start();
-	public boolean pause();
 	public boolean stop();
 
 	
 	
-	public void setSendCallback(SendCallback sendCallback);
 
+	public String show();
 
-	
-	
-	
 	
 } 

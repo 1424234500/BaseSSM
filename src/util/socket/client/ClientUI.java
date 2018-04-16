@@ -28,7 +28,7 @@ import util.TaskInterface;
 import util.TaskMake;
 import util.ThreadUtil;
 import util.Tools;
-import util.socket.FrameSocket;
+import util.socket.SocketFrame;
 import util.socket.Msg;
 import util.socket.ThreadUtilServer;
 

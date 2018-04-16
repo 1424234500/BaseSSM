@@ -11,7 +11,77 @@ import util.Tools;
  * 再由实际的底层调用此规则
  */
 
-public abstract class ServerImpl<Arg> implements Server<Arg>{
+public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
+	
+
+	/**
+	 * 底层实现 由实现类setThis 使this.do 调用  底层 frame.do
+	 */
+	SocketFrame frame = null;	//此怼底层引用
+	public ServerHashmapImpl(SocketFrame<SOCK> frame){
+		this.frame = frame;			//此对底层引用
+		this.frame.setServer(this);	//底层对此引用
+	}
+	
+	/**
+	 * 上层调用 底层 实现 发送
+	 * 向某个客户发送消息
+	 */
+	@Override
+	public void send(SOCK obj, String jsonstr){
+		Tools.out(">>>>", jsonstr);
+		this.frame.send(obj, jsonstr);
+	}
+	/**
+	 * 处理业务转发逻辑 底层调用这里 事件触发
+	 */
+	@Override
+	public void onReceive(SOCK obj, String jsonstr){
+		this.doMsg(obj, jsonstr);
+	}
+	/**
+	 * 1.java.net.Socket
+	 * 底层调用 事件触发
+	 */
+	@Override
+	public void onNewConnection(SOCK obj) {
+		//新连接 添加为自己掌管的客户 socket
+		ToClient toClient = new ToClient<SOCK>(obj);
+		this.addClient(DEFAULT_SYSKEY, toClient);
+		Tools.out("新连接", toClient);
+	} 
+	/**
+	 * 断开连接 事件触发
+	 */
+	@Override
+	public void onDisConnection(SOCK obj) {
+		//新连接 添加为自己掌管的客户 socket
+		ToClient toClient = this.getClient(obj);
+		Tools.out("断开连接", toClient);
+		this.removeClient(toClient.getSysKey(), toClient.getKey());
+	}
+	@Override
+	public boolean start() {
+		this.frame.start();
+		return true;
+	} 
+	@Override
+	public boolean stop() {
+		this.frame.stopImpl();
+		this.frame = null;
+		return true;
+	} 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 		//索引! 系统key       系统子级key  客户端引用
 	HashMap<String, HashMap<String, ToClient>> toClients = new HashMap<String, HashMap<String, ToClient>>();
 	final static String DEFAULT_SYSKEY = "0";
@@ -32,8 +102,7 @@ public abstract class ServerImpl<Arg> implements Server<Arg>{
 	 * Arg -> socket -> ToClient -> sysKey,key
 	 * str -> Msg(msgType, toSysKey, toKey, map)
 	 */
-	@Override
-	public void onReceive(Arg obj, String jsonstr){
+	public void doMsg(SOCK obj, String jsonstr){
 		Tools.out("<<<<<<<<<<", jsonstr);
 
 		
@@ -63,45 +132,9 @@ public abstract class ServerImpl<Arg> implements Server<Arg>{
 		}
 		
 	}
-	/**
-	 * 上层调用 
-	 * 向某个客户发送消息
-	 */
-	@Override
-	public void send(Arg obj, String jsonstr){
-		Tools.out(">>>>", jsonstr);
-		this.sendCallback.sendCallback(obj, jsonstr);
-	}
-	SendCallback sendCallback = null;
-	@Override
-	public void setSendCallback(SendCallback sendCallback) {
-		this.sendCallback = sendCallback;
-	}
+	
 
-	/**
-	 * 1.java.net.Socket
-	 * 
-	 */
-	@Override
-	public void onNewConnection(Arg obj) {
-		//新连接 添加为自己掌管的客户 socket
-		ToClient toClient = new ToClient<Arg>(obj);
-		this.addClient(DEFAULT_SYSKEY, toClient);
-		Tools.out("新连接", toClient);
-	} 
-	@Override
-	public void onDisConnection(Arg obj) {
-		//新连接 添加为自己掌管的客户 socket
-		ToClient toClient = this.getClient(obj);
-		Tools.out("断开连接", toClient);
-		this.removeClient(toClient.sysKey, toClient.key);
-	}
-	@Override
-	public boolean pause() {
-		return true;
-	}
- 
-	 
+
  
 
 	
@@ -158,7 +191,7 @@ public abstract class ServerImpl<Arg> implements Server<Arg>{
 	/**
 	 * 通过底层socket引用对象来获取hashmap中的toClient(sysKey, key, socket)实例
 	 */
-	private ToClient getClient(Arg obj){
+	private ToClient getClient(SOCK obj){
 		ToClient res = null;
 		for(String sysKey : toClients.keySet()){
 			for(String key : toClients.get(sysKey).keySet()){
@@ -171,7 +204,7 @@ public abstract class ServerImpl<Arg> implements Server<Arg>{
 		return res;
 	}
 	//服务器 路由状态
-	private String show(){
+	public String show(){
 		String res = "\n";
 		res += "------------------------------------------\n";
 		res += "--sysKeys : " + toClients.keySet().size();
@@ -187,5 +220,7 @@ public abstract class ServerImpl<Arg> implements Server<Arg>{
 		Tools.out(res);
 		return res;
 	}
+
+	
 	
 } 
