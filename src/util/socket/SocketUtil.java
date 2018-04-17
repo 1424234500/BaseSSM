@@ -1,0 +1,132 @@
+package util.socket;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+
+import util.Tools;
+
+public class SocketUtil {
+	
+/**
+ * 包协议
+ * 4个字节 长度 size 
+ * 正文\r
+ * 	
+ */
+	
+	
+	/**
+	 * socket io 阻塞模式读取行
+	 */
+	public static String readImpl(Socket socket, InterfaceOut interfaceOut) throws Exception {
+		String res = "";
+		InputStream is = socket.getInputStream();
+		InputStreamReader isr = new InputStreamReader(is);
+		BufferedReader reader = new BufferedReader(isr);
+		if(reader.ready()){	//若有可读数据 才readLine 直到行读完
+			byte[] head = new byte[4];
+			int len = is.read(head, 0, 4);	//使用基本流读取 头head4个字节决定长度
+			if(len == 4){
+				res = reader.readLine();	//在上面head的偏移量下 再读取行
+				len = Tools.bytes2int(head);
+				interfaceOut.out("size", len, "res", res);
+			}else{
+				res = reader.readLine();
+				interfaceOut.out("读取head异常", len, head.toString(), res);
+			}
+		}
+		return res;
+	}
+
+	/**
+	 * socket io 阻塞模式发送行
+	 */
+	public static void sendImpl(Socket socket, String jsonstr, InterfaceOut socketIO) throws Exception {
+		if(!Tools.isNull(jsonstr))return;
+		byte[] bytes = jsonstr.getBytes();
+		OutputStream os = socket.getOutputStream();
+		os.write(Tools.int2bytes(bytes.length));	//int = 4byte = 32bit
+		os.write(bytes);
+//		os.write('\r');
+//		os.write('\n');
+		os.flush();		
+	}
+
+	
+	
+	
+	/**
+	 * socket nio 非阻塞模式发送字节包
+	 */
+	public static void sendImpl(SocketChannel socket, String jsonstr, InterfaceOut socketIO) throws Exception {
+		if(!Tools.isNull(jsonstr))return;
+		
+		byte[] bytes = jsonstr.getBytes("UTF-8");
+        int size = bytes.length;
+        ByteBuffer sizeBuffer = ByteBuffer.allocate(4);
+        sizeBuffer.putInt(bytes.length);
+        sizeBuffer.flip();
+        while (sizeBuffer.hasRemaining()) {
+            socket.write(sizeBuffer);
+        }	
+        ByteBuffer buffer = ByteBuffer.allocate(size);
+        buffer.put(bytes);
+        buffer.flip();
+        while (buffer.hasRemaining()) {
+            socket.write(buffer);
+        }	
+        socket.finishConnect();
+	}
+	/**
+	 * socket nio 非阻塞模式读取字节包
+	 */
+	public static String readImpl(SocketChannel socket, InterfaceOut interfaceOut) throws Exception {
+		String res = "";
+		
+        ByteBuffer sizeBuffer = ByteBuffer.allocate(4);
+        sizeBuffer.clear();
+        int read = socket.read(sizeBuffer);	//尝试读取数据流 的头4个字节<int> 读取长度 -1表示读取到了数据流的末尾了；
+        if (read != -1) {	//若有数据<0.2条数据 1条数据 3.2条数据>
+            sizeBuffer.flip();
+            int size = sizeBuffer.getInt();	//头4个字节 int 大小 int = 4byte = 32bit
+            
+            int readCount = 0;
+            byte[] b = new byte[1024];
+    		ByteBuffer buffer = ByteBuffer.allocate(1024);
+            StringBuilder sb = new StringBuilder();
+            while (readCount < size) {  //读取已知长度消息内容 异步读取 死循环 直到读够目标字节数
+                buffer.clear();
+                read = socket.read(buffer);
+                if (read != -1) {
+                    readCount += read;
+                    buffer.flip();
+                    int index = 0 ;
+                    while(buffer.hasRemaining()) {
+                        b[index++] = buffer.get();
+                        if (index >= b.length) {
+                            index = 0;
+                            sb.append(new String(b,"UTF-8"));
+                        }
+                    }
+                    if (index > 0) {
+                        sb.append(new String(b,"UTF-8"));
+                    }
+                }
+            }
+            res = sb.toString();
+            interfaceOut.out("size", size, "res", res);
+        } 
+		return res;		
+	}
+	
+	
+	
+	
+	
+}

@@ -3,7 +3,9 @@ package util.socket;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -12,6 +14,7 @@ import java.net.Socket;
 import util.TaskInterface;
 import util.TaskMake;
 import util.Tools;
+import util.setting.Setting;
 
 /**
  * 底层 socket 基本实现
@@ -24,18 +27,21 @@ public  class SocketIO extends SocketFrame<Socket>  {
 
 	static ServerSocket serverSocket;
 	 
-	static String  serverHostName = "walker";				//服务器hostname
-	static boolean boolIfOn = false;	//是否开启监听线程
-	 
+	static String  serverHostName;			//服务器hostname
+	static boolean boolIfOn;				//是否开启监听线程
+	static String  serverIp;				//服务器ip
+	static int	   serverPort;				//服务器port
+
  
-	 
+	public SocketIO(){
+		serverPort = Setting.getInt("socket_port_io", 8090);
+	}
 
 	@Override
 	protected void startImpl() throws Exception{
 		serverSocket = new ServerSocket(serverPort);
 		out("启动服务器成功：服务器信息如下");
 		serverIp = InetAddress.getLocalHost().getHostAddress();
-		serverPort = serverSocket.getLocalPort();
 		serverHostName = InetAddress.getLocalHost().getHostName();
 		out(serverIp, serverPort, serverHostName);
 		out("等待客户端.....");
@@ -56,21 +62,21 @@ public  class SocketIO extends SocketFrame<Socket>  {
 		out("关闭服务器监听线程");
 		
 	} 
-	//读取数据
+	/**
+	 * io阻塞方式 行读取模式  解离长度头 假设最多发送不会超过一行
+	 * line:  int<28>{"id":0010,"name":"asdfj"}
+	 */
 	@Override
 	public String readImpl(Socket socket) throws Exception{
-		String res = "";
-		BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		res = reader.readLine();
-		return res;
+		return SocketUtil.readImpl(socket, this);
 	}
-	//发送数据
+	/**
+	 * io阻塞方式 对应的行发送模式  添加长度头
+	 * line:  int<28>{"id":0010,"name":"asdfj"}
+	 */
 	@Override
 	public void sendImpl(Socket socket, String jsonstr) throws Exception {
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter( socket.getOutputStream()));
-		writer.write(jsonstr); 
-		writer.newLine();
-		writer.flush();
+		SocketUtil.sendImpl(socket, jsonstr, this);
 	}
 
 	@Override

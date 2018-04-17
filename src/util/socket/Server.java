@@ -6,11 +6,10 @@ package util.socket;
  * 负责维护和很多客户端保持连接
  * 同时维护和很多服务端保持连接
  * socket信息 中转 转发站
- * 
+ * 逻辑处理接口!!!!!!!!!!!!
  */
 
 public interface Server <Arg> {
-//	? extends Test
 	/**
 	 * socket 写入 发送
 	 * 收到一个 服务端服务请求  转发给对应对象的 客户端
@@ -46,6 +45,6 @@ public interface Server <Arg> {
 	
 
 	public String show();
-
+	public void out(Object...objects);
 	
 } 

@@ -41,11 +41,15 @@ public class TaskMake{
 			this.time = time;
 			this.maxRetryCount = maxRetryCount;
 		} 
+		public void out(Object...objects){
+//			result.tip(objects);
+			Tools.out("Task", Tools.objects2string(objects));
+		}
 		@Override
 		public void run() {
 			try{
 				if(count > 0 && count <= maxRetryCount){
-					Tools.out("尝试重新" + doName, count);
+					out("尝试重新" + doName, count);
 					result.doTask();
 					count = 0;
 					result.onTrue();
@@ -58,7 +62,7 @@ public class TaskMake{
 				}
 			}catch(Exception e){
 //				e.printStackTrace();
-				Tools.out(TaskMake.this.doName + "异常," + Tools.calcTime(time) + "后重新读取", count++, e.toString());
+				out(TaskMake.this.doName + "异常," + Tools.calcTime(time) + "后重新读取", count++, e.toString());
 				ThreadUtil.sleep(time);
 				TaskMake.this.startTask();
 			}

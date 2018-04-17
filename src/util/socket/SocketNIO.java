@@ -6,12 +6,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 
 import util.TaskInterface;
 import util.TaskMake;
 import util.Tools;
+import util.setting.Setting;
 
 /**
  * 底层 socket 基本实现
@@ -20,31 +25,34 @@ import util.Tools;
  *
  */
 
-public  class SocketNIO extends SocketFrame<Socket>  {
+public  class SocketNIO extends SocketFrame<SocketChannel>  {
 
-	static ServerSocket serverSocket;
+	static ServerSocketChannel serverSocketChannel;
 	 
-	static String  serverIp = "127.0.0.1";				//服务器ip
-	static int	   serverPort = 8090;				//服务器port
-	static String  serverHostName = "walker";				//服务器hostname
-	static boolean boolIfOn = false;	//是否开启监听线程
-	 
+	static String  serverHostName;			//服务器hostname
+	static boolean boolIfOn;				//是否开启监听线程
+	static String  serverIp;				//服务器ip
+	static int	   serverPort;				//服务器port
+	
  
-	 
+	public SocketNIO(){
+		serverPort = Setting.getInt("socket_port_nio", 8091);
+	}
 
 	@Override
 	protected void startImpl() throws Exception{
-		serverSocket = new ServerSocket(serverPort);
+		serverSocketChannel = ServerSocketChannel.open();
+		serverSocketChannel.bind(new InetSocketAddress(serverPort));
+		
 		out("启动服务器成功：服务器信息如下");
 		serverIp = InetAddress.getLocalHost().getHostAddress();
-		serverPort = serverSocket.getLocalPort();
 		serverHostName = InetAddress.getLocalHost().getHostName();
 		out(serverIp, serverPort, serverHostName);
 		out("等待客户端.....");
 		boolIfOn = true;
 		while (boolIfOn) {
 			try{
-				Socket tempSocket = serverSocket.accept();
+				SocketChannel tempSocket = serverSocketChannel.accept();
 				//获取到一个连接客户,放入连接客户集合
 				out("检测到连接:" + tempSocket.toString());
 				//上层负责管理转发调用逻辑  
@@ -57,38 +65,28 @@ public  class SocketNIO extends SocketFrame<Socket>  {
 		}
 		out("关闭服务器监听线程");
 		
-	} 
-	//读取数据
-	@Override
-	public String readImpl(Socket socket) throws Exception{
-		String res = "";
-		BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		res = reader.readLine();
-		return res;
 	}
-	//发送数据
+
 	@Override
-	public void sendImpl(Socket socket, String jsonstr) throws Exception {
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter( socket.getOutputStream()));
-		writer.write(jsonstr); 
-		writer.newLine();
-		writer.flush();
+	protected void startRead(SocketChannel socket) throws Exception {
+		read(socket);
+	}
+
+	@Override
+	protected String readImpl(SocketChannel socket) throws Exception {
+		return SocketUtil.readImpl(socket, this);
+	}
+
+	@Override
+	protected void sendImpl(SocketChannel socket, String jsonstr) throws Exception {
+		SocketUtil.sendImpl(socket, jsonstr, this);
 	}
 
 	@Override
 	protected void stopImpl() {
-		try {
-			serverSocket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	@Override
-	protected void startRead(Socket socket) throws Exception {
-		read(socket);
-	} 
-	  
-	
+		// TODO Auto-generated method stub
+		
+	}  
 	
 	
 }

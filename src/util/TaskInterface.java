@@ -8,5 +8,5 @@ public interface TaskInterface{
 	public void onTrue() ;	//操作成功
 	public void onFalse();	//操作重试都失败
 	public void doTask() throws Exception;	//执行任务
-	
+	public void tip(Object...objects);	//提示信息输出
 } 

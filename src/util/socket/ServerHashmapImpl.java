@@ -29,7 +29,7 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 	 */
 	@Override
 	public void send(SOCK obj, String jsonstr){
-		Tools.out(">>>>", jsonstr);
+		out(">>>>", jsonstr);
 		this.frame.send(obj, jsonstr);
 	}
 	/**
@@ -48,7 +48,7 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 		//新连接 添加为自己掌管的客户 socket
 		ToClient toClient = new ToClient<SOCK>(obj);
 		this.addClient(DEFAULT_SYSKEY, toClient);
-		Tools.out("新连接", toClient);
+		out("新连接", toClient);
 	} 
 	/**
 	 * 断开连接 事件触发
@@ -57,7 +57,7 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 	public void onDisConnection(SOCK obj) {
 		//新连接 添加为自己掌管的客户 socket
 		ToClient toClient = this.getClient(obj);
-		Tools.out("断开连接", toClient);
+		out("断开连接", toClient);
 		this.removeClient(toClient.getSysKey(), toClient.getKey());
 	}
 	@Override
@@ -83,7 +83,7 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 	
 	
 		//索引! 系统key       系统子级key  客户端引用
-	HashMap<String, HashMap<String, ToClient>> toClients = new HashMap<String, HashMap<String, ToClient>>();
+	static HashMap<String, HashMap<String, ToClient>> toClients = new HashMap<String, HashMap<String, ToClient>>();
 	final static String DEFAULT_SYSKEY = "0";
 	final static String DEFAULT_KEY = "0";
 	
@@ -103,7 +103,7 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 	 * str -> Msg(msgType, toSysKey, toKey, map)
 	 */
 	public void doMsg(SOCK obj, String jsonstr){
-		Tools.out("<<<<<<<<<<", jsonstr);
+		out("<<<<<<<<<<", jsonstr);
 
 		
 		ToClient toClient = this.getClient(obj);
@@ -113,7 +113,7 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 		Msg msg = new Msg(fromSysKey, fromKey, jsonstr);
 		String toSysKey = msg.getToSysKey();
 		String toKey = msg.getToKey();
-		Tools.out("onReceive", msg);
+		out("onReceive", msg);
 
 		//未登录某系统时 都归属于 this 0/1000+
 		if(msg.getMsgType() == Msg.LOGIN_CLIENT){		//客户端登录
@@ -217,8 +217,13 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 			}
 		}
 		res += "\n";
-		Tools.out(res);
+		out(res);
 		return res;
+	}
+
+	@Override
+	public void out(Object...objects) {
+		Tools.out(objects);
 	}
 
 	

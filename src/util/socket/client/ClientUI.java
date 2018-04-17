@@ -6,15 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -24,20 +15,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import util.TaskInterface;
-import util.TaskMake;
-import util.ThreadUtil;
 import util.Tools;
-import util.socket.SocketFrame;
 import util.socket.Msg;
-import util.socket.ThreadUtilServer;
 
 public class ClientUI extends JFrame  {
-	private static final long serialVersionUID = 1L;
-
-	public static void main(String[] args) {
-		new ClientUI();
-	}
 
 	public JButton jbshowusers = new JButton("好友");
 	public JButton jbshowrooms = new JButton("会话");
@@ -52,10 +33,18 @@ public class ClientUI extends JFrame  {
 	public JTextField jtfSend2;// 需要发送的文本信息
 	public JTextArea taShow;// 信息展示
 	
-
-	 
-	public ClientUI() {
-		super("模拟客户端");
+	Client client;
+	public ClientUI(Client cc, String name) {
+		super(name);
+		init(cc, name);
+	}
+	public ClientUI(Client cc) {
+		this(cc, "模拟客户端");
+	}
+	public void init(Client cc, String name){
+		this.client = cc;
+		this.client.setUI(this);
+		this.client.start(); 
 		btStart = new JButton("关闭");
 		btSend = new JButton("发送");
 		btLogin = new JButton("登录");
@@ -65,18 +54,19 @@ public class ClientUI extends JFrame  {
 		jtfSend2 = new JTextField(6);
 		jtfSend1.setText("101");
 		jtfSend2.setText("123");
-		jtfSend.setText("{\"cmd\":12,\"value0\":\"group\",\"value1\":\"100000\",\"value2\":\"text\",\"value3\":\"2017-05-24 00:03:31\",\"value4\":\"消息 "+ Tools.getNowTimeL() +"\"}");
+//		jtfSend.setText("{\"cmd\":12,\"value0\":\"group\",\"value1\":\"100000\",\"value2\":\"text\",\"value3\":\"2017-05-24 00:03:31\",\"value4\":\"消息 "+ Tools.getNowTimeL() +"\"}");
+		jtfSend.setText("{\"sy\":\""+ name + "\"}");
 
 		taShow = new JTextArea();
 
 
 		btStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (client == null) {
-					startclient();
+				if (client != null) {
+					client.start();
 					btStart.setText("关闭");
 				} else {
-					stop();
+					client.stop();
 					client = null;
 					btStart.setText("启动");
 				}
@@ -87,7 +77,7 @@ public class ClientUI extends JFrame  {
 		btSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String mmsg = ("" + jtfSend.getText());// 写入发送流到 客户端去
-			   startSendTask(client, mmsg);
+				client.send(mmsg);
 			}
 		});
 		btLogin.addActionListener(new ActionListener() {
@@ -98,12 +88,13 @@ public class ClientUI extends JFrame  {
 				msg.setMsgType(Msg.LOGIN_CLIENT);
 				msg.setToKey(key);
 				msg.setToSysKey(sysKey);
-				startSendTask(client, msg.getData());
+				client.send(msg.getData());
 				
 			}
 		});
 		jbshowrooms.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				out(client.show());
 			}
 		});
 		jbtest.addActionListener(new ActionListener() {
@@ -147,109 +138,8 @@ public class ClientUI extends JFrame  {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setBounds(80, 80, 780, 280);
 		this.setVisible(true);
-		startclient(); 
 	//	test();
 	}
-	
-	Socket client = null;
-	String ip = "127.0.0.1";
-	int port = 8090;
-	int reconnect = 998;	//重连次数
-	long sleeptime = 1000;//重连间隔
-	private void startclient()   {
-		startConnectTask();
-	}
-	 
-	 
-	//开始连接任务
-	private void startConnectTask(){
-		TaskMake task = new TaskMake(new TaskInterface() {
-			@Override
-			public void onTrue() {
-				out("连接成功", client);
-			}
-			@Override
-			public void onFalse() {
-				out("连接多次后依然失败 -----");
-			}
-			@Override
-			public void doTask() throws Exception {
-				Socket socket = new Socket(ip, port);
-				client = socket;
-				startReadTask();
-			}
-		}, "连接服务器", sleeptime, reconnect);
-		task.startTask();
-	}  
-	//开始读取任务
-	private void startReadTask(){
-		TaskMake taskMake = new TaskMake(new TaskInterface() {
-			@Override
-			public void onTrue() {
-				startReadTask();	//一个task(20延迟,最多连续两次异常读取)
-			}
-			@Override
-			public void onFalse() {	//多次异常读取后就认为失联
-				out("失联", client);
-				startConnectTask();
-			}
-			@Override
-			public void doTask() throws Exception {
-				String readLine = read(client);
-				if(Tools.isNull(readLine)){
-					onReceive(client, readLine);
-				}
-			}
-		}, "读取消息",1000, 5);	//最多5次读取
-		taskMake.startTask();
-	}  
-	//开启发送任务
-	public void startSendTask(final Socket socket, final String jsonstr){
-		TaskMake task = new TaskMake(new TaskInterface() {
-			@Override
-			public void onTrue() {
-				out("发送成功", jsonstr);
-			}
-			@Override
-			public void onFalse() {
-				out("发送失败", jsonstr);
-			}
-			@Override
-			public void doTask() throws Exception {
-				send(socket, jsonstr);
-			}
-		});
-		task.startTask();
-	}
-	//读取数据
-	private String read(Socket socket) throws Exception{
-		String res = "";
-		BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		res = reader.readLine();
-		return res;
-	}
-	//发送数据
-	public void send(Socket socket, String jsonstr) throws Exception {
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter( socket.getOutputStream()));
-		writer.write(jsonstr); 
-		writer.newLine();
-		writer.flush();
-	}
-	public void onReceive(Socket socket, String jsonstr) {
-		out("<<<<<<<", jsonstr);
-	}
-
-	
-	
-	
-	public void stop(){
-		try {
-			client.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	} 
 
 	public void out(Object...objects) {
 		String s = Tools.objects2string(objects);
@@ -259,13 +149,17 @@ public class ClientUI extends JFrame  {
 			if (this.taShow.getText().length() >= 14000) {
 				this.taShow.setText("");
 			}
-			this.taShow.append(s + "\n");
+			this.taShow.append(this.client.getClass().getName() + " " + s + "\n");
 			
 			if(this.jcbscroll.isSelected())
 				this.taShow.setCaretPosition(this.taShow.getText().length()); // 锁定最底滚动
 
 //			Tools.out(s);
 		}
+	}
+
+	public void onReceive(String readLine) {
+		out(readLine);
 	}
 
 }

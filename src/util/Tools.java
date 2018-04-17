@@ -2,6 +2,7 @@ package util;
 
 import java.awt.Color;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -94,9 +95,9 @@ public class Tools {
 		if(objects == null)return null;
 		String[] objs = new  String[objects.length] ;
 		for(int i = 0; i < objects.length; i++){
-			if(objects[i] != null)
+			if(objects[i] != null){
 				objs[i] = objects[i].toString();
-			else
+			}else
 				objs[i] = "null!";
 		}
 		return objs;
@@ -225,7 +226,7 @@ public class Tools {
 	 */
 	public static long parseLong(String num) {
 		long res = 0;
-		 if(num == null){
+		 if(!Tools.isNull(num)){
 			 res = 0;
 		 }else{
 			 try{
@@ -242,7 +243,7 @@ public class Tools {
 	 */
 	public static double parseDouble(String num) {
 		double res = 0;
-		 if(num == null){
+		 if(!Tools.isNull(num)){
 			 res = 0;
 		 }else{
 			 try{
@@ -259,7 +260,7 @@ public class Tools {
 	 */
 	public static int parseInt(String num) {
 		int res = 0;
-		 if(num == null){
+		 if(!Tools.isNull(num)){
 			 res = 0;
 		 }else{
 			 try{

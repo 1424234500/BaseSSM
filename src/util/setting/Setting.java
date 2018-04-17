@@ -43,16 +43,36 @@ public class Setting {
             InputStream in = new BufferedInputStream (new FileInputStream(settingFileName));
             proper.load(in);     ///加载属性列表 
             in.close(); 
-
         }
         catch(Exception e){
             e.printStackTrace();
         }
 	}
+	
 	public static String getProperty(String key, String defaultValue ){
 		if(defaultValue == null) defaultValue = "";
-		return proper.getProperty(key, defaultValue);
+		
+		String res = proper.getProperty(key);
+		if(!Tools.isNull(res)){	//该键值不存在 则添加存入文件
+			res = defaultValue;
+			saveProperty(key, defaultValue);
+		}
+		return res;
 	}
+	public static String getString(String key, String defaultValue){
+		return getProperty(key, defaultValue+"");
+	}
+	public static int getInt(String key, int defaultValue){
+		return Tools.parseInt(getProperty(key, defaultValue+""));
+	}
+	public static long getLong(String key, long defaultValue){
+		return Tools.parseLong(getProperty(key, defaultValue+""));
+	}
+	public static Double getDouble(String key, double defaultValue){
+		return Tools.parseDouble(getProperty(key, defaultValue+""));
+	}
+	
+	
 	
 	/**
 	 * 设置并写入文件 若为空”“则不处理
