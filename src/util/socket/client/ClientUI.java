@@ -52,8 +52,8 @@ public class ClientUI extends JFrame  {
 		jtfSend = new JTextField(20);
 		jtfSend1 = new JTextField(6);
 		jtfSend2 = new JTextField(6);
-		jtfSend1.setText("101");
-		jtfSend2.setText("123");
+		jtfSend1.setText("syskey001");
+		jtfSend2.setText("1001");
 //		jtfSend.setText("{\"cmd\":12,\"value0\":\"group\",\"value1\":\"100000\",\"value2\":\"text\",\"value3\":\"2017-05-24 00:03:31\",\"value4\":\"消息 "+ Tools.getNowTimeL() +"\"}");
 		jtfSend.setText("{\"sy\":\""+ name + "\"}");
 
@@ -77,15 +77,24 @@ public class ClientUI extends JFrame  {
 		btSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String mmsg = ("" + jtfSend.getText());// 写入发送流到 客户端去
-				client.send(mmsg);
+				
+				String sysKey = jtfSend1.getText();	//发往系统
+				String key = jtfSend2.getText();	//发往用户连接
+				Msg msg = new Msg();
+				msg.setMsgType(Msg.DATA);
+				msg.setToKey(key);
+				msg.setToSysKey(sysKey);
+				msg.setFromSysKey(sysKey);
+				msg.put("data", mmsg);
+				client.send(msg.getData());
 			}
 		});
 		btLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String sysKey = jtfSend1.getText();
-				String key = jtfSend2.getText();
+				String sysKey = jtfSend1.getText();	//发往系统
+				String key = jtfSend2.getText();	//发往用户连接
 				Msg msg = new Msg();
-				msg.setMsgType(Msg.LOGIN_CLIENT);
+				msg.setMsgType(Msg.LOGIN);
 				msg.setToKey(key);
 				msg.setToSysKey(sysKey);
 				client.send(msg.getData());

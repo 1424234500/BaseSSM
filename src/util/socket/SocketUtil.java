@@ -28,18 +28,25 @@ public class SocketUtil {
 		String res = "";
 		InputStream is = socket.getInputStream();
 		InputStreamReader isr = new InputStreamReader(is);
-		BufferedReader reader = new BufferedReader(isr);
-		if(reader.ready()){	//若有可读数据 才readLine 直到行读完
+		
+		if(isr.ready()){
 			byte[] head = new byte[4];
-			int len = is.read(head, 0, 4);	//使用基本流读取 头head4个字节决定长度
-			if(len == 4){
-				res = reader.readLine();	//在上面head的偏移量下 再读取行
-				len = Tools.bytes2int(head);
-				interfaceOut.out("size", len, "res", res);
-			}else{
-				res = reader.readLine();
-				interfaceOut.out("读取head异常", len, head.toString(), res);
-			}
+	        int read = is.read(head, 0, head.length);	//尝试读取数据流 的头4个字节<int> 读取长度 -1表示读取到了数据流的末尾了；
+	        if (read != -1) {
+	            int size = Tools.bytes2int(head);	//头4个字节 int 大小 int = 4byte = 32bit
+	            int readCount = 0;
+	            StringBuilder sb = new StringBuilder();
+	            while (readCount < size) {  //读取已知长度消息内容 异步读取 死循环 直到读够目标字节数
+		            byte[] buffer = new byte[2048];
+	                read = is.read(buffer, 0, Math.min(size - readCount, buffer.length) );
+	                if (read != -1) {
+	                    readCount += read;
+                        sb.append(new String(buffer,"UTF-8"));
+	                }
+	            }
+	            res = sb.toString();
+	            interfaceOut.out("size", size, "res", res);
+	        } 
 		}
 		return res;
 	}

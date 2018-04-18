@@ -18,49 +18,43 @@ public class Msg{
 	final public static int BROADCAST = -2;		//广播所有
 	final public static int BROADCAST_SYS = -1;	//广播本系统
 	
-	final public static int LOGIN_SERVER = 0;				//服务器登录
-	final public static int LOGIN_CLIENT = 1;				//客户端登录
+	final public static int LOGIN = 0;				//服务器/客户端登录
 	
 	final public static int TOSERVER = 11;			//发往服务器
 	final public static int TOCLIENT = 12;			//发往客户端
+	final public static int DATA = 10;				//文本消息 请求转发
 	
 
 
 	int msgType;		//一条消息 的类型  登录系统Msg.LOGIN 广播本系统
 	String toSysKey;	//发往目标系统	也可以根据socket绑定的sysKey 和 key做 逻辑验证
 	String toKey;		//发往目标客户
-	
-	Map map;	//消息数据包
+	String fromSysKey;	//来自系统
+	String fromKey;		//来自服务器
+	Map map;			//消息数据包
 	
 	public Msg(){
 		map = new HashMap();
 		msgType = -999;
 		toSysKey = "0";
 		toKey = "0";
+		fromSysKey = "0";
+		fromKey = "0";
 	}
-
-	public Msg(String sysKey, String key, String jsonstr){
-		this(jsonstr);
-		this.put("fromsyskey", sysKey);
-		this.put("fromkey", key);
-	}
+ 
 	public Msg(String jsonstr){
-		map = new HashMap();
-		msgType = -999;
-		toSysKey = "0";
-		toKey = "0";
-	
-        map = JsonUtil.getMap(jsonstr);
-        Tools.out(map);
-        msgType = Tools.parseInt(MapListUtil.getMap(map, "msgtype"));
-        toSysKey = MapListUtil.getMap(map, "tosyskey");
-        toKey = MapListUtil.getMap(map, "tokey");
-		
-		this.put("tttttttttt", "ttttttttttt");
+        Map map = JsonUtil.getMap(jsonstr);
+//        Tools.out(tmap);
+        this.setMsgType(Tools.parseInt(MapListUtil.getMap(map, "msgtype", "0")));
+        this.setToSysKey(MapListUtil.getMap(map, "tosyskey", "0"));
+        this.setToKey(MapListUtil.getMap(map, "tokey", "0"));
+        this.setFromSysKey(MapListUtil.getMap(map, "fromsyskey", "0"));
+        this.setFromKey(MapListUtil.getMap(map, "fromkey", "0"));
+        this.setData((Map) MapListUtil.getMap(map, "data", new HashMap()));
+        
 	}
 	public Msg setMsgType(int key){
 		this.msgType = key;
-		this.put("msgtype", key);
 		return this;
 	}
 	
@@ -74,7 +68,14 @@ public class Msg{
 		return map;
 	}
 	public String getData(){
-		return JsonUtil.makeJson(this.map);
+		Map m = new HashMap();
+		m.put("msgtype", this.getMsgType());
+		m.put("tosyskey", this.getToSysKey());
+		m.put("tokey", this.getToKey());
+		m.put("fromsyskey", this.getFromSysKey());
+		m.put("fromkey", this.getFromKey()); 
+		m.put("data", this.getDataMap());
+		return JsonUtil.makeJson(m);
 	}
 	public Object get(Object key){
 		return this.get(key, null);
@@ -89,20 +90,29 @@ public class Msg{
 
 
 
+	public String getFromSysKey() {
+		return fromSysKey;
+	}
 
+	public void setFromSysKey(String fromSysKey) {
+		this.fromSysKey = fromSysKey;
+	}
+
+	public String getFromKey() {
+		return fromKey;
+	}
+
+	public void setFromKey(String fromKey) {
+		this.fromKey = fromKey;
+	}
 
 	public String getToSysKey() {
 		return toSysKey;
 	}
 
-
-
 	public void setToSysKey(String toSysKey) {
-		this.put("tosyskey", toSysKey);
 		this.toSysKey = toSysKey;
 	}
-
-
 
 	public String getToKey() {
 		return toKey;
@@ -111,7 +121,6 @@ public class Msg{
 
 
 	public void setToKey(String toKey) {
-		this.put("tokey", toKey);
 		this.toKey = toKey;
 	}
 
@@ -121,11 +130,15 @@ public class Msg{
 		return msgType;
 	}
 
+	public Msg setData(Map data){
+		this.map = data;
+		return this;
+	}
 
 
 	@Override
 	public String toString() {
-		return Tools.objects2string(msgType, toSysKey, toKey, map);
+		return this.getData();
 	}
 	 
 	

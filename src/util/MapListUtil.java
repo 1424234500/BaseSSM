@@ -194,6 +194,21 @@ public class MapListUtil {
 		}
 	}
 	/**
+	 * 获取map的name列
+	 * @param map
+	 * @param name
+	 * @return Object
+	 */
+	public static Object getMap(Map map, String name, Object defaultValue){
+		if(map == null)return "map is null";
+		if(map.get(name) == null){
+			return defaultValue;
+		}else{
+			return map.get(name);
+		}
+	}
+	
+	/**
 	 * 转换Map<String, Object> -> Map<String, Double>
 	 * @param map
 	 * @return

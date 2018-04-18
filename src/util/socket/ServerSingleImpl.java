@@ -5,20 +5,17 @@ import java.util.HashMap;
 import util.Tools;
 
 /**
- * 一种逻辑管理的服务 实现  抽离转发规则
- * 由底层控制调用 此 又回归底层调用实现
- * 使用HashMap<String, HashMap<String, SOCKET>>管理所有连接和定义转发规则
- * 再由实际的底层调用此规则
+ * 单独的socket服务器管理实现
  */
 
-public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
+public  class ServerSingleImpl<SOCK> implements Server<SOCK>{
 	
 
 	/**
 	 * 底层实现 由实现类setThis 使this.do 调用  底层 frame.do
 	 */
 	SocketFrame frame = null;	//此怼底层引用
-	public ServerHashmapImpl(SocketFrame<SOCK> frame){
+	public ServerSingleImpl(SocketFrame<SOCK> frame){
 		this.frame = frame;			//此对底层引用
 		this.frame.setServer(this);	//底层对此引用
 	}
@@ -131,19 +128,8 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 			msg.setFromKey(fromKey);		//发消息者不需要设置自己的路由ip 只需要设置目标地点
 			msg.setFromSysKey(fromSysKey);
 			out("解析结构", msg.getData());
-			if(msg.getMsgType() == Msg.DATA){
-				toClient = this.getClient(msg.getToSysKey(), msg.getToKey());
-				if(toClient == null){//不在线
-					out("不在线", msg);
-					msg.put("res", "false");
-					msg.put("info", "不在线");
-					send(obj, msg.getData());
-				}else{
-					send(toClient.getSocket(), msg.getData());
-					msg.put("res", "true");
-					send(obj, msg.getData());
-				}
-			}
+
+
 			
 			
 			
