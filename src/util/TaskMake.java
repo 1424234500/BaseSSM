@@ -51,10 +51,10 @@ public class TaskMake{
 				if(count > 0 && count <= maxRetryCount){
 					out("尝试重新" + doName, count);
 					result.doTask();
-					count = 0;
 					result.onTrue();
 				}else if(count > maxRetryCount){
 					result.onFalse();
+					count = 0;
 				}else{
 					result.doTask();
 					count = 0;

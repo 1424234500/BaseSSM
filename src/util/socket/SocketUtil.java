@@ -127,7 +127,7 @@ public class SocketUtil {
                 }
             }
             res = sb.toString();
-            interfaceOut.out("size", size, "res", res);
+//            interfaceOut.out("size", size, "res", res);
         } 
 		return res;		
 	}

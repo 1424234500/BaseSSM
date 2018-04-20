@@ -24,6 +24,7 @@ public abstract class ClientFrame implements Client, InterfaceOut{
 	}
 	public void out(Object...objects){
 		clientUi.out(objects);
+//		Tools.out(objects);
 	}
  
 	//开始连接任务
@@ -33,6 +34,7 @@ public abstract class ClientFrame implements Client, InterfaceOut{
 			@Override
 			public void onTrue() {
 				out("连接成功");
+				read();
 			}
 			@Override
 			public void onFalse() {
@@ -58,7 +60,7 @@ public abstract class ClientFrame implements Client, InterfaceOut{
 			}
 			@Override
 			public void onFalse() {	//多次异常读取后就认为失联
-				out("失联");
+				out("失联", show());
 				start();
 			}
 			@Override
@@ -81,7 +83,7 @@ public abstract class ClientFrame implements Client, InterfaceOut{
 		TaskMake task = new TaskMake(new TaskInterface() {
 			@Override
 			public void onTrue() {
-//				out("发送成功", jsonstr);
+				out("发送", jsonstr);
 			}
 			@Override
 			public void onFalse() {

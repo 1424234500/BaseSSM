@@ -15,6 +15,8 @@ import util.Tools;
  */
 @SuppressWarnings({ "serial", "rawtypes", "unchecked" })
 public class Msg{
+	final public static int SHOW = -1000;				//监控
+
 	final public static int BROADCAST = -2;		//广播所有
 	final public static int BROADCAST_SYS = -1;	//广播本系统
 	
@@ -31,6 +33,9 @@ public class Msg{
 	String toKey;		//发往目标客户
 	String fromSysKey;	//来自系统
 	String fromKey;		//来自服务器
+
+	String info;	//说明
+	String ok;		//传输结果
 	Map map;			//消息数据包
 	
 	public Msg(){
@@ -45,14 +50,43 @@ public class Msg{
 	public Msg(String jsonstr){
         Map map = JsonUtil.getMap(jsonstr);
 //        Tools.out(tmap);
+        this.setOk(MapListUtil.getMap(map, "ok", ""));
+        this.setInfo(MapListUtil.getMap(map, "info", ""));
         this.setMsgType(Tools.parseInt(MapListUtil.getMap(map, "msgtype", "0")));
         this.setToSysKey(MapListUtil.getMap(map, "tosyskey", "0"));
         this.setToKey(MapListUtil.getMap(map, "tokey", "0"));
         this.setFromSysKey(MapListUtil.getMap(map, "fromsyskey", "0"));
         this.setFromKey(MapListUtil.getMap(map, "fromkey", "0"));
         this.setData((Map) MapListUtil.getMap(map, "data", new HashMap()));
-        
 	}
+	public String getData(){
+		Map m = new HashMap();
+		m.put("ok", this.getOk());
+		m.put("info", this.getInfo());
+		m.put("msgtype", this.getMsgType());
+		m.put("tosyskey", this.getToSysKey());
+		m.put("tokey", this.getToKey());
+		m.put("fromsyskey", this.getFromSysKey());
+		m.put("fromkey", this.getFromKey()); 
+		m.put("data", this.getDataMap());
+		return JsonUtil.makeJson(m);
+	}
+	public String getInfo() {
+		return info;
+	}
+
+	public void setInfo(String info) {
+		this.info = info;
+	}
+
+	public String getOk() {
+		return ok;
+	}
+
+	public void setOk(String ok) {
+		this.ok = ok;
+	}
+
 	public Msg setMsgType(int key){
 		this.msgType = key;
 		return this;
@@ -67,16 +101,7 @@ public class Msg{
 	public Object getDataMap(){
 		return map;
 	}
-	public String getData(){
-		Map m = new HashMap();
-		m.put("msgtype", this.getMsgType());
-		m.put("tosyskey", this.getToSysKey());
-		m.put("tokey", this.getToKey());
-		m.put("fromsyskey", this.getFromSysKey());
-		m.put("fromkey", this.getFromKey()); 
-		m.put("data", this.getDataMap());
-		return JsonUtil.makeJson(m);
-	}
+	
 	public Object get(Object key){
 		return this.get(key, null);
 	}

@@ -104,6 +104,9 @@ public class ClientUI extends JFrame  {
 		jbshowrooms.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				out(client.show());
+				Msg msg = new Msg();
+				msg.setMsgType(Msg.SHOW);
+				client.send(msg.getData());
 			}
 		});
 		jbtest.addActionListener(new ActionListener() {
@@ -168,7 +171,7 @@ public class ClientUI extends JFrame  {
 	}
 
 	public void onReceive(String readLine) {
-		out(readLine);
+		out("读取", readLine);
 	}
 
 }

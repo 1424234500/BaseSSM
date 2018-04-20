@@ -29,7 +29,7 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 	 */
 	@Override
 	public void send(SOCK obj, String jsonstr){
-		out(">>>>", jsonstr);
+		out("转发", jsonstr);
 		this.frame.send(obj, jsonstr);
 	}
 	/**
@@ -58,7 +58,8 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 		//新连接 添加为自己掌管的客户 socket
 		ToClient toClient = this.getClient(obj);
 		out("断开连接", toClient);
-		this.removeClient(toClient.getSysKey(), toClient.getKey());
+		if(toClient != null)
+			this.removeClient(toClient.getSysKey(), toClient.getKey());
 	}
 	@Override
 	public boolean start() {
@@ -102,18 +103,24 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 	 * Arg -> socket -> ToClient -> sysKey,key
 	 * str -> Msg(msgType, toSysKey, toKey, map)
 	 */
-	@SuppressWarnings("rawtypes")
-	public void doMsg(SOCK obj, String jsonstr){
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void doMsg(SOCK sock, String jsonstr){
 		out("处理消息", jsonstr);
 
 		ToClient<SOCK> toClient = null;
-		ToClient<SOCK> fromClient = this.getClient(obj);	//发送者<fromSys,from,socket>
+		ToClient<SOCK> fromClient = this.getClient(sock);	//发送者<fromSys,from,socket>
 		if(fromClient == null) return;
 
 		String fromSysKey = fromClient.getSysKey();	//该发送者被记录认可的身份from
 		String fromKey = fromClient.getKey();
 		Msg msg = new Msg(jsonstr);	//消息<fromSys,from,toSys,to>
-		if(msg.getMsgType() == Msg.LOGIN){	//服务器/客户端登录 未登录某系统时 都归属于 this 0/1000+
+		if(msg.getMsgType() == Msg.SHOW){	//服务器/客户端登录 未登录某系统时 都归属于 this 0/1000+
+			msg.setFromKey(DEFAULT_KEY);
+			msg.setFromSysKey(DEFAULT_SYSKEY);
+			msg.setOk("true");
+			msg.put("res", show());
+			send(sock, msg.getData());		//回传结果
+		}else if(msg.getMsgType() == Msg.LOGIN){	//服务器/客户端登录 未登录某系统时 都归属于 this 0/1000+
 			String newSysKey = msg.getToSysKey();	//登录目标系统 fromsyskey
 			String pwd = msg.getToKey();			//登录密码 fromkey
 			if(pwd.equals("1")){
@@ -122,26 +129,26 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 				this.changeClient(fromSysKey, fromKey, newSysKey);
 			}
 			show();
-			msg.put("res", "true");
-			fromClient = this.getClient(obj);
+			msg.setOk("true");
+			fromClient = this.getClient(sock);
 			msg.setFromSysKey(fromClient.getSysKey());
 			msg.setFromKey(fromClient.getKey());
-			send(obj, msg.getData());
+			send(sock, msg.getData());		//回传结果
 		}else{
 			msg.setFromKey(fromKey);		//发消息者不需要设置自己的路由ip 只需要设置目标地点
-			msg.setFromSysKey(fromSysKey);
+			msg.setFromSysKey(fromSysKey);	//接收端会收到 来自那里kk 并发送自目标kk  a - ss - s -k ss -k a -k ss - akb
 			out("解析结构", msg.getData());
 			if(msg.getMsgType() == Msg.DATA){
 				toClient = this.getClient(msg.getToSysKey(), msg.getToKey());
 				if(toClient == null){//不在线
 					out("不在线", msg);
-					msg.put("res", "false");
-					msg.put("info", "不在线");
-					send(obj, msg.getData());
+					msg.setOk("false");
+					msg.setInfo("不在线");
+					send(sock, msg.getData());
 				}else{
-					send(toClient.getSocket(), msg.getData());
-					msg.put("res", "true");
-					send(obj, msg.getData());
+					send(toClient.getSocket(), msg.getData());	//发往目标
+					msg.setOk("true");
+					send(sock, msg.getData());		//回传结果
 				}
 			}
 			

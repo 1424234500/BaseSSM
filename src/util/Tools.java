@@ -22,7 +22,7 @@ public class Tools {
 
 	
  
-	private static int toolong = 350; 
+	private static int toolong = 600; 
 	public static String tooLongCut(String str) {
 		if (str.length() > toolong)
 			return   "len." + str.length() + " size." + Tools.calcSize(str.length()) + str.substring(0, toolong);
@@ -38,7 +38,7 @@ public class Tools {
 	 *	通过字符串长度，计算大概的 流量大小 MB KB B char=B 
 	 */
 	public static String calcSize(int filesize) {
-		return calcSize(filesize);
+		return calcSize((long)filesize);
 	}
 	/**
 	 *	通过字符串长度，计算大概的 流量大小 MB KB B char=B 

@@ -79,7 +79,7 @@ public abstract class SocketFrame<SOCK> implements InterfaceOut {
 			public void tip(Object... objects) {
 				out(objects);
 			}
-		}, "读取消息",1000, 5);	//最多5次读取
+		}, "读取消息",1000, 3);	//最多5次读取
 		taskMake.startTask();
 	}  
 	//开启发送任务

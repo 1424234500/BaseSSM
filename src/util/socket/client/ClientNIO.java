@@ -55,7 +55,7 @@ public class ClientNIO extends ClientFrame {
 
 	@Override
 	protected void startImpl() throws Exception {
-		Tools.out("NIO", serverIp, serverPort);
+		out("NIO", serverIp, serverPort);
 		socket = SocketChannel.open();
 		socket.connect(new InetSocketAddress(serverIp, serverPort));
         if(this.socket == null){
