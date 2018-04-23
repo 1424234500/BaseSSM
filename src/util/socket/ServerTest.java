@@ -4,12 +4,10 @@ public class ServerTest {
 
 	public static void main(String[] args) {
 		
-//		Server serverIO = new ServerHashmapImpl(new SocketIO());
-//		serverIO.start();
-		Server serverNIO = new ServerHashmapImpl(new SocketNIO());
-		serverNIO.start();
-//		
-		
+//		new ServerHashmapImpl(new SocketIO()).start();
+//		new ServerHashmapImpl(new SocketNIO()).start();
+		new ServerHashmapImpl(new SocketNetty()).start();
+
 		
 	}
 

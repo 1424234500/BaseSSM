@@ -20,14 +20,14 @@ public abstract class SocketFrame<SOCK> implements InterfaceOut {
 	int reconnect = 20;	//重连次数
 	long sleeptime = 1000;//重连间隔
 	
-	Server server;	//父级引用 循环引用
+	Server<SOCK> server;	//父级引用 循环引用
 	
 	public SocketFrame(){
 		reconnect = Setting.getInt("reconnect_count", 20);
 		sleeptime = Setting.getLong("reconnect_sleep", 1000);
 	}
 	
-	public void setServer(Server server){
+	public void setServer(Server<SOCK> server){
 		this.server = server;
 	}
 	public void out(Object...objects){
@@ -66,13 +66,13 @@ public abstract class SocketFrame<SOCK> implements InterfaceOut {
 			@Override
 			public void onFalse() {	//多次异常读取后就认为失联
 				out("失联", socket);
-				server.onDisConnection(socket);
+				onDisConnection(socket);
 			}
 			@Override
 			public void doTask() throws Exception {
 				String readLine = readImpl(socket);
 				if(Tools.isNull(readLine)){
-					server.onReceive(socket, readLine);
+					onReceive(socket, readLine);
 				}
 			}
 			@Override
@@ -110,6 +110,18 @@ public abstract class SocketFrame<SOCK> implements InterfaceOut {
 	 */
 	protected void onNewConnection(SOCK socket){
 		server.onNewConnection(socket);
+	}
+	/**
+	 * 断开连接传递给上级管理
+	 */
+	protected void onDisConnection(SOCK socket){
+		server.onDisConnection(socket);
+	}
+	/**
+	 * 获取到数据转交上级
+	 */
+	protected void onReceive(SOCK socket, String readLine) {
+		server.onReceive(socket, readLine);
 	}
 	/**
 	 * 关闭 底层socket 关闭循环引用

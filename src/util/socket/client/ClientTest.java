@@ -8,7 +8,8 @@ public class ClientTest {
 //		new ClientUI(new ClientIO("127.0.0.1", 8091), "io-nio");
 //		new ClientUI(new ClientNIO("127.0.0.1", 8090), "nio-io");
 //		new ClientUI(new ClientNIO("127.0.0.1", 8091), "nio-nio-server");
-		new ClientUI(new ClientNIO("127.0.0.1", 8091), "nio-nio-client");
+//		new ClientUI(new ClientNIO("127.0.0.1", 8091), "nio-nio-client");
+		new ClientUI(new ClientNetty("127.0.0.1", 8092), "netty-client");
  		
 		
 		

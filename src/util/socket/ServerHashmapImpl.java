@@ -141,7 +141,6 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 			if(msg.getMsgType() == Msg.DATA){
 				toClient = this.getClient(msg.getToSysKey(), msg.getToKey());
 				if(toClient == null){//不在线
-					out("不在线", msg);
 					msg.setOk("false");
 					msg.setInfo("不在线");
 					send(sock, msg.getData());
