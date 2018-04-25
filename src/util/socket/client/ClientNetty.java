@@ -2,6 +2,7 @@ package util.socket.client;
  
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -20,6 +21,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.ReferenceCountUtil;
 import util.RobotUtil;
 import util.Tools;
@@ -83,10 +85,12 @@ public class ClientNetty extends ClientFrame {
                     @Override  
                     public void initChannel(SocketChannel ch) throws Exception {  
 						ChannelPipeline p = ch.pipeline();
+//						p.addLast("ping", new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS)); 	//5s心跳包 
 //						p.addLast(new LoggingHandler(LogLevel.INFO));
 //						p.addLast( new ObjectEncoder(),  new ObjectDecoder(ClassResolvers.cacheDisabled(null)))
 					    p.addLast(new NettyEncoder(), new NettyDecoder());  
 						p.addLast(new HandlerNetty());
+
                     }  
                 });  
   

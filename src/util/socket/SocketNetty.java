@@ -1,9 +1,11 @@
 package util.socket;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -21,8 +23,12 @@ import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.IdleStateHandler;
 import util.Tools;
 import util.setting.Setting;
+import util.socket.netty.HeartBeatClientHandler;
 import util.socket.netty.NettyDecoder;
 import util.socket.netty.NettyEncoder;
 
@@ -61,10 +67,13 @@ public class SocketNetty extends SocketFrame<ChannelHandlerContext> {
 					@Override
 					public void initChannel(SocketChannel ch) throws Exception {
 						ChannelPipeline p = ch.pipeline();
+//						p.addLast(new IdleStateHandler(10, 0, 0, TimeUnit.SECONDS)); 	//5s心跳包 
 //						p.addLast(new LoggingHandler(LogLevel.INFO));
 //						p.addLast( new ObjectEncoder(),  new ObjectDecoder(ClassResolvers.cacheDisabled(null)))
 					    p.addLast(new NettyEncoder(), new NettyDecoder());  
+//						p.addLast(new HeartBeatClientHandler());  
 						p.addLast(new HandlerNetty());
+
 					}
 			});
 
@@ -123,6 +132,26 @@ public class SocketNetty extends SocketFrame<ChannelHandlerContext> {
 		 
 		
 		@Override
+		public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+			super.userEventTriggered(ctx, evt);
+			out("userEventTriggered", ctx, evt);
+			
+		
+		}
+
+		@Override
+		public void channelActive(ChannelHandlerContext ctx) throws Exception {
+			super.channelActive(ctx);
+			out("channelActive", ctx);
+		}
+
+		@Override
+		public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+			super.channelInactive(ctx);
+			out("channelInactive", ctx);
+		}
+
+		@Override
 		public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
 			super.handlerAdded(ctx);
 			onNewConnection(ctx);
@@ -139,7 +168,7 @@ public class SocketNetty extends SocketFrame<ChannelHandlerContext> {
 		@Override
 		public void channelRead(ChannelHandlerContext ctx, Object msg) {
 			onReceive(ctx, (String)msg);
-//			out("channelRead", msg); 
+			out("channelRead", msg); 
 		}
 	
 		@Override
