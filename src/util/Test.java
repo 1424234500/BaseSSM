@@ -1,8 +1,16 @@
 package util;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * 如何写出无法维护的代码
@@ -11,9 +19,70 @@ import java.util.concurrent.TimeUnit;
 public class Test {
 
 	public static void main(String[] args) {
-		new Test();
+//		new Test();
+	
+		testSort();
+	
 	}
-
+	public static void testSort(){
+		int arr[] = {0,3,2,1,4,5,6,2};
+		List<Integer> list = new ArrayList();
+		for(int i : arr){
+			list.add(i);
+		}
+		Tools.out(list);
+		Collections.sort(list);  
+		Tools.out(list);
+		
+		
+		 
+        long time, time2;
+        time = System.currentTimeMillis(); 
+        
+        Comparator com = new Comparator<Map>(){
+			@Override
+			public int compare(Map o1, Map o2) {
+				return o1.get("key").toString().compareTo(o2.get("key").toString());
+			}
+		};
+        
+        for(int count = 1000; count < 10000000; count*=2){
+			List<Map> listMap1 = new ArrayList<Map>(); 
+			List<Map> listMap = new ArrayList<Map>();
+			for(int i = 0; i < count; i++){
+				Map map = new HashMap();
+				map.put("key", (int)(Math.random()*1000));
+				listMap.add(map);
+				listMap1.add(map);
+			}
+			
+			time2 = System.currentTimeMillis(); 
+	        Tools.out("make list", count,  Tools.calcTime(time2 - time));
+	        time = time2;
+	        
+//			Tools.out(listMap);
+			Collections.sort(listMap, com);  
+//			Tools.out(listMap);
+			
+			time2 = System.currentTimeMillis(); 
+	        Tools.out("sort list com", Tools.calcTime(time2 - time), count);
+	        time = time2;
+	        
+	//        Tools.out(listMap1);
+//	        for(int i = 0; i < listMap1.size() - 1; i++){
+//	        	 for(int j = i+1; j < listMap1.size(); j++){
+//	        		 if(com.compare(listMap1.get(i), listMap1.get(j)) > 0)
+//	        			 Collections.swap(listMap1, i, j);
+//	             }
+//	        }
+	
+//			Tools.out(listMap1);
+	        
+	        time2 = System.currentTimeMillis(); 
+//	        Tools.out("sort list for", Tools.calcTime(time2 - time), count);
+	        time = time2;
+        }
+	}
 	public static void testInt(){
 		int a = 32768;//15
 		int aa = a*a;//30

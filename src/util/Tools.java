@@ -6,8 +6,15 @@ import java.lang.reflect.Array;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.poi.ss.formula.functions.T;
 
 
 
@@ -412,8 +419,18 @@ public class Tools {
 		return ip;
 	}
 
- 
-	 
+	/**
+	 * java自带的排序工具 高效率优化
+	 */
+	public static void sort(List<T> list, Comparator<T> com){
+		Collections.sort(list, com);
+	}
+	/**
+	 * java自带的排序工具 高效率优化
+	 */
+	public static void sort(T[] list, Comparator<T> com){
+		Arrays.sort(list, com);
+	}
 	
 
 	
