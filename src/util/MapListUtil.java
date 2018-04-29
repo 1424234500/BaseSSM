@@ -186,7 +186,7 @@ public class MapListUtil {
 	 * @return
 	 */
 	public static String getMap(Map map, String name, String defaultValue){
-		if(map == null)return "map is null";
+		if(map == null)return "";
 		if(map.get(name) == null){
 			return defaultValue;
 		}else{

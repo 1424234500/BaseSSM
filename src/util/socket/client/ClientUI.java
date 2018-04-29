@@ -52,8 +52,8 @@ public class ClientUI extends JFrame  {
 		jtfSend = new JTextField(20);
 		jtfSend1 = new JTextField(6);
 		jtfSend2 = new JTextField(6);
-		jtfSend1.setText("syskey001");
-		jtfSend2.setText("1001");
+		jtfSend1.setText("raspberrypi");
+		jtfSend2.setText("0");
 //		jtfSend.setText("{\"cmd\":12,\"value0\":\"group\",\"value1\":\"100000\",\"value2\":\"text\",\"value3\":\"2017-05-24 00:03:31\",\"value4\":\"消息 "+ Tools.getNowTimeL() +"\"}");
 		jtfSend.setText("{\"sy\":\""+ name + "\"}");
 

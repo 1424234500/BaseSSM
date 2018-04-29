@@ -142,7 +142,7 @@ public class SocketNetty extends SocketFrame<ChannelHandlerContext> {
 		@Override
 		public void channelActive(ChannelHandlerContext ctx) throws Exception {
 			super.channelActive(ctx);
-			out("channelActive", ctx);
+//			out("channelActive", ctx);
 		}
 
 		@Override
@@ -168,7 +168,7 @@ public class SocketNetty extends SocketFrame<ChannelHandlerContext> {
 		@Override
 		public void channelRead(ChannelHandlerContext ctx, Object msg) {
 			onReceive(ctx, (String)msg);
-			out("channelRead", msg); 
+//			out("channelRead", msg); 
 		}
 	
 		@Override

@@ -21,7 +21,8 @@ public class Msg{
 	final public static int BROADCAST_SYS = -1;	//广播本系统
 	
 	final public static int LOGIN = 0;				//服务器/客户端登录
-	
+	final public static int RES = 1;				//发送结果提示用
+
 	final public static int TOSERVER = 11;			//发往服务器
 	final public static int TOCLIENT = 12;			//发往客户端
 	final public static int DATA = 10;				//文本消息 请求转发
@@ -36,10 +37,10 @@ public class Msg{
 
 	String info;	//说明
 	String ok;		//传输结果
-	Map map;			//消息数据包
+	Map data;			//消息数据包
 	
 	public Msg(){
-		map = new HashMap();
+		data = new HashMap();
 		msgType = -999;
 		toSysKey = "0";
 		toKey = "0";
@@ -52,22 +53,22 @@ public class Msg{
 //        Tools.out(tmap);
         this.setOk(MapListUtil.getMap(map, "ok", ""));
         this.setInfo(MapListUtil.getMap(map, "info", ""));
-        this.setMsgType(Tools.parseInt(MapListUtil.getMap(map, "msgtype", "0")));
-        this.setToSysKey(MapListUtil.getMap(map, "tosyskey", "0"));
-        this.setToKey(MapListUtil.getMap(map, "tokey", "0"));
-        this.setFromSysKey(MapListUtil.getMap(map, "fromsyskey", "0"));
-        this.setFromKey(MapListUtil.getMap(map, "fromkey", "0"));
+        this.setMsgType(Tools.parseInt(MapListUtil.getMap(map, "msgType", "0")));
+        this.setToSysKey(MapListUtil.getMap(map, "toSysKey", "0"));
+        this.setToKey(MapListUtil.getMap(map, "toKey", "0"));
+        this.setFromSysKey(MapListUtil.getMap(map, "fromSysKey", "0"));
+        this.setFromKey(MapListUtil.getMap(map, "fromKey", "0"));
         this.setData((Map) MapListUtil.getMap(map, "data", new HashMap()));
 	}
 	public String getData(){
 		Map m = new HashMap();
 		m.put("ok", this.getOk());
 		m.put("info", this.getInfo());
-		m.put("msgtype", this.getMsgType());
-		m.put("tosyskey", this.getToSysKey());
-		m.put("tokey", this.getToKey());
-		m.put("fromsyskey", this.getFromSysKey());
-		m.put("fromkey", this.getFromKey()); 
+		m.put("msgType", this.getMsgType());
+		m.put("toSysKey", this.getToSysKey());
+		m.put("toKey", this.getToKey());
+		m.put("fromSysKey", this.getFromSysKey());
+		m.put("fromKey", this.getFromKey()); 
 		m.put("data", this.getDataMap());
 		return JsonUtil.makeJson(m);
 	}
@@ -95,18 +96,18 @@ public class Msg{
 	
 	
 	public Msg put(Object key, Object value){
-		 map.put(key, value);
+		 data.put(key, value);
 		 return this;
 	}
 	public Object getDataMap(){
-		return map;
+		return data;
 	}
 	
 	public Object get(Object key){
 		return this.get(key, null);
 	}
 	public Object get(Object key, Object defaultValue){
-		 Object res = map.get(key);
+		 Object res = data.get(key);
 		 if(res == null)
 			 res = defaultValue;
 		 return res;
@@ -156,7 +157,7 @@ public class Msg{
 	}
 
 	public Msg setData(Map data){
-		this.map = data;
+		this.data = data;
 		return this;
 	}
 

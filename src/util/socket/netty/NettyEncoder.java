@@ -20,7 +20,7 @@ import util.Tools;
 	    @Override  
 	    protected void encode(ChannelHandlerContext tcx, String jsonstr, ByteBuf out) throws Exception {  
 	        // 1.写入消息的开头的信息标志(int类型)  
-	    	byte[] bs = jsonstr.getBytes();
+	    	byte[] bs = jsonstr.getBytes("UTF-8");
 	    	out.writeBytes(Tools.int2bytes(bs.length));
 //	        out.writeInt(bs.length);  
 	        // 3.写入消息的内容(byte[]类型)  

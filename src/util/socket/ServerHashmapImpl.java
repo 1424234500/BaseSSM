@@ -29,7 +29,7 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 	 */
 	@Override
 	public void send(SOCK obj, String jsonstr){
-		out("转发", jsonstr);
+		out("发出", jsonstr);
 		this.frame.send(obj, jsonstr);
 	}
 	/**
@@ -84,7 +84,7 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 	
 	//路由表？？？
 		//索引! 系统key       系统子级key  客户端引用
-	static HashMap<String, HashMap<String, ToClient>> toClients = new HashMap<String, HashMap<String, ToClient>>();
+	HashMap<String, HashMap<String, ToClient<SOCK>>> toClients = new HashMap<String, HashMap<String, ToClient<SOCK>>>();
 	final static String DEFAULT_SYSKEY = "0";
 	final static String DEFAULT_KEY = "0";
 	
@@ -105,7 +105,7 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void doMsg(SOCK sock, String jsonstr){
-		out("处理消息", jsonstr);
+		out("收到", jsonstr);
 
 		ToClient<SOCK> toClient = null;
 		ToClient<SOCK> fromClient = this.getClient(sock);	//发送者<fromSys,from,socket>
@@ -114,16 +114,29 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 		String fromSysKey = fromClient.getSysKey();	//该发送者被记录认可的身份from
 		String fromKey = fromClient.getKey();
 		Msg msg = new Msg(jsonstr);	//消息<fromSys,from,toSys,to>
+		msg.setFromKey(fromKey);		//发消息者不需要设置自己的路由ip 只需要设置目标地点
+		msg.setFromSysKey(fromSysKey);	//接收端会收到 来自那里kk 并发送自目标kk  a - ss - s -k ss -k a -k ss - akb
+		
 		if(msg.getMsgType() == Msg.SHOW){	//服务器/客户端登录 未登录某系统时 都归属于 this 0/1000+
 			msg.setFromKey(DEFAULT_KEY);
 			msg.setFromSysKey(DEFAULT_SYSKEY);
 			msg.setOk("true");
+			msg.setInfo("获取所有在线用户列表");
 			msg.put("res", show());
+			msg.setMsgType(Msg.RES);
 			send(sock, msg.getData());		//回传结果
+		}else if(msg.getMsgType() == Msg.BROADCAST){	//广播所有
+			msg.setOk("true");
+			msg.setInfo("广播 全系统");
+			for(String sysKey : toClients.keySet()){
+				for(String key : toClients.get(sysKey).keySet()){
+					send(toClients.get(sysKey).get(key).getSocket(), msg.getData());
+				}
+			}
 		}else if(msg.getMsgType() == Msg.LOGIN){	//服务器/客户端登录 未登录某系统时 都归属于 this 0/1000+
 			String newSysKey = msg.getToSysKey();	//登录目标系统 fromsyskey
 			String pwd = msg.getToKey();			//登录密码 fromkey
-			if(pwd.equals("1")){
+			if(pwd.length() > 3){
 				this.changeServer(fromSysKey, fromKey, newSysKey);
 			}else{
 				this.changeClient(fromSysKey, fromKey, newSysKey);
@@ -133,26 +146,32 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 			fromClient = this.getClient(sock);
 			msg.setFromSysKey(fromClient.getSysKey());
 			msg.setFromKey(fromClient.getKey());
+			msg.setMsgType(Msg.RES);
 			send(sock, msg.getData());		//回传结果
-		}else{
-			msg.setFromKey(fromKey);		//发消息者不需要设置自己的路由ip 只需要设置目标地点
-			msg.setFromSysKey(fromSysKey);	//接收端会收到 来自那里kk 并发送自目标kk  a - ss - s -k ss -k a -k ss - akb
+		}else if(! fromSysKey.equals(DEFAULT_SYSKEY)){	//不属于默认管制 已经认证
 			out("解析结构", msg.getData());
 			if(msg.getMsgType() == Msg.DATA){
 				toClient = this.getClient(msg.getToSysKey(), msg.getToKey());
 				if(toClient == null){//不在线
 					msg.setOk("false");
 					msg.setInfo("不在线");
+					msg.setMsgType(Msg.RES);
 					send(sock, msg.getData());
 				}else{
 					send(toClient.getSocket(), msg.getData());	//发往目标
 					msg.setOk("true");
+					msg.setMsgType(Msg.RES);
 					send(sock, msg.getData());		//回传结果
 				}
 			}
 			
 			
 			
+		}else{
+			msg.setOk("false");
+			msg.setInfo("Please login in, (msgType=0,toSysKey=sys001,toKey=pwd) ");
+			msg.setMsgType(Msg.RES);
+			send(sock, msg.getData());
 		}
 		
 		
@@ -174,7 +193,7 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 	
 	//获取某系统下一个最小的不重复的编码
 	private String getNewKey(String sysKey){
-		HashMap<String, ToClient> sys = getSys(sysKey);
+		HashMap<String, ToClient<SOCK>> sys = getSys(sysKey);
 		String res = "";
 		int start = 1000;
 		for(String key : sys.keySet()){
@@ -187,41 +206,43 @@ public  class ServerHashmapImpl<SOCK> implements Server<SOCK>{
 	
 	
 
-	private ToClient changeServer(String sysKey, String key, String toSysKey){
+	private ToClient<SOCK> changeServer(String sysKey, String key, String toSysKey){
 		return this.addServer(toSysKey, this.removeClient(sysKey, key));
 	}
-	private ToClient changeClient(String sysKey, String key, String toSysKey){
+	private ToClient<SOCK> changeClient(String sysKey, String key, String toSysKey){
 		return this.addClient(toSysKey, this.removeClient(sysKey, key));
 	}
-	private ToClient removeClient(String sysKey, String key){
+	private ToClient<SOCK> removeClient(String sysKey, String key){
 		return getSys(sysKey).remove(key);
 	} 
-	private ToClient addClient(String sysKey, ToClient toClient){
+	private ToClient<SOCK> addClient(String sysKey, ToClient<SOCK> toClient){
 		String key = getNewKey(sysKey);
 		toClient.setKey(key);
 		toClient.setSysKey(sysKey);
 		getSys(sysKey).put(key, toClient);
 		return toClient;
 	}
-	private ToClient addServer(String sysKey, ToClient toClient){
+	private ToClient<SOCK> addServer(String sysKey, ToClient<SOCK> toClient){
+		toClient.setKey(DEFAULT_KEY);
+		toClient.setSysKey(sysKey);
 		getSys(sysKey).put(DEFAULT_KEY, toClient);
 		return toClient;
 	}
 	
-	private HashMap<String, ToClient> getSys(String sysKey){
+	private HashMap<String, ToClient<SOCK>> getSys(String sysKey){
 		if(toClients.get(sysKey) == null){	//若该系统没有人登录 或者没有初始化 则初始化系统容器
-			toClients.put(sysKey, new HashMap<String, ToClient>());
+			toClients.put(sysKey, new HashMap<String, ToClient<SOCK>>());
 		}
 		return toClients.get(sysKey);
 	}
-	private ToClient getClient(String sysKey, String key){
+	private ToClient<SOCK> getClient(String sysKey, String key){
 		return getSys(sysKey).get(key);
 	}
 	/**
 	 * 通过底层socket引用对象来获取hashmap中的toClient(sysKey, key, socket)实例
 	 */
-	private ToClient getClient(SOCK obj){
-		ToClient res = null;
+	private ToClient<SOCK> getClient(SOCK obj){
+		ToClient<SOCK> res = null;
 		for(String sysKey : toClients.keySet()){
 			for(String key : toClients.get(sysKey).keySet()){
 				if(toClients.get(sysKey).get(key).like(obj)){
