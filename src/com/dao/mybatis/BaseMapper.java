@@ -5,12 +5,12 @@ import java.util.Map;
 
 
 public interface BaseMapper {   
-	Long count(Map map);
-    List<Map> find(Map map);   
+	Long count(Map<String, Object> map);
+    List<Map<String, Object>> find(Map<String, Object> map);   
 
-	int update(Map map);
-	int delete(Map map);
-	int add(Map map);
+	int update(Map<String, Object> map);
+	int delete(Map<String, Object> map);
+	int add(Map<String, Object> map);
 
 	
 	

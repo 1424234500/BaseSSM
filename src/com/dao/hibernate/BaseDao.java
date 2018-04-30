@@ -31,9 +31,9 @@ public interface BaseDao {
 	 *            参数
 	 * @return 结果集
 	 */
-	public List<Map> find(String sql, Object... params);
+	public List<Map<String, Object>> find(String sql, Object... params);
 
-	public Map findOne(String sql, Object... params);
+	public Map<String, Object> findOne(String sql, Object... params);
 
 	/**
 	 * 获得结果集
@@ -48,7 +48,7 @@ public interface BaseDao {
 	 *            每页显示多少条
 	 * @return 结果集
 	 */
-	public List<Map> findPage(String sql, int page, int rows, Object... params);
+	public List<Map<String, Object>> findPage(String sql, int page, int rows, Object... params);
 
 	/**
 	 * 执行SQL语句

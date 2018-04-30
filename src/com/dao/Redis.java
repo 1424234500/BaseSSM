@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.MapUtils;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -47,7 +49,7 @@ public class Redis   {
 	 */
 	public String setMap(String key, Map<String, String> map){
 		Jedis jedis = this.getJedis();
-		String res = jedis.hmset(key, (map));
+		String res = jedis.hmset(key, map);
 		close(jedis);
 		keys.add(key);
 		return res;
@@ -75,9 +77,9 @@ public class Redis   {
 	/**
 	* 添加一个list，指定list中的map的keyName/id列值为键值
 	*/
-	public void setList(String keyName, List<Map> list){ 
+	public void setList(String keyName, List<Map<String, Object>> list){ 
 		for(int i = 0; i < list.size(); i++){
-			setMap(MapListUtil.getList(list, i, keyName), list.get(i));
+			setMap(MapListUtil.getList(list, i, keyName), MapListUtil.map2ssmap(list.get(i)));
 		}  
 	}
 	/**

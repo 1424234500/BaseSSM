@@ -145,7 +145,7 @@ public class AngularControll extends BaseControll{
 		String timeto = request.getParameter("TIMETO");
 		
 		Page page = getPage(request);
-		List<Map> list = studentServiceHibernate.list(id, name, timefrom, timeto, page);
+		List<Map<String, Object>> list = studentServiceHibernate.list(id, name, timefrom, timeto, page);
 		log(list, page);
 		writeJson(response, list, page);
 	}
@@ -153,7 +153,7 @@ public class AngularControll extends BaseControll{
 	public void listRecent(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String count = request.getParameter("count"); 
 		 
-		List<Map> list = baseService.find("select * from (select s.*, rownum num from student s) where num < ? order by time desc ", count);
+		List<Map<String, Object>> list = baseService.find("select * from (select s.*, rownum num from student s) where num < ? order by time desc ", count);
 		writeJson(response, list);
 	} 
 	

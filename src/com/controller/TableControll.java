@@ -30,7 +30,7 @@ public class TableControll extends BaseControll {
 		this.beforeDo(request, response);
   
 		String table = this.getTableName();
-		  if(! Tools.isNull(table)){
+		  if(! Tools.notNull(table)){
 			  writeJson(response, "未提供表名字");return;
 		  }
 		  
@@ -44,8 +44,8 @@ public class TableControll extends BaseControll {
 
 		String timeFrom = (request.getParameter("TIMEFROM"));//yyyy-mm
 		String timeTo = (request.getParameter("TIMETO")); 
-		timeFrom = Tools.isNull(timeFrom)? timeFrom : Tools.getTime("yyyy-MM");
-		timeTo = Tools.isNull(timeTo)? timeTo :  Tools.getTime("yyyy-MM");
+		timeFrom = Tools.notNull(timeFrom)? timeFrom : Tools.getTime("yyyy-MM");
+		timeTo = Tools.notNull(timeTo)? timeTo :  Tools.getTime("yyyy-MM");
 		int maxMonthDay = 31;
 		int monthFrom = Tools.parseInt(timeFrom.substring(5, 7));
 		int monthTo = Tools.parseInt(timeTo.substring(5, 7));

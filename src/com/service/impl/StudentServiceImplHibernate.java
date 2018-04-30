@@ -35,23 +35,23 @@ public class StudentServiceImplHibernate implements StudentService,Serializable 
     protected BaseDao baseDao;
 
 	@Override
-	public List<Map> list(String id, String name, String timefrom, String timeto, Page page) {
+	public List<Map<String, Object>> list(String id, String name, String timefrom, String timeto, Page page) {
 		String sql = "";
 		List<String> params = new ArrayList<String>();
 		sql += "select id,name,to_char(time,'yyyy-mm-dd hh24:mi:ss') time from student where 1=1 ";
-		if(Tools.isNull(id)){
+		if(Tools.notNull(id)){
 			sql += " and id like ? ";
 			params.add("%" + id + "%");
 		} 
-		if(Tools.isNull(name)){
+		if(Tools.notNull(name)){
 			sql += " and name like ? ";
 			params.add("%" + name + "%");
 		}
-		if(Tools.isNull(timefrom)){
+		if(Tools.notNull(timefrom)){
 			sql += " and time >= " + SqlHelp.to_dateL();
 			params.add(timefrom);
 		}
-		if(Tools.isNull(timeto)){
+		if(Tools.notNull(timeto)){
 			sql += " and time <= " + SqlHelp.to_dateL();
 			params.add( timeto);
 		} 

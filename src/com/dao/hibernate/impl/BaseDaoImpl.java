@@ -69,7 +69,7 @@ public class BaseDaoImpl implements BaseDao  {
 	  
 
 	@Override
-	public List<Map> find(String sql, Object... params) {
+	public List<Map<String, Object>> find(String sql, Object... params) {
 		SQLQuery q = getCurrentSession().createSQLQuery(sql);
 		setParams(q, params);
 		return q.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
@@ -89,7 +89,7 @@ public class BaseDaoImpl implements BaseDao  {
 	}
 	
 	@Override
-	public List<Map> findPage(String sql, int page, int rows, Object... params) {
+	public List<Map<String, Object>> findPage(String sql, int page, int rows, Object... params) {
 		SQLQuery q = getCurrentSession().createSQLQuery(sql);
 		setParams(q, params);
 		return q.setFirstResult((page - 1) * rows).setMaxResults(rows).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();

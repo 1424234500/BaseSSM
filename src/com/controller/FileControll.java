@@ -62,23 +62,23 @@ public class FileControll extends BaseControll{
 
 		List<String> params = new ArrayList<String>();
 		String sql = "select id,(select count(*) from file_down_up where fileid=f.id and type='down') count,name,upuserid,type,file_size(filesize) filesize,to_char(uptime," + SqlHelp.getTimeFormatL() + ") uptime, to_char(changetime," + SqlHelp.getTimeFormatL() + ") changetime,about from fileinfo f where 1=1 ";
-		if(Tools.isNull(id)){
+		if(Tools.notNull(id)){
 			sql += " and id like ? ";
 			params.add("%" + id + "%");
 		} 
-		if(Tools.isNull(name)){
+		if(Tools.notNull(name)){
 			sql += " and name like ? ";
 			params.add("%" + name + "%");
 		}
-		if(Tools.isNull(timefrom)){
+		if(Tools.notNull(timefrom)){
 			sql += " and uptime >= " + SqlHelp.to_dateL();
 			params.add(timefrom);
 		}
-		if(Tools.isNull(timeto)){
+		if(Tools.notNull(timeto)){
 			sql += " and uptime <= " + SqlHelp.to_dateL();
 			params.add( timeto);
 		} 
-	    List<Map> res = baseService.findPage(page, sql, params.toArray() );
+	    List<Map<String, Object>> res = baseService.findPage(page, sql, params.toArray() );
 	    log(res, page);
 	    writeJson(response, res, page);
 	} 

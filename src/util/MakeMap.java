@@ -17,7 +17,7 @@ public class MakeMap{
 		map.put(key, value);
 		return this;
 	}
-	public Map<String, Object> build(){
+	public Map build(){
 		return map;
 	}
 	 

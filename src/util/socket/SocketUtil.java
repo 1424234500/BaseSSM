@@ -59,7 +59,7 @@ public class SocketUtil {
 	 * socket io 阻塞模式发送行
 	 */
 	public static void sendImpl(Socket socket, String jsonstr, InterfaceOut socketIO) throws Exception {
-		if(!Tools.isNull(jsonstr))return;
+		if(!Tools.notNull(jsonstr))return;
 		byte[] bytes = jsonstr.getBytes();
 		OutputStream os = socket.getOutputStream();
 		os.write(Tools.int2bytes(bytes.length));	//int = 4byte = 32bit
@@ -76,7 +76,7 @@ public class SocketUtil {
 	 * socket nio 非阻塞模式发送字节包
 	 */
 	public static void sendImpl(SocketChannel socket, String jsonstr, InterfaceOut socketIO) throws Exception {
-		if(!Tools.isNull(jsonstr))return;
+		if(!Tools.notNull(jsonstr))return;
 		
 		byte[] bytes = jsonstr.getBytes("UTF-8");
         int size = bytes.length;

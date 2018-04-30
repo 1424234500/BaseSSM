@@ -66,7 +66,7 @@ public abstract class ClientFrame implements Client, InterfaceOut{
 			@Override
 			public void doTask() throws Exception {
 				String readLine = readImpl();
-				if(Tools.isNull(readLine)){
+				if(Tools.notNull(readLine)){
 					clientUi.onReceive(readLine);
 				}
 			}

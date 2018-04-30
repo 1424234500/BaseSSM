@@ -53,7 +53,7 @@ public class Setting {
 		if(defaultValue == null) defaultValue = "";
 		
 		String res = proper.getProperty(key);
-		if(!Tools.isNull(res)){	//该键值不存在 则添加存入文件
+		if(!Tools.notNull(res)){	//该键值不存在 则添加存入文件
 			res = defaultValue;
 			saveProperty(key, defaultValue);
 		}

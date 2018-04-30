@@ -55,11 +55,11 @@ public class LogServiceImpl implements LogService,Serializable {
 			map.put("count", (Tools.parseInt(map.get("count")) + 1) + "");
 			redis.setMap(url, map); 
 		}else{
-			redis.setMap(url, MapListUtil.map2ssmap(MapListUtil.map()
+			redis.setMap(url, MapListUtil.map()
 					.put("url", url)
 					.put("costtime", costtime)
 					.put("count", 1)
-					.build()));
+					.build());
 		} 
 		//redis.show();
 	}

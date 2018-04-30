@@ -40,7 +40,7 @@ public class FileServiceImpl implements FileService,Serializable {
 	@Override
 	public void scan() {
 		//删除表中中不存在文件的记录
-		final List<Map> list = baseDao.find("select * from fileinfo");
+		final List<Map<String, Object>> list = baseDao.find("select * from fileinfo");
 		for(int i = 0; i < list.size(); i++){
 			File file = new File(MapListUtil.getList(list, i, "PATH"));
 			if(!file.exists() || file.isDirectory()){

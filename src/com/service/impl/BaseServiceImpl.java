@@ -41,7 +41,7 @@ public class BaseServiceImpl implements BaseService,Serializable {
 	}
 
 	@Override
-	public List<Map> find(String sql, Object... params) {
+	public List<Map<String, Object>> find(String sql, Object... params) {
 		return baseDao.find(sql, params);
 	}
 
@@ -51,7 +51,7 @@ public class BaseServiceImpl implements BaseService,Serializable {
 	}
 
 	@Override
-	public List<Map> findPage(Page page, String sql, Object... params) {
+	public List<Map<String, Object>> findPage(Page page, String sql, Object... params) {
 		page.setNUM(baseDao.count(sql, params ));
 		return baseDao.findPage(sql,page.getNOWPAGE(),page.getSHOWNUM(), params );
 	}

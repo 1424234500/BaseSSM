@@ -23,16 +23,16 @@ public interface BaseService {
 	/**
 	 * 查询结果集合
 	 */
-	public List<Map> find(String sql, Object... params);
+	public List<Map<String, Object>> find(String sql, Object... params);
 	/**
 	 * 查询一条记录 往往根据id来查询 此处只做取一条处理
 	 */
-	public Map findOne(String sql, Object... params);
+	public Map<String, Object> findOne(String sql, Object... params);
 
 	/**
 	 * 查询分页结果集合
 	 */
-	public List<Map> findPage(Page page, String sql, Object... params);
+	public List<Map<String, Object>> findPage(Page page, String sql, Object... params);
 
 	/**
 	 * 执行sql语句

@@ -49,10 +49,10 @@ public class WebHelp {
 	@SuppressWarnings({ })
 	public static String getKey(HttpServletRequest request, Object name){
 		String value = request.getParameter((String)name);
-		if(!Tools.isNull(value)){	//兼容全小写
+		if(!Tools.notNull(value)){	//兼容全小写
 			value = request.getParameter(((String)name).toLowerCase());
 		}
-		if(!Tools.isNull(value)){	//兼容全大写
+		if(!Tools.notNull(value)){	//兼容全大写
 			value = request.getParameter(((String)name).toUpperCase());
 		}
 		return value;

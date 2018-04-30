@@ -12,12 +12,12 @@ import com.controller.Page;
  *
  */
 public interface StudentService  {
-	public List<Map>  list(String id, String name, String timefrom, String timeto, Page page) ;
+	public List<Map<String, Object>>  list(String id, String name, String timefrom, String timeto, Page page) ;
     
 	public int update(String id, String name, String time);
 	public int delete(String id);
 	public int add( String name, String time);
 
-	public Map get(String id);
+	public Map<String, Object> get(String id);
 	
 }

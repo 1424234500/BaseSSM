@@ -1,9 +1,6 @@
 package util;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -80,7 +77,7 @@ public class MapListUtil {
 		
 		Tools.out("-----------"); 
 		
-		List<Map> li = new ArrayList<Map>();
+		List<Map<String, Object>> li = new ArrayList<Map<String, Object>>();
 		for(int i = 0; i < 2; i++){
 			Map mm = getMap()
 					.put("id", "id-" + i)
@@ -134,6 +131,20 @@ public class MapListUtil {
 		return new ArrayList<Map>();
 	}
 	/**
+	 * 获取某键值索引第一个
+	 */
+	public static int getCountListByName(List<Map<String,Object>> list, String name, String value){
+		if(list == null)return -1;
+		for(int i = 0; i < list.size(); i++){
+			if(list.get(i).get(name).toString().equals(value)){
+				return i;
+			}
+		}
+		return -1;
+		
+	}
+	
+	/**
 	 * List<Map> 转换为 List<Map<String, String>
 	 * @param list
 	 * @return
@@ -151,15 +162,11 @@ public class MapListUtil {
 	
 	/**
 	 * 获取list<map>的第i行name列
-	 * @param list
-	 * @param i
-	 * @param name
-	 * @return
 	 */
-	public static String getList(List<Map> list, int i, String name){
+	public static String getList(List<Map<String, Object>> list, int i, String name){
 		return getList(list, i, name, "null");
 	}
-	public static String getList(List<Map> list, int i, String name, String defaultValue){
+	public static String getList(List<Map<String, Object>> list, int i, String name, String defaultValue){
 		if(list == null) return "list is null";
 		if(i < 0)return "i < 0";
 		if(i >= list.size())return "i > list size";
@@ -280,11 +287,11 @@ public class MapListUtil {
 		return list1;
 	}
 	
-	public static List<List<String>> toArrayAndTurn(List<Map> list){
+	public static List<List<String>> toArrayAndTurn(List<Map<String, Object>> list){
 		return turnListString(toArray(list));
 	}
 	
-	public static List<List<String>> toArray(List<Map> list){
+	public static List<List<String>> toArray(List<Map<String, Object>> list){
 		List<List<String>> res = new ArrayList<List<String>>();
 		
 		if(list != null && list.size() > 0){
@@ -332,9 +339,9 @@ public class MapListUtil {
 	 * 		col12, col22, col32, col42
 	 * 		col13, col23, col33, col43
 	 */
-	public static List<Map> turnListMap(List<Map> list){
+	public static List<Map<String, Object>> turnListMap(List<Map<String, Object>> list){
 		
-		List<Map> res = new ArrayList<Map>();
+		List<Map<String, Object>> res = new ArrayList<Map<String, Object>>();
 		
 		if(list != null && list.size() > 0){
 			Set set = list.get(0).keySet(); 
@@ -355,6 +362,21 @@ public class MapListUtil {
 		
 		return res;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	public static List<Map> testList(){
 		List<Map> res = new ArrayList<Map>();

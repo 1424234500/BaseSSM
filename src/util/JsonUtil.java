@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 
+
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -26,17 +28,7 @@ public class JsonUtil {
             e.printStackTrace();
         }
         return res;
-    }
-    public static String makeJson(Object obj) {
-        String res = "";
-        try {
-            JSONObject jo = new JSONObject(obj);
-            res = jo.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return res;
-    }
+    } 
     public static String makeJson(List<Object> list) {
         String res = "";
         try {
@@ -48,7 +40,7 @@ public class JsonUtil {
         return res;
     }
 
-    public static String makeJson(Object cmd, Object obj) {
+    public static String makeJson(Object cmd, Map obj) {
         String res = "";
         try {
             JSONObject jomap = new JSONObject(obj);
@@ -111,7 +103,7 @@ public class JsonUtil {
     /**
      * 递归 解析JSONArray为list
      */
-    private static List toList(JSONArray ja){
+    private static List toList(JSONArray ja) throws JSONException{
     	List list = new ArrayList<>();
     	for(int i = 0; i < ja.length(); i++){
         	Object object = ja.get(i);
@@ -132,7 +124,7 @@ public class JsonUtil {
     /**
      * 递归 解析JSONObject为map
      */
-    private static Map toMap(JSONObject jo){
+    private static Map toMap(JSONObject jo) throws JSONException{
     	Map map = new HashMap();
         //迭代多有的Key值  
         Iterator it = jo.keys();  

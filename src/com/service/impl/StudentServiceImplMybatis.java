@@ -35,10 +35,10 @@ public class StudentServiceImplMybatis implements StudentService, Serializable {
 	protected BaseMapper baseMapper;
 
 	@Override
-	public List<Map> list(String id, String name, String timefrom, String timeto, Page page) {
-		if(!Tools.isNull(name)) name = "";
+	public List<Map<String, Object>> list(String id, String name, String timefrom, String timeto, Page page) {
+		if(!Tools.notNull(name)) name = "";
 		else name = SqlHelp.like(name);
-		if(!Tools.isNull(id)) id = "";
+		if(!Tools.notNull(id)) id = "";
 		else  id = SqlHelp.like(id);
 		
 		Map map = MapListUtil.getMap()
@@ -71,12 +71,12 @@ public class StudentServiceImplMybatis implements StudentService, Serializable {
 	}
 
 	@Override
-	public Map get(String id) {
-		Map map = MapListUtil.getMap() 
+	public Map<String, Object> get(String id) {
+		Map<String, Object> map = MapListUtil.getMap() 
 				.put("id", id)
 				.build();
-		List<Map> list = baseMapper.find(map);
-		Map res = null;
+		List<Map<String, Object>> list = baseMapper.find(map);
+		Map<String, Object> res = null;
 		if(list != null && list.size() > 0){
 			res = list.get(0);
 		}else{

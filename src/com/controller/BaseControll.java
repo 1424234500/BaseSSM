@@ -50,7 +50,7 @@ public abstract class BaseControll {
 		String timefrom = request.getParameter("timefrom");
 		String timeto = request.getParameter("timeto");
 		Page page = Page.getPage(request);
-	    List<Map> res = baseService.findPage(page, "select * from student");
+	    List<Map<String, Object>> res = baseService.findPage(page, "select * from student");
 		map.put("res", res);
 		map.put("PAGE", page);
 		return "student/list";
@@ -85,10 +85,10 @@ public abstract class BaseControll {
 	public void writeJson(HttpServletResponse response, List list) throws IOException{
 		writeJson(response, JsonUtil.makeJson(list) ); 
 	}
-	public void writeJson(HttpServletResponse response, Map map) throws IOException{
+	public void writeJson(HttpServletResponse response, Map<String, Object> map) throws IOException{
 		writeJson(response, JsonUtil.makeJson(map) ); 
 	}
-	public void writeJson(HttpServletResponse response, List<Map> list, Page page) throws IOException{
+	public void writeJson(HttpServletResponse response, List<Map<String, Object>> list, Page page) throws IOException{
 		Map res = MapListUtil.getMap().put("res", list).put("PAGE", page).build();
 		writeJson(response, res);
 	}
@@ -152,7 +152,7 @@ public abstract class BaseControll {
 	 */
 	@SuppressWarnings("rawtypes")
 	public Map getTableParam(HttpServletRequest request) throws Exception{
-		if(!Tools.isNull(this.tableName))
+		if(!Tools.notNull(this.tableName))
 			throw new Exception("没有配置表");
 		List<Object> res = baseService.getColumns(this.tableName); 
 		return WebHelp.getParam(request, res);
@@ -167,7 +167,7 @@ public abstract class BaseControll {
 	 * @throws Exception
 	 */
 	public String getTableKeyName(HttpServletRequest request) throws Exception{
-		if(!Tools.isNull(this.tableName))
+		if(!Tools.notNull(this.tableName))
 			throw new Exception("没有配置表");
 		List<Object> res = baseService.getColumns(this.tableName); 
 		if(res.size() <= 0)
@@ -188,13 +188,13 @@ public abstract class BaseControll {
 		
 		for(String key : map.keySet()){
 			String value = MapListUtil.getMap(map, key);
-			if (Tools.isNull(value)) {
+			if (Tools.notNull(value)) {
 				sql += " and " + key + " like ? ";
 				params.add("%" + value + "%");
 			}
 		}
 		 
-		List<Map> res = baseService.findPage(page, sql, params.toArray());
+		List<Map<String, Object>> res = baseService.findPage(page, sql, params.toArray());
 		log(res.size(), res, page);
 		writeJson(response, res, page);
 	}
@@ -257,14 +257,14 @@ public abstract class BaseControll {
 	public void cols(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		this.beforeDo(request, response);
 
-		if(!Tools.isNull(this.tableName))return;
+		if(!Tools.notNull(this.tableName))return;
 		List<Object> res = baseService.getColumns(this.tableName);
 		writeJson(response, res);
 	}
 	
 	void beforeDo(HttpServletRequest request, HttpServletResponse response) {
 		String tableName = this.getValue(request, "TABLE_NAME");
-		if(Tools.isNull(tableName)){
+		if(Tools.notNull(tableName)){
 			this.setTableName(tableName);
 		}
 	} 

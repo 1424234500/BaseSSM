@@ -39,8 +39,8 @@ public class DinnerControl extends BaseControll {
 		String timeFrom = (request.getParameter("TIMEFROM"));//yyyy-mm
 		String timeTo = (request.getParameter("TIMETO")); 
 		Date date = new Date();
-		timeFrom = Tools.isNull(timeFrom)? timeFrom : Tools.getTime("yyyy-MM");
-		timeTo = Tools.isNull(timeTo)? timeTo :  Tools.getTime("yyyy-MM");
+		timeFrom = Tools.notNull(timeFrom)? timeFrom : Tools.getTime("yyyy-MM");
+		timeTo = Tools.notNull(timeTo)? timeTo :  Tools.getTime("yyyy-MM");
 		int maxMonthDay = 31;
 		int monthFrom = Tools.parseInt(timeFrom.substring(5, 7));
 		int monthTo = Tools.parseInt(timeTo.substring(5, 7));

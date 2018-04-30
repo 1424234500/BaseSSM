@@ -71,7 +71,7 @@ public abstract class SocketFrame<SOCK> implements InterfaceOut {
 			@Override
 			public void doTask() throws Exception {
 				String readLine = readImpl(socket);
-				if(Tools.isNull(readLine)){
+				if(Tools.notNull(readLine)){
 					onReceive(socket, readLine);
 				}
 			}
