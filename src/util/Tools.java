@@ -12,6 +12,17 @@ public class Tools {
 	public static void main(String argc[]) {
 
 	}
+	
+	
+	
+
+	public static String fillInt(Object obj, int len){
+		return fillStringBy(obj+"", " ", len, 1);
+	}
+	public static String fillInt(Object obj){
+		return fillInt(obj, 5);
+	}
+
 
 	private static int toolong = 600;
 
