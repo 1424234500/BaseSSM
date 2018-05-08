@@ -26,7 +26,7 @@ public class SocketUtil {
 	
 	
 	/**
-	 * socket io 阻塞模式读取行
+	 * socket io 阻塞模式读取
 	 */
 	public static String readImpl(Socket socket, InterfaceOut interfaceOut) throws Exception {
 		String res = "";
@@ -56,7 +56,7 @@ public class SocketUtil {
 	}
 
 	/**
-	 * socket io 阻塞模式发送行
+	 * socket io 阻塞模式发送
 	 */
 	public static void sendImpl(Socket socket, String jsonstr, InterfaceOut socketIO) throws Exception {
 		if(!Tools.notNull(jsonstr))return;
