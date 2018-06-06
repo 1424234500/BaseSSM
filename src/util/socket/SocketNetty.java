@@ -181,7 +181,6 @@ public class SocketNetty extends SocketFrame<ChannelHandlerContext> {
 		public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
 			// Close the connection when an exception is raised.
 			ctx.close();
-//			out("exceptionCaught", ctx, cause);
 			out("异常", ctx, cause);
 			
 		}

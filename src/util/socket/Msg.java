@@ -2,8 +2,7 @@ package util.socket;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.json.JSONObject;
+import java.util.UUID;
 
 import util.JsonUtil;
 import util.MapListUtil;
@@ -13,7 +12,7 @@ import util.Tools;
  * socket 传递 消息结构 
  *
  */
-@SuppressWarnings({ "serial", "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked" })
 public class Msg{
 	final public static int SHOW = -1000;				//监控
 
@@ -28,54 +27,86 @@ public class Msg{
 	final public static int DATA = 10;				//文本消息 请求转发
 	
 
-
-	int msgType;		//一条消息 的类型  登录系统Msg.LOGIN 广播本系统
+	//决定转发规则
+	int msgType;		//一条消息 的类型  登录系统Msg.LOGIN 广播本系统 
 	String toSysKey;	//发往目标系统	也可以根据socket绑定的sysKey 和 key做 逻辑验证
 	String toKey;		//发往目标客户
 	String fromSysKey;	//来自系统
 	String fromKey;		//来自服务器
 
-	String info;	//说明
+	//消息id 状态
+	String id;		//消息id
 	String ok;		//传输结果
-	Map data;			//消息数据包
+	String info;	//说明
+	//消息实体
+	Map data;		//消息数据包
 	
 	public Msg(){
+		id = UUID.randomUUID().toString();
+		ok = "";
+		info = "";
 		data = new HashMap();
-		msgType = -999;
-		toSysKey = "0";
-		toKey = "0";
-		fromSysKey = "0";
-		fromKey = "0";
+		
+		msgType = -2;
+		toSysKey = "";
+		toKey = "";
+		fromSysKey = "";
+		fromKey = "";
 	}
- 
+	public Msg(boolean ifNull){
+		if(ifNull){
+			id = UUID.randomUUID().toString();
+		}
+	}
 	public Msg(String jsonstr){
         Map map = JsonUtil.getMap(jsonstr);
-//        Tools.out(tmap);
-        this.setOk(MapListUtil.getMap(map, "ok", ""));
-        this.setInfo(MapListUtil.getMap(map, "info", ""));
-        this.setMsgType(Tools.parseInt(MapListUtil.getMap(map, "msgType", "0")));
-        this.setToSysKey(MapListUtil.getMap(map, "toSysKey", "0"));
-        this.setToKey(MapListUtil.getMap(map, "toKey", "0"));
-        this.setFromSysKey(MapListUtil.getMap(map, "fromSysKey", "0"));
-        this.setFromKey(MapListUtil.getMap(map, "fromKey", "0"));
+        this.setOk(MapListUtil.getMap(map, "ok", "0"));
+        this.setInfo(MapListUtil.getMap(map, "in", ""));
+        this.setId(MapListUtil.getMap(map, "id", ""));
         this.setData((Map) MapListUtil.getMap(map, "data", new HashMap()));
+
+        this.setMsgType(Tools.parseInt(MapListUtil.getMap(map, "mt", "-2")));
+        this.setToSysKey(MapListUtil.getMap(map, "tsk", ""));
+        this.setToKey(MapListUtil.getMap(map, "tk", ""));
+        this.setFromSysKey(MapListUtil.getMap(map, "fsk", ""));
+        this.setFromKey(MapListUtil.getMap(map, "fk", ""));
 	}
+	
+	//回传消息
+	public Msg getEcho(boolean ok, String info){
+		Msg msg = new Msg(false);
+		msg.setMsgType(Msg.RES);
+		msg.setId(this.id);
+		msg.setOk(ok);
+		msg.setInfo(info);
+		return msg;
+	}
+	
+	
+	
+	
 	public String getData(){
 		Map m = new HashMap();
-		m.put("ok", this.getOk());
-		m.put("info", this.getInfo());
-		m.put("msgType", this.getMsgType());
-		m.put("toSysKey", this.getToSysKey());
-		m.put("toKey", this.getToKey());
-		m.put("fromSysKey", this.getFromSysKey());
-		m.put("fromKey", this.getFromKey()); 
-		m.put("data", this.getDataMap());
+		if(Tools.notNull(ok)) m.put("ok", ok);
+		if(Tools.notNull(id)) m.put("id", id);
+		if(Tools.notNull(info)) m.put("in", info);
+		if(data != null && data.size() > 0) m.put("data", data);
+
+		if(Tools.notNull(msgType)) m.put("mt", msgType);
+		if(Tools.notNull(toSysKey)) m.put("tsk", toSysKey);
+		if(Tools.notNull(toKey)) m.put("tk", toKey);
+		if(Tools.notNull(fromSysKey)) m.put("fsk", fromSysKey);
+		if(Tools.notNull(fromKey)) m.put("fk", fromKey); 
+		
 		return JsonUtil.makeJson(m);
 	}
-	public String getInfo() {
-		return info;
+	public String getId() {
+		return id;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
 	public void setInfo(String info) {
 		this.info = info;
 	}
@@ -83,9 +114,11 @@ public class Msg{
 	public String getOk() {
 		return ok;
 	}
-
-	public void setOk(String ok) {
+	public void setOk(String ok){
 		this.ok = ok;
+	}
+	public void setOk(boolean ok) {
+		this.ok = ok?"1":"0";
 	}
 
 	public Msg setMsgType(int key){
@@ -106,13 +139,13 @@ public class Msg{
 	public Object get(Object key){
 		return this.get(key, null);
 	}
-	public Object get(Object key, Object defaultValue){
-		 Object res = data.get(key);
-		 if(res == null)
-			 res = defaultValue;
-		 return res;
-	}
 
+    public <T> T get(Object key, T defaultValue){
+        Object res = data.get(key);
+        if(res == null)
+            res = defaultValue;
+        return (T)res;
+    }
 
 
 
@@ -160,7 +193,9 @@ public class Msg{
 		this.data = data;
 		return this;
 	}
-
+	public String getDataJson(){
+        return JsonUtil.makeJson(this.data);
+    }
 
 	@Override
 	public String toString() {

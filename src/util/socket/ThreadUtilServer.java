@@ -31,7 +31,7 @@ public class ThreadUtilServer {
 	public static final int ScheduledThread = 3;//定时任务线程池
 
 	//存储三种池 统一
-	private static Map<Integer, ExecutorService>          mapExec = new HashMap<>();
+	private static Map<Integer, ExecutorService>          mapExec = new HashMap<Integer, ExecutorService>();
 	
 //	private static ScheduledExecutorService 			  scheduleExec;
 
