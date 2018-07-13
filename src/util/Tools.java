@@ -105,9 +105,10 @@ public class Tools {
 		return strings2string(res);
 	}
 
+	//传入数组 作为动态参数 则也会 变为动参 除非手动上转为Object
 	public static String[] objects2strings(Object... objects) {
 		if (objects == null)
-			return null;
+			return new String[]{""};
 		String[] objs = new String[objects.length];
 		for (int i = 0; i < objects.length; i++) {
 			if (objects[i] != null) {
