@@ -11,7 +11,9 @@ import java.util.Random;
  */
 public class RandomUtil {
  
- 
+	/**
+	 * 生成无重复乱序序列
+	 */
 	public static int[] getSequence  (int size, int start){
 		Integer[] res = new Integer[size]; 
 		res = initIntArr(res, -1);

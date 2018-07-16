@@ -11,7 +11,7 @@ import java.util.Map;
  * @author Walker
  * 2018年7月13日
  */
-public class Bean extends HashMap{ 
+public class Bean extends HashMap<Object, Object>{ 
 	public static Bean getBean(){
 		return new Bean();
 	}
