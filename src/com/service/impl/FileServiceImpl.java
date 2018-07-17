@@ -43,7 +43,7 @@ public class FileServiceImpl implements FileService,Serializable {
 		final List<Map<String, Object>> list = baseDao.find("select * from fileinfo");
 		for(int i = 0; i < list.size(); i++){
 			File file = new File(MapListUtil.getList(list, i, "PATH"));
-			if(!file.exists() || file.isDirectory()){
+			if(!file.exists()){ // || file.isDirectory()
 				baseDao.executeSql("delete from fileinfo where id=?", MapListUtil.getList(list, i, "ID"));
 			}
 		} 
@@ -65,7 +65,7 @@ public class FileServiceImpl implements FileService,Serializable {
 						String type = FileUtil.getFileType(name);
 						String path = obj.getPath();
 						String changetime = Tools.formatL(new Date(obj.lastModified()));
-						String about = "扫描出";
+						String about = path;
 						baseDao.executeSql("insert into fileinfo"
 								+ "(id,                   uptime, name,filesize,  type,path,changetime               ,about ) values "
 								+ "(SEQ_fileinfo.Nextval, sysdate,?    ,?      ,  ?   ,?    ,"+ SqlHelp.to_dateL() +",?   ) "

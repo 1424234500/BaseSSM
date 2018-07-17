@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.service.FileService;
 
+import util.Bean;
 import util.FileUtil;
 import util.MapListUtil;
 import util.JsonUtil;
@@ -40,9 +41,7 @@ import util.database.SqlHelp;
 public class FileControll extends BaseControll{
 	public FileControll() {
 		super(FileControll.class, "");
-		// TODO Auto-generated constructor stub
 	}
-
 
 	static public Logger logger = LoggerFactory.getLogger(FileControll.class); 
 	@Autowired
@@ -125,9 +124,10 @@ public class FileControll extends BaseControll{
     	long starttime = System.currentTimeMillis();
 
 		String id = request.getParameter("id");  
-		String path = baseService.getString("select path from fileinfo where id=?", id);
-		String name = baseService.getString("select name from fileinfo where id=?", id);
-		
+		String fpath = request.getParameter("path");  
+		Bean bean = new Bean(baseService.findOne("select name from fileinfo where id=? or path=?", id, fpath));
+		String path = bean.get("PATH", "");
+		String name = bean.get("NAME", "");
         name = URLEncoder.encode(name,"UTF-8");      //转码，免得文件名中文乱码  
         //设置文件下载头  
         response.addHeader("Content-Disposition", "attachment;filename=" + name);    

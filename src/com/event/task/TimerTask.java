@@ -35,16 +35,16 @@ public class TimerTask {
 	@Scheduled(cron = "0 0/60 * * * ?") //每小时
 	public void EveryHour() {
 	    logger.info("[eachHour 59m][每小时任务]");
+	    
+	    logger.info("扫描同步上传文件"); 
+	    //刷新上传文件集合的 文件数据到 内存数据库？ 文件管理系统 展示文件 介绍（图片），
+	    fileService.scan();
 	}
 
 	
 	@Scheduled(cron = "0/60 * * * * ?") //每分钟
 	public void eachMinute() {
 	    logger.info("[eachMinute 0/60 * * * * ?][每分钟任务]");
-	    
-		logger.info("扫描同步上传文件"); 
-	    //刷新上传文件集合的 文件数据到 内存数据库？ 文件管理系统 展示文件 介绍（图片），
-	    fileService.scan();
 	    
 		logger.info("Redis操作记录持久化"); 
 	    //刷新redis到oracle

@@ -49,16 +49,16 @@ public class LogServiceImpl implements LogService,Serializable {
 	public void exeStatis(String url, String params, long costtime) {
 		Redis redis = Redis.getInstance();
 
-		if(redis != null && redis.existsMap(url)){ 
+		if(redis != null && redis.exists(url)){ 
 			Map<String, String> map = redis.getMap(url);
 			map.put("costtime", (Tools.parseLong(map.get("costtime")) + costtime) + "");
 			map.put("count", (Tools.parseInt(map.get("count")) + 1) + "");
 			redis.setMap(url, map); 
 		}else{
 			redis.setMap(url, MapListUtil.map()
-					.put("url", url)
-					.put("costtime", costtime)
-					.put("count", 1)
+					.put("url", ""+url)
+					.put("costtime", ""+costtime)
+					.put("count", ""+1)
 					.build());
 		} 
 		//redis.show();
@@ -72,7 +72,7 @@ public class LogServiceImpl implements LogService,Serializable {
 		Set<String> keys = redis.getKeys();
 		if(keys != null && !keys.isEmpty())
 			for(String key : keys){
-				if(redis.existsMap(key)){ 
+				if(redis.exists(key)){ 
 					Map map = redis.getMap(key); 
 					int res = baseDao.executeSql("insert into log_time"
 							+ "(id, url, count, time, costtime) "

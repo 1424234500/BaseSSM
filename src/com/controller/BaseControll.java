@@ -79,9 +79,6 @@ public abstract class BaseControll {
 		writeJson(response, JsonUtil.makeJson(key, map) ); 
 	}
 
-	public void writeJson(HttpServletResponse response, Object[] list) throws IOException{
-		writeJson(response, JsonUtil.makeJson("res", list) ); 
-	}
 	public void writeJson(HttpServletResponse response, List list) throws IOException{
 		writeJson(response, JsonUtil.makeJson(list) ); 
 	}

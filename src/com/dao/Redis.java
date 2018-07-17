@@ -96,14 +96,13 @@ public class Redis   {
 		return res;
 	}
 	
-	public boolean existsMap(String key){
+	public boolean exists(String key){
 		Jedis jedis = this.getJedis();
 		boolean res = jedis.exists(key);
 		close(jedis);
 		return res;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void close(Jedis jedis){
 		if(jedis != null){
 			jedis.close();

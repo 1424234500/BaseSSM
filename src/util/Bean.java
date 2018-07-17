@@ -26,7 +26,7 @@ public class Bean extends HashMap<Object, Object>{
      * 构造体方法，直接初始化Bean
      * @param values    带数据信息
      */
-    public Bean(HashMap<Object, Object> values) {
+    public Bean(Map<?, ?> values) {
         super(values);
     }
 

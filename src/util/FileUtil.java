@@ -43,7 +43,7 @@ public class FileUtil {
 		    	if(or.equals("time")){
 	    		   String str1 = String.valueOf(o1.lastModified());  
 		           String str2 = String.valueOf(o2.lastModified());  
-		    		res = str1.compareTo(str2);
+		           res = str1.compareTo(str2);
 		    	}else 	if(or.equals("name")){
 		    		res = o1.getName().compareTo(o2.getName());  
 		    	} 

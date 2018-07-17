@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- maxElementsInMemory最大缓存元素个数 -->
+<!-- eternal是否永久有效 -->
+<!-- overflowToDisk超过最大缓存数是否存到磁盘 -->
+<!-- timeToIdleSeconds空闲时间，在这个时间内缓存元素没被访问则移除 -->
+<!-- timeToLiveSeconds缓存元素的最大生存时间 -->
+<!-- memoryStoreEvictionPolicy缓存置换策略，LFU为最近最不常用页面置换算法，LRU为最近最少使用页面置换算法 -->
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="false"
+	monitoring="autodetect" dynamicConfig="false">
+	<!--start count -->
+	<defaultCache maxElementsInMemory="100000" eternal="true"
+		overflowToDisk="false" diskSpoolBufferSizeMB="30" maxElementsOnDisk="10000000"
+		diskPersistent="false" statistics="true"
+		diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU">
+		<terracotta clustered="false" />
+	<cacheEventListenerFactory
+	class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+	properties="replicateAsynchronously=true, replicatePuts=false, replicateUpdates=false,
+	replicateUpdatesViaCopy=false, replicateRemovals=true "/>
+	</defaultCache>
+
+	<!-- 单独设置菜单的缓存，单个菜单文件100KB，避免上万登录用户全部缓存，一般设定为并发用户数1000-2000 -->
+	<cache name="SY_ORG_USER__MENU" maxElementsInMemory="1000"
+		eternal="true" overflowToDisk="false" statistics="true"
+		memoryStoreEvictionPolicy="LRU" />
+	<!--UserBean 缓存 -->
+	<cache name="SY_ORG_USER" maxElementsInMemory="100000"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="7200"
+		timeToLiveSeconds="7200" memoryStoreEvictionPolicy="LFU" />
+	<!--用户变量缓存 -->
+	<cache name="SY_ORG_USER__VAR" maxElementsInMemory="100000"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="7200"
+		timeToLiveSeconds="7200" memoryStoreEvictionPolicy="LFU" />
+	<!-- 单独设置页面缓存，缓存时间5分钟一刷新 -->
+	<cache name="SimplePageCachingFilter" maxElementsInMemory="2000"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="300"
+		timeToLiveSeconds="300" memoryStoreEvictionPolicy="LFU" />
+	<!-- 单独设置密码输入错误超过指定次数需要延迟1分钟之后才能再次验证 -->
+	<cache name="COCHAT_PASSWORD_ERROR_DELAY_TIME" maxElementsInMemory="2000000"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="60"
+		timeToLiveSeconds="180" memoryStoreEvictionPolicy="LFU" />
+	<!-- 扫一扫单点登录随机码与Token对应关系 -->
+	<cache name="QRCodeAuth" maxElementsInMemory="2000000"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="60"
+		timeToLiveSeconds="600" memoryStoreEvictionPolicy="LFU" />
+	
+	<!-- OAUTH2单点登录access_token缓存-->
+	<cache name="OAUTH2_CACHE" maxElementsInMemory="2000000"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="60"
+		timeToLiveSeconds="600" memoryStoreEvictionPolicy="LFU">
+		<cacheEventListenerFactory
+		class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+		properties="replicateAsynchronously=false, replicatePuts=true, replicateUpdates=true,
+		replicateUpdatesViaCopy=true, replicateRemovals=true "/>
+	</cache>
+	
+	<!-- 锁定账户3小时-->
+	<cache name="LockAccount" maxElementsInMemory="2000000"
+		eternal="false" overflowToDisk="false" 
+		timeToLiveSeconds="10800" memoryStoreEvictionPolicy="LFU" />	
+	
+	<!-- 登录时加密密码的随机Key -->
+	<cache name="LOGIN_PASSWD_RANDOMKEY" maxElementsInMemory="2000000"
+		eternal="false" overflowToDisk="false"
+		timeToLiveSeconds="60" memoryStoreEvictionPolicy="FIFO" />
+		
+	<!-- 登录短信验证码验证  半小时过期-->
+	<cache name="MSG_VALIDATE" maxElementsInMemory="2000000"
+		eternal="false" overflowToDisk="false" 
+		timeToLiveSeconds="1800" memoryStoreEvictionPolicy="LFU">	
+		<cacheEventListenerFactory
+		class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+		properties="replicateAsynchronously=true, replicatePuts=true, replicateUpdates=true,
+		replicateUpdatesViaCopy=true, replicateRemovals=true "/>
+	</cache>
+	
+	<!-- 新邮件防重   5分钟过期-->
+	<cache name="NewMailNotice4ICBC" maxElementsInMemory="2000000"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="60"
+		timeToLiveSeconds="300" memoryStoreEvictionPolicy="LFU" >
+		<cacheEventListenerFactory
+		class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+		properties="replicateAsynchronously=false, replicatePuts=true, replicateUpdates=true,
+		replicateUpdatesViaCopy=true, replicateRemovals=true "/>
+	</cache>
+		
+		<!--邮件监控 5分钟过期，根据心跳上送时间灵活调整 -->
+	<cache name="_CACHE_C_SY_Monitor" maxElementsInMemory="2000000"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="300"
+		timeToLiveSeconds="300" memoryStoreEvictionPolicy="LFU" />
+	
+	<!-- 外网邮箱地址与NotesID的对照关系缓存 -->
+	<!-- 空闲时间为一个小时，最大生存时间为24小时 -->
+	<cache name="_CACHE_CC_OPEN_MAIL_EMAIL_USER_" maxElementsInMemory="2000000"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="3600"
+		timeToLiveSeconds="86400" memoryStoreEvictionPolicy="LFU" />
+	
+	<!-- NotesID与用户编码、姓名的对照关系缓存 -->
+	<!-- 空闲时间为一个小时，最大生存时间为24小时 -->
+	<cache name="_CACHE_CC_OPEN_MAIL_NOTESID_USER_" maxElementsInMemory="2000000"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="3600"
+		timeToLiveSeconds="86400" memoryStoreEvictionPolicy="LFU" />
+		
+	<!-- LDAP每日更新错误信息  24小时过期-->
+	<cache name="LDAPSYN" maxElementsInMemory="200"
+		eternal="false" overflowToDisk="false" 
+		timeToLiveSeconds="86400" memoryStoreEvictionPolicy="LFU" />	
+	
+	<!--SSIC_ID与USER_CODE对应关系-->
+	<cache name="ICBC_USER_SSICID" maxElementsInMemory="2000000"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="3600"
+		timeToLiveSeconds="86400" memoryStoreEvictionPolicy="LFU" />
+	<!-- 在线用户 2小时清理一次 -->
+	<cache name="ONLINE_USER" maxElementsInMemory="2000000"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="3600"
+		timeToLiveSeconds="7200" memoryStoreEvictionPolicy="LFU" />
+	
+	<!-- 系统配置缓存同步 -->
+	<cache name="_CACHE_C_SY_COMM_CONFIG_PUBLIC" maxElementsInMemory="2000000"
+		eternal="true" overflowToDisk="false" memoryStoreEvictionPolicy="LFU">
+		<cacheEventListenerFactory
+		class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+		properties="replicateAsynchronously=false, replicatePuts=true, replicateUpdates=true,
+		replicateUpdatesViaCopy=true, replicateRemovals=true "/>
+	</cache>	
+		
+	<!-- 集群环境 RMI同步设置 --> 
+	<cacheManagerPeerProviderFactory
+		class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
+		properties="peerDiscovery=automatic, multicastGroupAddress=230.0.0.1,	multicastGroupPort=9999, timeToLive=1" />
+
+	<cacheManagerPeerListenerFactory
+		class="net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory" />
+	
+</ehcache>
