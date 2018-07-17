@@ -18,7 +18,10 @@ import org.json.JSONObject;
 
 
 public class JsonUtil {
-
+	/**
+	 * map转json
+	 * @param obj
+	 */
 	public static String makeJson(Map obj) {
         String res = "";
         try {
@@ -29,7 +32,11 @@ public class JsonUtil {
         }
         return res;
     } 
-    public static String makeJson(List<Object> list) {
+	/**
+	 * list转json
+	 * @param list
+	 */
+    public static String makeJson(List list) {
         String res = "";
         try {
             JSONArray ja = new JSONArray(list);
@@ -39,7 +46,6 @@ public class JsonUtil {
         }
         return res;
     }
-
     public static String makeJson(Object cmd, Map obj) {
         String res = "";
         try {
@@ -147,6 +153,10 @@ public class JsonUtil {
         }  
     	return map;
     }
+    /**
+     * 解析json为map 
+     * @param jsonstr
+     */
     public static Map<String, Object> getMap(String jsonstr) {
         Map<String, Object> map = new HashMap<String, Object>();
         try {
@@ -157,7 +167,10 @@ public class JsonUtil {
         }
         return map;
     }
-
+    /**
+     * 解析json为list
+     * @param jsonstr
+     */
     public static List<Map<String, Object>> getList(String jsonstr) {
         List<Map<String, Object>> res = new ArrayList<>();
         try {
@@ -167,12 +180,7 @@ public class JsonUtil {
             e.printStackTrace();
         }
         return res;
-    }
-
-    public static List<Map<?, ?>> orderListMap(List<Map<?, ?>> list) {
-        return list;
-    }
-
+    } 
 
     public static void out(String str) {
 

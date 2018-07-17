@@ -71,22 +71,14 @@ public abstract class BaseControll {
 		pw.write("" + res);
 	} 
 	
-
-	public void writeJson(HttpServletResponse response, String key, List list) throws IOException{
-		writeJson(response, JsonUtil.makeJson(key, list) ); 
-	}
-	public void writeJson(HttpServletResponse response, String key, Map map) throws IOException{
-		writeJson(response, JsonUtil.makeJson(key, map) ); 
-	}
-
 	public void writeJson(HttpServletResponse response, List list) throws IOException{
 		writeJson(response, JsonUtil.makeJson(list) ); 
 	}
-	public void writeJson(HttpServletResponse response, Map<String, Object> map) throws IOException{
+	public void writeJson(HttpServletResponse response, Map map) throws IOException{
 		writeJson(response, JsonUtil.makeJson(map) ); 
 	}
-	public void writeJson(HttpServletResponse response, List<Map<String, Object>> list, Page page) throws IOException{
-		Map res = MapListUtil.getMap().put("res", list).put("PAGE", page).build();
+	public void writeJson(HttpServletResponse response, List<Map<String, Object>> res2, Page page) throws IOException{
+		Map res = MapListUtil.getMap().put("res", res2).put("PAGE", page).build();
 		writeJson(response, res);
 	}
 	public void writeJson(HttpServletResponse response, String jsonStr) throws IOException{

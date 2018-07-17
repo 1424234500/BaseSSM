@@ -50,6 +50,25 @@ public class FileControll extends BaseControll{
 	
 	static int cacheSize = 512;
 	
+	@RequestMapping("/fileCols.do")
+	public void fileCols(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		writeJson(response, FileUtil.getFileMap());
+	}
+	@RequestMapping("/fileDir.do")
+	public void fileDir(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String dir = request.getParameter("dir");
+		if( ! Tools.notNull(dir)){
+			dir = UtilTools.getUploadDir();
+		}
+		int type = FileUtil.check(dir);
+		if(type == 1){ //若是文件夹
+			writeJson(response, FileUtil.ls(dir));
+		}else if(type == 0){ //文件
+			this.down(request, response);
+		}
+	} 
+	
+	
 	@RequestMapping("/list.do")
 	public void list(HttpServletRequest request, HttpServletResponse response) throws IOException { 
 		String id = request.getParameter("ID");
@@ -86,11 +105,11 @@ public class FileControll extends BaseControll{
 	
 	@RequestMapping("/delete.do")
 	public void delete(HttpServletRequest request, HttpServletResponse response) throws IOException { 
-		String id = request.getParameter("id");  
-
+		String path = request.getParameter("path");  
+		
+		if(path.indexOf(UtilTools.getUploadDir()) <= 0) return;
 		int count = 0;
-		String path = baseService.getString("select path from fileinfo where id=?", id);
-		count = baseService.executeSql("delete from fileinfo where id=?", id);
+		count = baseService.executeSql("delete from fileinfo where path=?", path);
 		FileUtil.delete(path);
 	    Map res = MapListUtil.getMap().put("res", count).build();
 		writeJson(response, res);
@@ -123,11 +142,12 @@ public class FileControll extends BaseControll{
     public void down(HttpServletRequest request,HttpServletResponse response) throws Exception{  
     	long starttime = System.currentTimeMillis();
 
-		String id = request.getParameter("id");  
-		String fpath = request.getParameter("path");  
-		Bean bean = new Bean(baseService.findOne("select name from fileinfo where id=? or path=?", id, fpath));
-		String path = bean.get("PATH", "");
-		String name = bean.get("NAME", "");
+		String path = request.getParameter("path");
+		if(path == null || FileUtil.check(path) != 0){
+			return;
+		}
+			
+		String name = FileUtil.getFileName(path);
         name = URLEncoder.encode(name,"UTF-8");      //转码，免得文件名中文乱码  
         //设置文件下载头  
         response.addHeader("Content-Disposition", "attachment;filename=" + name);    
@@ -152,7 +172,7 @@ public class FileControll extends BaseControll{
             //记录文件上传下载情况 并打印
             // id,fileid,type(up/down),costtime(ms),time
             log("down file", name, path, Tools.calcTime(deta),Tools.calcSize(size) );
-            fileService.fileUpDown(id, "down", deta+"" ); 
+//            fileService.fileUpDown(path, "down", deta+"" ); 
 
         } catch (Exception e1) {  
             e1.printStackTrace();  

@@ -11,11 +11,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.FileSystem;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -355,7 +357,7 @@ public class FileUtil {
      * .c .txt .python 文本类型
      */
     public static Object readByType(String path, Fun<String> fun, Fun<ArrayList<ArrayList<Object>>> excel){
-    	if(!file(path)) {
+    	if(check(path) != 0) {
     		return "false";
     	}
     	String ext = getFileType(path);
@@ -496,18 +498,12 @@ public class FileUtil {
 		if (coders == null) {
 			Tools.out("文件夹为null");
 		}else{
-			Map<String, Object> map;
 			for (File coder : coders) {
 				if (coder.isFile()) {
 					// 后缀判定xxx.apk, about.txt, xxx.img
 					String fileName = coder.getName();
 					if(getFileType(fileName).equals(ext)){
-						map = new HashMap<String, Object>();
-						map.put("LENGTH",  coder.length());
-						map.put("SIZE", calcSize(coder.length()));
-						map.put("FILENAME", fileName);
-						map.put("URL", dir + fileName);
-						res.add(map);
+						res.add(fileToMap(coder));
 					}
 				}
 	
@@ -517,6 +513,67 @@ public class FileUtil {
 		return res;
 	}
 	
+	/**
+	 * 获取某路径下所有文件 文件夹 ll
+	 */
+	public static List<Map> ls(String dir){
+		List<Map> res = new ArrayList<Map>();
+		
+		Tools.out("扫描文件目录:" + dir);
+		File rootfile = new File(dir);
+		File coders[] = rootfile.listFiles();  
+		int countFile = 0;
+		for (File coder : coders) {
+			if (coder.isDirectory()) {
+				res.add(fileToMap(coder));
+			}
+		}
+		for (File coder : coders) {
+			if (coder.isFile()) {
+				countFile++;
+				res.add(fileToMap(coder));
+			}
+		}
+		Tools.out("文件夹数量:" + (coders.length - countFile) + " \t文件数量:" + countFile);
+		return res;
+	}
+	/**
+	 * 获取文件 map样式键集合
+	 */
+	public static List getFileMap(){
+		List<String> res = new ArrayList<String>();
+		res.add("PATH");
+		res.add("NAME");
+		res.add("SIZE");
+		res.add("LENGTH");
+		res.add("TIME");
+		res.add("TYPE");
+		res.add("CHILDS");
+		return res;
+	}
+	public static Map fileToMap(File coder){
+		Map map = new LinkedHashMap<String, Object>();
+		map.put("PATH", coder.getAbsolutePath());
+		map.put("NAME", coder.getName());
+		map.put("SIZE", calcSize(coder.length()));
+		map.put("LENGTH",  coder.length());
+		map.put("TIME", coder.lastModified());
+		
+		String type = "";
+		int dirfiles = 0;
+		if(coder.isFile()){
+			type = getFileType(coder.getAbsolutePath());
+		}else if(coder.isDirectory()){
+			type = "dir";
+			File[] f =  coder.listFiles();
+			if(f != null)
+				dirfiles =f.length;
+		}
+		map.put("TYPE", type);
+		map.put("CHILDS", dirfiles);
+
+		return map;
+	}
 	
 	//通过字符串长度，计算大概的 流量大小 MB KB B char=B
 	static String calcSize(long length) {
@@ -532,15 +589,23 @@ public class FileUtil {
 			return m>0?  m+"."+k/100+"MB" : k>0? k+"."+b/100+"KB" : b+"B";
 		}
 	
-	public static boolean file(String path){
+	/**
+	 * 检查文件类型 
+	 * @param path
+	 * @return 0 文件 1文件夹 -1异常
+	 */
+	public static int check(String path){
+		int res = -1;
 		File file = new File(path);
 		if(file.exists()){
 			if(file.isFile()){
-				return true;
+				res = 0;
+			}else if(file.isDirectory()){
+				res = 1;
 			}
 		}
-		System.out.println("文件：" + path + "不存在或者不是文件");
-		return false;
+		out("文件：" + path + "不存在或者不是文件");
+		return res;
 	}
 	//删除附件，Eg: Constant.fileupload目录,xxx-xxx.doc 则删除该目录下所有xxx-xxx.doc/exe/dll
   	public static boolean delete(String dir, String filename){
@@ -563,10 +628,8 @@ public class FileUtil {
 	public static boolean delete(String path){
 		File file = new File(path);
 		if(file.exists()){
-			if(file.isFile()){
-				file.delete();
-				return true;
-			}
+			file.delete();
+			return true;
 		}
 		return false;
 	}
@@ -616,29 +679,29 @@ public class FileUtil {
 	 * @return
 	 */
 	public static String getFileName(String path){
-			String res = "null";
+		String res = "null";
 
-			if(path == null){
-			}else{
-				int ii = path.lastIndexOf("\\");
-				//out(""+ii);
-				if(ii >= 0){
-					res = path.substring(ii + 1);
-				}
+		if(path == null){
+		}else{
+			int ii = path.lastIndexOf(File.separator);
+			//out(""+ii);
+			if(ii >= 0){
+				res = path.substring(ii + 1);
 			}
-			return res;
 		}
+		return res;
+	}
 	/**
 	 *  /sdcard/mycc/record/100-101020120120120.amr return /sdcard/mycc/record/
 	 * @param path
 	 * @return
 	 */
 	public static String getFilePath(String path){
-			String res = "null";
+			String res = "";
 
 			if(path == null){
 			}else{
-				int ii = path.lastIndexOf("\\");
+				int ii = path.lastIndexOf(File.separator);
 				//out(""+ii);
 				if(ii >= 0){
 					res = path.substring(0, ii );
@@ -650,18 +713,19 @@ public class FileUtil {
 
 	
 	
-//	public static void main(String[] argv){
-//		String path = "F:\\desktop\\公司\\问题维护\\6月\\工作记录-6月-6.xlsx";
-//		out(path);
-//		out(getFileType(path));
-//		out(getFileNameOnly(path));
-//		out(getFileName(path));
-//		out(getFilePath(path));
-//		
-//	}
-	public static void out(String str){
-		System.out.println("FileUtil>>" + str);
+	public static void main(String[] argv){
+		String dirpath = "C:\\tomcat\\download";
+		String path = "C:\\tomcat\\download\\20180717150340-compareTo2.c";
 		
+
+		List<Map> res = (FileUtil.ls(dirpath));
+		
+		Tools.formatOut(res);
+		
+		
+	}
+	public static void out(Object...objects){
+		Tools.out(objects);
 	}
 	
 	

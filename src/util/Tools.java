@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class Tools {
 
@@ -85,6 +86,11 @@ public class Tools {
 
 	public static void out(Object... objects) {
 		out(objects2string(objects));
+	}
+	public static void formatOut(List list){
+		for(Object obj : list){
+			out(obj);
+		}
 	}
 
 	public static String strings2string(String[] strs) {
