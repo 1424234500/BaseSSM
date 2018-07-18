@@ -68,7 +68,7 @@ public class TomcatControll extends BaseControll{
 				.put("legend", legend)		
 				.put("tooltip", new Object())  
 				.put("xAxis", xAxis) 
-				.put("yAxis", new Object()) //若无报错YAxis 0 not found
+				.put("yAxis", new HashMap()) //若无报错YAxis 0 not found
 				.put("series", series) 
 				.build();
 		 
@@ -113,9 +113,9 @@ public class TomcatControll extends BaseControll{
 		Map option = MapListUtil.map()
 				.put("title", title)  
 				.put("legend", legend)		
-				.put("tooltip", new Object()) 
+				.put("tooltip", new HashMap()) 
 				.put("xAxis", xAxis) 
-				.put("yAxis", new Object()) //若无报错YAxis 0 not found
+				.put("yAxis", new HashMap()) //若无报错YAxis 0 not found
 				.put("series", series) 
 				.build();
 		 

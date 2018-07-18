@@ -175,7 +175,7 @@ public class MapListUtil {
 		if(list.get(i).get(name) == null){
 			return defaultValue;
 		}else{
-			return getMap(list.get(i), "name");
+			return getMap(list.get(i), name);
 		}
 	}
 	public static String getMap(Map map, String name){

@@ -85,7 +85,9 @@ public class ThreadUtil {
 		ExecutorService exec = getExecutorServiceInstance(type);
 		exec.execute(runnable);
 	}
-
+	public static void execute(Runnable runnable) {
+		execute(ThreadUtil.DefaultThread, runnable);
+	}
 	/**
 	 * 添加多个线程任务 type三种线程池
 	 * @param type ThreadHelp.

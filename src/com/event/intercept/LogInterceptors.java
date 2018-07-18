@@ -49,7 +49,7 @@ public class LogInterceptors implements HandlerInterceptor{
         long beginTime = startTimeThreadLocal.get(); 
         long time = endTime - beginTime;
         // 此处认为处理时间超过500毫秒的请求为慢请求
-        logger.info("--------stop " + Tools.calcTime(time));
+//        logger.info("--------stop " + Tools.calcTime(time));
  
         String requestUri = request.getRequestURI();  
         String contextPath = request.getContextPath();  
@@ -99,7 +99,7 @@ public class LogInterceptors implements HandlerInterceptor{
         	}catch(Exception e){ }
         }
         //日志 记录 输出       
-        logger.info("++++++++ ");
+//        logger.info("++++++++ ");
 	    logger.info("[" + url + "] [" + cla + "." + name + "]" + WebHelp.getRequestMap(request).toString());
  
         return true;  

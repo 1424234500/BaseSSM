@@ -44,9 +44,8 @@ public class TimerTask {
 	
 	@Scheduled(cron = "0/60 * * * * ?") //每分钟
 	public void eachMinute() {
-	    logger.info("[eachMinute 0/60 * * * * ?][每分钟任务]");
-	    
-		logger.info("Redis操作记录持久化"); 
+//	    logger.info("[eachMinute 0/60 * * * * ?][每分钟任务]");
+//		logger.info("Redis操作记录持久化"); 
 	    //刷新redis到oracle
 	    logService.saveStatis();
 	    

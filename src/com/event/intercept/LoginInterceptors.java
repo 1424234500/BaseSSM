@@ -69,7 +69,7 @@ public class LoginInterceptors implements HandlerInterceptor{
 	        logService.userMake(user.getId(), url, ip, host, port, params);
 	        
     	}else{
-	    	logger.info("未登录：跳转到login页面！");  
+//	    	logger.info("未登录：跳转到login页面！");  
            // request.getRequestDispatcher("/login/onlogin.do").forward(request, response);  
            // return false;
 	    }

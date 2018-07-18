@@ -119,71 +119,56 @@ public class FileUtil {
 	public static List<File> getAllFiles(String dir){
 		return showDir(dir, null);
 	}
-	public static List<File> showDirAsync(String dir, final Fun<File> funFileOrDir){ 
-		//创建一个集合存放遍历到的File
+	/**
+	 * 获取或操作 所有文件夹和文件 同步  dir可 ,分割多个dir
+	 * @param dir
+	 * @param funFileOrDir
+	 */
+	public static List<File> showDirAsync(String dire, final Fun<File> funFileOrDir){ 
 		final List< File >files=new ArrayList<File>();
-		
-		String[] dirs = dir.split(",");
-		
-		for(int i = 0; i < dirs.length; i++){
-			final File file=new File(dirs[i]);
-			//文件夹必须存在                并且要是文件夹
-			if (file.exists()) {
-				files.add(file);	//加入根
-				if(funFileOrDir != null){
-					 funFileOrDir.make(file);
-				 } 
-				if(file.isDirectory()){
-					longErgodic(file, files, funFileOrDir);//把遍历得到的东西存放在files里面
-				}
-			}
+		String[] dirs = dire.split(",");
+		for(final String dir : dirs){
+			longErgodic(new File(dir), files, funFileOrDir);//把遍历得到的东西存放在files里面
 		}
 		return files;
 	}
-	public static List<File> showDir(String dir, final Fun<File> funFileOrDir){ 
-		//创建一个集合存放遍历到的File
+	/**
+	 * 获取或操作 所有文件夹和文件 线程池异步 dir可 ,分割多个dir
+	 * @param dir
+	 * @param funFileOrDir
+	 */
+	public static List<File> showDir(String dire, final Fun<File> funFileOrDir){ 
 		final List< File >files=new ArrayList<File>();
-		
-		final File file=new File(dir);
-		//文件夹必须存在                并且要是文件夹
-		if (file.exists()&&file.isDirectory()) {
-			files.add(file);	//加入根
-			if(funFileOrDir != null){
-				 funFileOrDir.make(file);
-			 } 
-			ThreadUtil.thread(new Fun<Long>() {
-				public void make(Long obj) {
-					longErgodic(file, files, funFileOrDir);//把遍历得到的东西存放在files里面
+		String[] dirs = dire.split(",");
+		for(final String dir : dirs){
+			ThreadUtil.execute(new Runnable(){
+				public void run(){
+					longErgodic(new File(dir), files, funFileOrDir);//把遍历得到的东西存放在files里面
 				}
-			});
+			});		
 		}
 		return files;
 	}
 	/**
 	 * 递归遍历目录
-	 * @param file
-	 * @param files
-	 * @param funFileOrDir
+	 * @param file 当前处理文件
+	 * @param files 结果集
+	 * @param funFileOrDir 回调函数处理
 	 */
-	private static void longErgodic(File file, List<File> files, Fun<File> funFileOrDir) { 
-		
-		//把文件夹的所有文件（包括文件和文件名）都放在一个文件类的数组里面 
-		File[] fillArr=file.listFiles(); 
-		//如果是一个空的文件夹
-		 if (fillArr==null) {
-			 //后面的不执行，直接返回
+	private static void longErgodic(File file, final List<File> files, final Fun<File> funFileOrDir) { 
+		if (file == null || ! file.exists())
 			return;
-		} 
-		//如果文件夹有内容,遍历里面的所有文件（包括文件夹和文件），都添加到集合里面
-		 for (File file2 : fillArr) { 
-			 //如果只是想要里面的文件或者文件夹或者某些固定格式的文件可以判断下再添加
-			 files.add(file2); 
-			 if(funFileOrDir != null){
-				 funFileOrDir.make(file2);
-			 }
-			 //添加到集合后，在来判断是否是文件夹，再遍历里面的所有文件
-			 //方法的递归
-			 longErgodic(file2, files, funFileOrDir);
+		files.add(file);	//添加当前 节点
+		if(file.isDirectory()){ //若是文件夹 则递归子节点 深度优先
+			File[] fillArr = file.listFiles();
+			if (fillArr == null)
+				return;
+			for (File file2 : fillArr) {
+				longErgodic(file2, files, funFileOrDir);//把遍历得到的东西存放在files里面
+			}
+		}
+		if (funFileOrDir != null) { //处理当前节点
+			funFileOrDir.make(file);
 		}
 	}
 	 
@@ -307,7 +292,7 @@ public class FileUtil {
         
         FileWriter fw = null;
         
-        //System.out.println("把内容：" + content + "， 写入文件："  + path);
+        //out("把内容：" + content + "， 写入文件："  + path);
         
         try {
             /**
@@ -402,7 +387,7 @@ public class FileUtil {
 			int length; 
 			while ( (byteread = inStream.read(buffer)) != -1) { 
 				bytesum += byteread; //字节数 文件大小 
-				//System.out.println(bytesum); 
+				//out(bytesum); 
 				fs.write(buffer, 0, byteread); 
 			} 
 			inStream.close(); 
@@ -455,7 +440,7 @@ public class FileUtil {
 		} 
 		} 
 		catch (Exception e) { 
-		//System.out.println("复制整个文件夹内容操作出错"); 
+		//out("复制整个文件夹内容操作出错"); 
 		e.printStackTrace(); 
 	
 		} 
@@ -487,16 +472,16 @@ public class FileUtil {
 		List<Map<String,Object>> res = new ArrayList<Map<String,Object>>();
 		
 		// 扫描文件夹 读取数据
-		Tools.out("扫描文件目录" + dir);
+		out("扫描文件目录" + dir);
 		File rootfile = null;
 		try {
 			rootfile = new File(dir);
 		} catch (Exception e) {
-			Tools.out("打开文件目录[" + dir + "] error ");
+			out("打开文件目录[" + dir + "] error ");
 		}
 		File coders[] = rootfile.listFiles(); // 用户各自文件夹名集合
 		if (coders == null) {
-			Tools.out("文件夹为null");
+			out("文件夹为null");
 		}else{
 			for (File coder : coders) {
 				if (coder.isFile()) {
@@ -519,7 +504,7 @@ public class FileUtil {
 	public static List<Map> ls(String dir){
 		List<Map> res = new ArrayList<Map>();
 		
-		Tools.out("扫描文件目录:" + dir);
+		out("扫描文件目录:" + dir);
 		File rootfile = new File(dir);
 		File coders[] = rootfile.listFiles();  
 		int countFile = 0;
@@ -534,9 +519,22 @@ public class FileUtil {
 				res.add(fileToMap(coder));
 			}
 		}
-		Tools.out("文件夹数量:" + (coders.length - countFile) + " \t文件数量:" + countFile);
+		out("文件夹数量:" + (coders.length - countFile) + " \t文件数量:" + countFile);
 		return res;
 	}
+	/**
+	 * 获取某文件详情
+	 */
+	public static Map getFileMap(String file){
+		if(file != null && file.length() > 0){
+			File rootfile = new File(file);
+			if(rootfile.exists()){
+				return fileToMap(rootfile);
+			}
+		}
+		return new HashMap();
+	}
+	
 	/**
 	 * 获取文件 map样式键集合
 	 */
@@ -602,9 +600,12 @@ public class FileUtil {
 				res = 0;
 			}else if(file.isDirectory()){
 				res = 1;
+			}else{
+				out("文件：" + path + "不存在或者不是文件");
 			}
+		}else{
+			out("文件：" + path + "不存在或者不是文件");
 		}
-		out("文件：" + path + "不存在或者不是文件");
 		return res;
 	}
 	//删除附件，Eg: Constant.fileupload目录,xxx-xxx.doc 则删除该目录下所有xxx-xxx.doc/exe/dll
@@ -625,12 +626,17 @@ public class FileUtil {
 		}
 		return false;
 	}
+  	/**
+  	 * 递归删除 文件 或者 文件夹 所有
+  	 */
 	public static boolean delete(String path){
-		File file = new File(path);
-		if(file.exists()){
-			file.delete();
-			return true;
-		}
+		FileUtil.showDirAsync(path, new Fun<File>() {
+			@Override
+			public void make(File file) {
+				file.delete();
+			}
+		});
+		
 		return false;
 	}
 	/**
@@ -725,7 +731,7 @@ public class FileUtil {
 		
 	}
 	public static void out(Object...objects){
-		Tools.out(objects);
+//		Tools.out(objects);
 	}
 	
 	

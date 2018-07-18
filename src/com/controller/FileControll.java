@@ -105,31 +105,38 @@ public class FileControll extends BaseControll{
 	
 	@RequestMapping("/delete.do")
 	public void delete(HttpServletRequest request, HttpServletResponse response) throws IOException { 
-		String path = request.getParameter("path");  
-		
-		if(path.indexOf(UtilTools.getUploadDir()) <= 0) return;
+		String path = request.getParameter("PATH");  
 		int count = 0;
-		count = baseService.executeSql("delete from fileinfo where path=?", path);
-		FileUtil.delete(path);
-	    Map res = MapListUtil.getMap().put("res", count).build();
+		String info = "";
+		if(Tools.notNull(path)){
+			if(path.indexOf(UtilTools.getUploadDir()) == 0){
+				count = baseService.executeSql("delete from fileinfo where path=?", path);
+				FileUtil.delete(path);
+			}else{
+				info = "无权限删除" + path;
+			}
+		}else{
+			info = "路径为null";
+		}
+		
+	    Map res = MapListUtil.getMap().put("res", count).put("info",  info).build();
 		writeJson(response, res);
 	}
 	
 	@RequestMapping("/update.do")
 	public void update(HttpServletRequest request, HttpServletResponse response) throws IOException { 
-		String id = request.getParameter("ID"); 
+		String id = request.getParameter("PATH"); 
 		String about = request.getParameter("ABOUT"); 
 	    
-		int count = baseService.executeSql("update fileinfo set about=? where id=? ", about, id);
+		int count = baseService.executeSql("update fileinfo set about=? where PATH=? ", about, id);
 		Map res = MapListUtil.getMap().put("res", count).build();
 		writeJson(response, res);	
 	}
 
 	@RequestMapping("/get.do")
 	public void get(HttpServletRequest request, HttpServletResponse response) throws IOException { 
-		String id = request.getParameter("id");  
-
-		Map map = baseService.findOne("select * from fileinfo where id=? ", id );
+		String path = request.getParameter("PATH");  
+		Map map = FileUtil.getFileMap(path);
 		writeJson(response, map);	
 	}
 	 /**  
@@ -142,7 +149,7 @@ public class FileControll extends BaseControll{
     public void down(HttpServletRequest request,HttpServletResponse response) throws Exception{  
     	long starttime = System.currentTimeMillis();
 
-		String path = request.getParameter("path");
+		String path = request.getParameter("PATH");
 		if(path == null || FileUtil.check(path) != 0){
 			return;
 		}
@@ -195,12 +202,11 @@ public class FileControll extends BaseControll{
 
         MultipartHttpServletRequest mreq = (MultipartHttpServletRequest)request;
         MultipartFile file = mreq.getFile("file");
-        String about = request.getParameter("about");
-         
+        String uppath = request.getParameter("path");
         String name = file.getOriginalFilename();
-        String newName = Tools.getTimeSequence() + "-" + name;
-        String dir = UtilTools.getUploadDir();
-        String path = dir + newName;
+        String newName = name; // Tools.getTimeSequence() + "-" + 
+        String dir = Tools.notNull(uppath) ? uppath : UtilTools.getUploadDir();
+        String path = dir + File.separator + newName;
         FileOutputStream out = new FileOutputStream(path);
         int res = 0; 
 //      fos.write(file.getBytes());
@@ -221,7 +227,7 @@ public class FileControll extends BaseControll{
             long deta = endtime - starttime;//下载写入耗时deta 大小size 名字name 路径path
             //记录文件上传下载情况 并打印
             // id,fileid,type(up/down),costtime(ms),time
-            String key = fileService.upload(getUser(request).getId(), name, path, about); 
+            String key = fileService.upload(getUser(request).getId(), name, path, ""); 
             res = key.equals("0")?0:1;
             log("up file", name, path, Tools.calcTime(deta) , Tools.calcSize(size));
 

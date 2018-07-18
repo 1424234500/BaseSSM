@@ -2,6 +2,7 @@ package com.controller;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -81,9 +82,9 @@ public class LunchControl extends BaseControll {
 		Map option = MapListUtil.map()
 				.put("title", title)  
 				.put("legend", legend) 
-				.put("tooltip", new Object()) //若无则不能预览
+				.put("tooltip", new HashMap()) //若无则不能预览
 				.put("xAxis", xAxis) 
-				.put("yAxis", new Object()) //若无则报错YAxis 0 not found
+				.put("yAxis", new HashMap()) //若无则报错YAxis 0 not found
 				.put("series", series) 
 				.build();
 		 
