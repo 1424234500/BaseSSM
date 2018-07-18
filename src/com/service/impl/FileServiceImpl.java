@@ -44,7 +44,7 @@ public class FileServiceImpl implements FileService,Serializable {
 		for(int i = 0; i < list.size(); i++){
 			File file = new File(MapListUtil.getList(list, i, "PATH"));
 			if(!file.exists()){ // || file.isDirectory()
-				baseDao.executeSql("delete from fileinfo where id=?", MapListUtil.getList(list, i, "ID"));
+				baseDao.executeSql("delete from fileinfo where PATH=?", MapListUtil.getList(list, i, "PATH"));
 			}
 		} 
 		//添加其它文件到表中
