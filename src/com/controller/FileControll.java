@@ -57,8 +57,15 @@ public class FileControll extends BaseControll{
 	@RequestMapping("/fileDir.do")
 	public void fileDir(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String dir = request.getParameter("dir");
+		String name = request.getParameter("name");
+		String newdir = request.getParameter("newdir");
+		
+
 		if( ! Tools.notNull(dir)){
 			dir = UtilTools.getUploadDir();
+		}
+		if( Tools.notNull(newdir, name)){
+			FileUtil.mkdir(dir + File.separator + name);
 		}
 		int type = FileUtil.check(dir);
 		if(type == 1){ //若是文件夹
