@@ -16,7 +16,7 @@ import org.apache.commons.collections.CollectionUtils;
  * 如何写出无法维护的代码
  *
  */
-public class Test {
+public class TestNothing {
 
 	public static void main(String[] args) {
 //		new Test();
@@ -97,7 +97,7 @@ public class Test {
 		out("-31", -2*aa, "31-1", aa*2-1);
 		out(aa*4);//33
 	}
-	Test(){
+	TestNothing(){
 //		defineWord();
 		
 		

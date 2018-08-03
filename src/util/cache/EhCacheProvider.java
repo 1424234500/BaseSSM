@@ -11,8 +11,6 @@ import net.sf.ehcache.Element;
 
 /**
  * EhCache的缓存服务实现类
- * @author Jerry Li
- *
  */
 public class EhCacheProvider implements ICacheProvider {
 

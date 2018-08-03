@@ -156,7 +156,7 @@ public class FileControll extends BaseControll{
     public void down(HttpServletRequest request,HttpServletResponse response) throws Exception{  
     	long starttime = System.currentTimeMillis();
 
-		String path = request.getParameter("PATH");
+		String path = request.getParameter("path");
 		if(path == null || FileUtil.check(path) != 0){
 			return;
 		}

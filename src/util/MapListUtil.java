@@ -37,7 +37,7 @@ public class MapListUtil {
 
 		Map map22 = getMap().put("key2", "value2").build();
 		Map map3 = map;
-		Tools.out("map.keySet 键集合",map.keySet());
+		Tools.out("map.keySet null键唯一 键集合",map.keySet());
 		Tools.out("map.entrySet 键值集合",map.entrySet());
 		//for (Map.Entry<String, Object> entry : map.entrySet())
 
@@ -51,31 +51,31 @@ public class MapListUtil {
 		);
 		list.add(map);
 		list.add(map3);
-		Tools.out(list);
+		Tools.out("list一种数组 可重复键值 可null add对象的引用唯一", list);
 
 		HashSet<Map> set = new HashSet<Map>();
 		set.add(map);
 		set.add(map2);
-		Tools.out("set 不同map", set);
+//		Tools.out("set 不同map", set);
 		set.add(map);
 		set.add(map3);
 		set.add(map22);
-		Tools.out("set 相同引用map equals判断不重复", set);
+		set.add(null);
+		Tools.out("set 一种数组(list) 允许一个null 相同引用(map) add对象的value equals判断不重复  重复覆盖", set);
 
 		HashMap<String, Object> hmap = new HashMap<>();
 		hmap.put(null, "valueNull");
 		hmap.put("keynull", null);
 		hmap.put("key1", "value1");
 
-		Tools.out("hash", hmap);
-
+		Tools.out("hash map 键值可null HashMap去掉了HashTable的contains方法，但是加上了containsValue()和containsKey()方法", hmap);
 
 		Hashtable<String, Object> htable = new Hashtable<>();
 //		htable.put(null, "valueNull");
 //		htable.put("keynull", null);
 		htable.put("key1", "value1");
 
-		Tools.out("table 键值", htable);
+		Tools.out("hash table 键值不能null 。HashTable sync 锁", htable);
 
 		Tools.out("-----------");
 
