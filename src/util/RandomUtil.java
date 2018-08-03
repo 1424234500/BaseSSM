@@ -31,7 +31,8 @@ public class RandomUtil {
 		System.out.println("start." + start + " size." + size + "  生成序列结果：");
 		arrayMake(res, new IMake() {
 			public <T> void fun(T[] arr, int i, T value) {
-				System.out.print(value + " ");
+				if(i < 30)
+					System.out.print(value + " ");
 			}
 		});
 		System.out.println("");

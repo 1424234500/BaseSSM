@@ -15,9 +15,11 @@ public class SortUtil {
 	 */
 	public static <T> T[] timSort(T[] arr, Comparator<T> comp){
 		logTime();
+		countIf = 0;
+		countSwap = 0;
 		int len = arr.length;
 		Arrays.sort(arr, comp);
-		showTime("Java timSort \t大小:" + len + " 比较次数:" + 0 + " 交换次数:" + 0);
+		showTime("Java timSort \t大小:" + len + " 比较次数:" + countIf + " 交换次数:" + countSwap);
 		return arr;
 	}
 	/**
@@ -26,15 +28,13 @@ public class SortUtil {
 	public static <T> T[] bubbleSort(T[] arr, Comparator<T> comp){
 		logTime();
 		int len  = arr.length;
-		long countIf = 0;
-		long countSwap = 0;
+		countIf = 0;
+		countSwap = 0;
 		for(int i = 0; i < len; i++){
 			for(int j = 0; j < len - i - 1; j++){
-				countIf ++;
 				//第一次冒泡 相邻两两比较 交换   冒出最大值
 				if(comp.compare(arr[j], arr[j + 1]) > 0){
 					swap(arr, j, j + 1);
-					countSwap ++;
 				}
 			}
 		}
@@ -47,13 +47,12 @@ public class SortUtil {
 	public static <T> T[] selectionSort(T[] arr, Comparator<T> comp){
 		logTime();
 		int len  = arr.length;
-		long countIf = 0;
-		long countSwap = 0;
+		countIf = 0;
+		countSwap = 0;
 		int maxIndex = 0;
 		for(int i = 0; i < len - 1; i++){
 			maxIndex = 0;
 			for(int j = 1; j < len - i; j++){
-				countIf ++;
 				//第一次选择 全部比较 选择最大值
 				if(comp.compare(arr[maxIndex], arr[j]) < 0){
 					maxIndex = j;
@@ -61,7 +60,6 @@ public class SortUtil {
 			}
 			if(maxIndex != len - i - 1){
 				swap(arr, maxIndex, len - i - 1);
-				countSwap ++;
 			}
 		}
 		showTime("选择排序  selectionSort \t大小:" + len + " 比较次数:" + countIf + " 交换次数:" + countSwap);
@@ -75,7 +73,7 @@ public class SortUtil {
 		logTime();
 		int len  = arr.length;
 		countIf = 0;
-		long countSwap = 0;
+		countSwap = 0;
 		T now;
 		//默认第一个为有序 从第二个开始插入
 		for(int i = 1; i < len; i++){
@@ -115,14 +113,12 @@ public class SortUtil {
 		int res = -1;
 		int middle = (left + right) / 2;
 		if(middle > left){ // 4 5 6  
-			countIf ++;
 			if(comp.compare(now, arr[middle]) > 0){ //now > middle -> middle,right
 				return search(arr, now, middle, right, comp);
 			}else{//now <= middle -> left,middle
 				return search(arr, now, left, middle, comp);
 			}
 		}else{ // 4 4 5
-			countIf ++;
 			res = comp.compare(now, arr[left]) > 0 ? right : left;
 		}
 		return res;
@@ -152,7 +148,6 @@ public class SortUtil {
 		T key = arr[first];
 		while(first < last){
 			while(first < last){
-				countIf ++;
 				if(comp.compare(arr[last], key) > 0){
 					last--;
 				}else{
@@ -161,7 +156,6 @@ public class SortUtil {
 			}
 			arr[first] = arr[last];
 			while(first < last){
-				countIf ++;
 				if(comp.compare(arr[first], key) <= 0){
 					first++;
 				}else{
@@ -198,14 +192,9 @@ public class SortUtil {
         T t = x[a];
         x[a] = x[b];
         x[b] = t;
+		countSwap ++;
     }
-
-	
-	
-	
-	
-	public static void main(String[] argc){
-		int len = 10000;
+	public static void test(int len){
 		Bean[] list = new Bean[len];
 		Bean[] res;
 		int[] sequence = RandomUtil.getSequence(len, 0);
@@ -216,6 +205,7 @@ public class SortUtil {
 		Comparator<Bean> comp = new Comparator<Bean>(){
 			@Override
 			public int compare(Bean o1, Bean o2) {
+				countIf ++;
 				return o1.get("k",0).compareTo(o2.get("k",0));
 			}
 		};
@@ -228,8 +218,15 @@ public class SortUtil {
 //		Tools.out(res);
 		res = timSort(list.clone(), comp);
 //		Tools.out(res);
-		
-		
+	}
+	
+	
+	
+	
+	public static void main(String[] argc){
+		test(1000);
+		test(10000);
+//		test(100000);
 	}
 	
 }
