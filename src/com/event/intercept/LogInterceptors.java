@@ -12,6 +12,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.controller.Context;
 import com.controller.WebHelp;
 import com.service.LogService;
 
@@ -58,6 +59,7 @@ public class LogInterceptors implements HandlerInterceptor{
         
         logService.exeStatis(url, params, time);
 
+        Context.clear();
     }  
     /** 
      * 该方法在目标方法调用之后，渲染视图之前被调用； 
@@ -84,6 +86,9 @@ public class LogInterceptors implements HandlerInterceptor{
     	
         // 设置开始时间  线程绑定变量（该数据只有当前请求的线程可见）
         startTimeThreadLocal.set(System.currentTimeMillis());
+        Context.setRequest(request);
+        Context.setResponse(response);
+        Context.setTimeStart();
  
         String requestUri = request.getRequestURI();  
         String contextPath = request.getContextPath();  
