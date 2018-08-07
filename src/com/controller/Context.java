@@ -95,7 +95,7 @@ public class Context {
 		return null;
 	}
 	public static Bean setResponse(HttpServletResponse response){
-		return Context.set(STR_REQUEST, response);
+		return Context.set(STR_RESPONSE, response);
 	}
 	public static HttpServletResponse getResponse(){
 		Bean bean = Context.getContext();
@@ -103,18 +103,7 @@ public class Context {
 			return (HttpServletResponse)(bean.get(STR_RESPONSE));
 		}
 		return null;
-	}
-	/**
-	 * 默认处理表名
-	 * @param name
-	 * @return
-	 */
-	public static Bean setTableName(String name){
-		return Context.set(STR_TABLENAME, name);
-	}
-	public static String getTableName(){
-		return Context.get(STR_TABLENAME, "");
-	}
+	} 
 	/**
 	 * 记录处理时间
 	 * @param name

@@ -29,9 +29,9 @@ public class TableControll extends BaseControll {
 	public void statis(HttpServletRequest request, HttpServletResponse response) throws IOException { 
 		this.beforeDo(request, response);
   
-		String table = this.getTableName();
+		String table = getTableName();
 		  if(! Tools.notNull(table)){
-			  writeJson(response, "未提供表名字");return;
+			  echo(false, "未提供表名字");return;
 		  }
 		  
 //		        legend: {      data: ['线条1', '线条2']   },
@@ -98,7 +98,7 @@ public class TableControll extends BaseControll {
 				.put("option", option) 
 				.put("info", WebHelp.getRequestMap(request)).build(); 
 		log(res);
-		writeJson(response, res);
+		echo(res);
 	}	
 	
 	

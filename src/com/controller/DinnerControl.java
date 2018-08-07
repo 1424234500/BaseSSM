@@ -94,7 +94,7 @@ public class DinnerControl extends BaseControll {
 				.put("option", option) 
 				.put("info", WebHelp.getRequestMap(request)).build(); 
 		log(res);
-		writeJson(response, res);
+		echo(res);
 	}	
 	
 	

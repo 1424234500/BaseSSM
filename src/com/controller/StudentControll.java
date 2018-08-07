@@ -20,7 +20,7 @@ import util.JsonUtil;
 
 /**
  * 样例 student表 id-name-time属性 增删查改
- * 
+ * 原始pw 和 跳转版本
  * @author Walker
  * 
  */  

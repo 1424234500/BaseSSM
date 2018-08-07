@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ public class FileControll extends BaseControll{
 	
 	@RequestMapping("/fileCols.do")
 	public void fileCols(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		writeJson(response, FileUtil.getFileMap());
+		echo(FileUtil.getFileMap());
 	}
 	@RequestMapping("/fileDir.do")
 	public void fileDir(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -69,7 +70,7 @@ public class FileControll extends BaseControll{
 		}
 		int type = FileUtil.check(dir);
 		if(type == 1){ //若是文件夹
-			writeJson(response, FileUtil.ls(dir));
+			echo( FileUtil.ls(dir));
 		}else if(type == 0){ //文件
 			this.down(request, response);
 		}
@@ -105,7 +106,7 @@ public class FileControll extends BaseControll{
 		} 
 	    List<Map<String, Object>> res = baseService.findPage(page, sql, params.toArray() );
 	    log(res, page);
-	    writeJson(response, res, page);
+	    echo( res, page);
 	} 
 	
 
@@ -127,7 +128,7 @@ public class FileControll extends BaseControll{
 		}
 		
 	    Map res = MapListUtil.getMap().put("res", count).put("info",  info).build();
-		writeJson(response, res);
+		echo( res);
 	}
 	
 	@RequestMapping("/update.do")
@@ -137,14 +138,14 @@ public class FileControll extends BaseControll{
 	    
 		int count = baseService.executeSql("update fileinfo set about=? where PATH=? ", about, id);
 		Map res = MapListUtil.getMap().put("res", count).build();
-		writeJson(response, res);	
+		echo( res);	
 	}
 
 	@RequestMapping("/get.do")
 	public void get(HttpServletRequest request, HttpServletResponse response) throws IOException { 
 		String path = request.getParameter("PATH");  
 		Map map = FileUtil.getFileMap(path);
-		writeJson(response, map);	
+		echo( map);	
 	}
 	 /**  
      * 文件下载功能  
@@ -157,6 +158,12 @@ public class FileControll extends BaseControll{
     	long starttime = System.currentTimeMillis();
 
 		String path = request.getParameter("path");
+//		String path1 = new String(path.getBytes("iso-8859-1"), "gbk");
+//		String path3 = URLDecoder.decode(path, "utf-8");
+//		String path4 = URLDecoder.decode(path);
+		path = new String(path.getBytes("iso-8859-1"), "utf-8");
+		
+		
 		if(path == null || FileUtil.check(path) != 0){
 			return;
 		}
@@ -234,7 +241,7 @@ public class FileControll extends BaseControll{
             long deta = endtime - starttime;//下载写入耗时deta 大小size 名字name 路径path
             //记录文件上传下载情况 并打印
             // id,fileid,type(up/down),costtime(ms),time
-            String key = fileService.upload(getUser(request).getId(), name, path, ""); 
+            String key = fileService.upload(getUser().getId(), name, path, ""); 
             res = key.equals("0")?0:1;
             log("up file", name, path, Tools.calcTime(deta) , Tools.calcSize(size));
 
@@ -252,7 +259,7 @@ public class FileControll extends BaseControll{
             }  
         }  
         
-        pw.write("" + res);
+        echo(res);
     }
 	
 	

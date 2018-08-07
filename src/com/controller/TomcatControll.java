@@ -78,7 +78,7 @@ public class TomcatControll extends BaseControll{
 				.put("option", option) 
 				.put("info", WebHelp.getRequestMap(request)).build(); 
 		log(res);
-		writeJson(response, res);
+		echo(res);
 	}	
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -125,15 +125,7 @@ public class TomcatControll extends BaseControll{
 				.put("option", option) 
 				.put("info", WebHelp.getRequestMap(request)).build(); 
 		log(res);
-		writeJson(response, res);
+		echo(res);
 	}	
 	
-	
-	static public Logger logger = LoggerFactory.getLogger(TomcatControll.class); 
-
-	@Override
-	public void log(Object... objs) {
-		 logger.info(Tools.objects2string(objs));
-	}
-    
 }

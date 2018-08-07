@@ -31,7 +31,6 @@ import util.Tools;
 public class AngularControll extends BaseControll{   
 	public AngularControll() {
 		super(AngularControll.class, "");
-		// TODO Auto-generated constructor stub
 	}
 
 	@Autowired
@@ -97,7 +96,7 @@ public class AngularControll extends BaseControll{
 				.put("option", option) 
 				.put("info", WebHelp.getRequestMap(request)).build(); 
 		log(res);
-		writeJson(response, res);
+		echo(res);
 	}	
 	
 	
@@ -105,7 +104,7 @@ public class AngularControll extends BaseControll{
 	public void login(HttpServletRequest request, HttpServletResponse response) throws IOException { 
 		Map res = MapListUtil.getMap().put("res", "true").put("info",WebHelp.getRequestMap(request)).build(); 
 		log(res);
-		writeJson(response, res);
+		echo(res);
 	}	
 	 
 	@RequestMapping("/update.do")
@@ -120,14 +119,14 @@ public class AngularControll extends BaseControll{
 	    }else{
 	    	res = MapListUtil.getMap().put("res",studentServiceHibernate.update(id, name, time)).build();
 	    }
-		writeJson(response, res);
+		echo(res);
 	}
 	@RequestMapping("/delete.do")
 	public void delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String id = request.getParameter("ID");
 	    
 	    Map res = MapListUtil.getMap().put("res",studentServiceHibernate.delete(id)).build();
-		writeJson(response, res);
+		echo(res);
 	}	
 	@RequestMapping("/get.do")
 	public void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -135,7 +134,7 @@ public class AngularControll extends BaseControll{
 		String id = request.getParameter("id");   
 		Map res = studentServiceHibernate.get(id );
 		log(res); 
-		writeJson(response, res);
+		echo(res);
 	}	
 	@RequestMapping("/list.do")
 	public void list(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -144,17 +143,17 @@ public class AngularControll extends BaseControll{
 		String timefrom = request.getParameter("TIMEFORM");
 		String timeto = request.getParameter("TIMETO");
 		
-		Page page = getPage(request);
+		Page page = Page.getPage(request);
 		List<Map<String, Object>> list = studentServiceHibernate.list(id, name, timefrom, timeto, page);
 		log(list, page);
-		writeJson(response, list, page);
+		echo(list, page);
 	}
 	@RequestMapping("/listrecent.do")
 	public void listRecent(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String count = request.getParameter("count"); 
 		 
 		List<Map<String, Object>> list = baseService.find("select * from (select s.*, rownum num from student s) where num < ? order by time desc ", count);
-		writeJson(response, list);
+		echo(list);
 	} 
 	
 	static public Logger logger = LoggerFactory.getLogger(AngularControll.class); 

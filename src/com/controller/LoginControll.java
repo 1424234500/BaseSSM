@@ -14,8 +14,13 @@ import com.mode.LoginUser;
 
 @Controller
 @RequestMapping("/login")
-public class LoginControll {
+public class LoginControll extends BaseControll{
  
+	public LoginControll() {
+		super(LoginControll.class, "");
+
+	}
+
 	@RequestMapping("/onlogin.do")
 	public String  onlogin(HttpServletRequest request, Map<String,Object> map) {
 		return "login";
@@ -30,7 +35,7 @@ public class LoginControll {
 
 		int res = 1;
 		 
-		response.getWriter().write("" + res); 
+		echo(res);
 	}
  
     
