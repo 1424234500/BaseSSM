@@ -11,7 +11,7 @@ import java.util.Map;
  * @author Walker
  * 2018年7月13日
  */
-public class Bean extends HashMap<Object, Object>{ 
+public class Bean extends HashMap{ 
 	public static Bean getBean(){
 		return new Bean();
 	}
@@ -26,7 +26,7 @@ public class Bean extends HashMap<Object, Object>{
      * 构造体方法，直接初始化Bean
      * @param values    带数据信息
      */
-    public Bean(Map<?, ?> values) {
+    public Bean(Map values) {
         super(values);
     }
 
@@ -55,8 +55,8 @@ public class Bean extends HashMap<Object, Object>{
 	public <T> T get(Object key, T defaultValue){
 		Object obj = get(key);
 		T res = null;
-		if(obj == null)obj = get(key.toString().toLowerCase());
-		if(obj == null)obj = get(key.toString().toUpperCase());
+//		if(obj == null)obj = get(key.toString().toLowerCase());
+//		if(obj == null)obj = get(key.toString().toUpperCase());
 
 		if(obj == null) {
 			res = defaultValue;
@@ -65,7 +65,7 @@ public class Bean extends HashMap<Object, Object>{
 				res = (T)(obj.toString());
 			} else if (obj instanceof String) {
 				if (defaultValue instanceof Integer) {
-					res = (T)(new Integer(Tools.parseInt(obj.toString())));
+					res = (T)(new Integer(Tools.parseInt(obj.toString(), (Integer)defaultValue)));
 				} else if (defaultValue instanceof Double) {
 					res = (T)(new Double(Tools.parseDouble(obj.toString())));
 				}else{

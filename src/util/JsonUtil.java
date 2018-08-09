@@ -154,6 +154,28 @@ public class JsonUtil {
     	return map;
     }
     /**
+     * 解析json为map/list/string
+     * @param jsonstr
+     */
+    public static Object get(String jsonstr) {
+        try {
+        	int type = getType(jsonstr);
+        	if(type == 0){
+        		return jsonstr;
+        	}
+            if(type == 1){
+                JSONObject jo = new JSONObject(jsonstr);
+            	return toMap(jo);
+            }else if(type == 2){
+            	JSONArray ja = new JSONArray(jsonstr);
+            	return toList(ja);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    /**
      * 解析json为map 
      * @param jsonstr
      */
@@ -181,7 +203,23 @@ public class JsonUtil {
         }
         return res;
     } 
-
+	/**
+	 * 0字符串 1map 2list
+	 */
+    public static int getType(String jsonstr){
+    	int res = 0;
+    	if(jsonstr != null){
+	    	String str = jsonstr.replace(" ", "");
+	    	if(str.length() > 0){
+	    		if(str.charAt(0) == '{' && str.charAt(str.length() - 1) == '}'){
+	    			res = 1;
+	    		}else if(str.charAt(0) == '[' && str.charAt(str.length() - 1) == ']'){
+	    			res = 2;
+	    		}
+	    	}
+    	}
+		return res;
+    }
     public static void out(String str) {
 
     }

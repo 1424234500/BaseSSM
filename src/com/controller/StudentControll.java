@@ -46,7 +46,7 @@ public class StudentControll {
 		String timefrom = request.getParameter("timefrom");
 		String timeto = request.getParameter("timeto");
 		Page page = Page.getPage(request);
-		map.putAll(WebHelp.getRequestMap(request));
+		map.putAll(WebHelp.getRequestBean(request));
 		
 	    List<Map<String, Object>> res = studentServiceHibernate.list(id, name, timefrom, timeto, page);
 	   // logger.info(MapListHelp.list2string(res));
@@ -110,7 +110,7 @@ public class StudentControll {
 		String timeto = request.getParameter("timeto");
 	     
 		Page page = Page.getPage(request);
-		map.putAll(WebHelp.getRequestMap(request));
+		map.putAll(WebHelp.getRequestBean(request));
 
 	    List<Map<String, Object>> res = studentServiceMybatis.list(id, name, timefrom, timeto, page);
 		map.put("PAGE", page);
@@ -172,6 +172,6 @@ public class StudentControll {
 	    
 	 
 	public void log(HttpServletRequest request){
-	    //logger.info(WebHelp.getRequestMap(request).toString()); 
+	    //logger.info(WebHelp.getRequestBean(request).toString()); 
 	}
 }

@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.service.StudentService;
 
+import util.Bean;
 import util.MapListUtil;
 import util.Tools;
+import util.cache.CacheMapImpl;
 
 /** 
  * Tomcat监控后台
@@ -34,6 +36,12 @@ public class TomcatControll extends BaseControll{
 		super(TomcatControll.class, "");
 	}
 
+	@RequestMapping("/listCacheMap.do") 
+	public void listCacheMap(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		Bean map = WebHelp.getParam(request, new String[]{"URL", "KEY", "VALUE", "EXPIRE", "TYPE"});
+		Map res = new CacheMapImpl().findCacheList(map);
+		echo(res);
+	}
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping("/statis.do") 
 	public void statis(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -76,7 +84,7 @@ public class TomcatControll extends BaseControll{
 		Map res = MapListUtil.getMap()
 				.put("res", "true")
 				.put("option", option) 
-				.put("info", WebHelp.getRequestMap(request)).build(); 
+				.put("info", WebHelp.getRequestBean(request)).build(); 
 		log(res);
 		echo(res);
 	}	
@@ -123,7 +131,7 @@ public class TomcatControll extends BaseControll{
 		Map res = MapListUtil.getMap()
 				.put("res", "true")
 				.put("option", option) 
-				.put("info", WebHelp.getRequestMap(request)).build(); 
+				.put("info", WebHelp.getRequestBean(request)).build(); 
 		log(res);
 		echo(res);
 	}	

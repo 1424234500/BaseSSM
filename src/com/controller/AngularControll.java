@@ -94,7 +94,7 @@ public class AngularControll extends BaseControll{
 		Map res = MapListUtil.getMap()
 				.put("res", "true")
 				.put("option", option) 
-				.put("info", WebHelp.getRequestMap(request)).build(); 
+				.put("info", WebHelp.getRequestBean(request)).build(); 
 		log(res);
 		echo(res);
 	}	
@@ -102,7 +102,7 @@ public class AngularControll extends BaseControll{
 	
 	@RequestMapping("/login.do") 
 	public void login(HttpServletRequest request, HttpServletResponse response) throws IOException { 
-		Map res = MapListUtil.getMap().put("res", "true").put("info",WebHelp.getRequestMap(request)).build(); 
+		Map res = MapListUtil.getMap().put("res", "true").put("info",WebHelp.getRequestBean(request)).build(); 
 		log(res);
 		echo(res);
 	}	

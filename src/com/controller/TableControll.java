@@ -96,7 +96,7 @@ public class TableControll extends BaseControll {
 		Map res = MapListUtil.getMap()
 				.put("res", "true")
 				.put("option", option) 
-				.put("info", WebHelp.getRequestMap(request)).build(); 
+				.put("info", WebHelp.getRequestBean(request)).build(); 
 		log(res);
 		echo(res);
 	}	

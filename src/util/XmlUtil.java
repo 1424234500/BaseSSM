@@ -35,13 +35,13 @@ public class XmlUtil {
     }
     
     /**
-     * 将xml字符串数据转为Bean
+     * 将xml字符串数据转为Map
      * @param str xml字符串 
-     * @return Bean实体
+     * @return Map实体
      **/
     @SuppressWarnings("unchecked")
-    public static Bean toBean(String str) {
-        Bean bean = new Bean();
+    public static Map toMap(String str) {
+        Map bean = new HashMap();
         if (str != null && str.length() > 0) {
             Document doc;
             try {
@@ -50,9 +50,9 @@ public class XmlUtil {
                 List<Element> items = root.elements();
                 for (Element item : items) {
                     if (item.isTextOnly()) {
-                        bean.set(item.getName(), item.getText());
+                        bean.put(item.getName(), item.getText());
                     } else {
-                        bean.set(item.getName(), parseNode(item));
+                        bean.put(item.getName(), parseNode(item));
                     }
                 }
             } catch (Exception e) {
@@ -70,7 +70,7 @@ public class XmlUtil {
      */
     @SuppressWarnings("unchecked")
     private static Object parseNode(Element element) {
-        Bean bean = new Bean();
+        Map bean = new HashMap();
         List<Object> beanList = new ArrayList<Object>();
         String name = element.getName();
         List<Element> list = element.elements();
@@ -78,12 +78,12 @@ public class XmlUtil {
         for (Element item : list) {
             String iName = item.getName();
             if (item.isTextOnly()) {
-                bean.set(iName, item.getText());
+                bean.put(iName, item.getText());
             } else if (name.equals(iName)) { //子节点名与父节点名相同，说明是数组
                 isList = true;
                 beanList.add(parseNode(item));
             } else {
-                bean.set(iName, parseNode(item));
+                bean.put(iName, parseNode(item));
             }
         }
         if (isList) {
@@ -95,20 +95,20 @@ public class XmlUtil {
     
     /**
      * bean转化为xml字符串，带xml头信息
-     * @param bean  Bean对象
+     * @param bean  Map对象
      * @return  xml字符串
      */
-    public static String toFullXml(Bean bean) {
+    public static String toFullXml(Map bean) {
         return toFullXml(NODE_NAME_ROOT, bean);
     }
     
     /**
      * bean转化为xml字符串，带xml头信息
      * @param rootnName 根节点名称
-     * @param bean  Bean对象
+     * @param bean  Map对象
      * @return  xml字符串
      */
-    public static String toFullXml(String rootnName, Bean bean) {
+    public static String toFullXml(String rootnName, Map bean) {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         sb.append(toXml(rootnName, bean));
@@ -120,10 +120,10 @@ public class XmlUtil {
     /**
      * bean转化为xml字符串，支持嵌套
      * @param nodeName 节点名称
-     * @param bean  Bean对象
+     * @param bean  Map对象
      * @return  xml字符串
      */
-    public static CharSequence toXml1(String nodeName, Bean bean) {
+    public static CharSequence toXml1(String nodeName, Map bean) {
         StringBuilder sb = new StringBuilder(20000000);
         if ((nodeName != null) && (nodeName.length() > 0)) {
             sb.append("<").append(nodeName).append(">");
@@ -133,8 +133,8 @@ public class XmlUtil {
             if (value != null) {
                 if (value != null) {
                     sb.append("<").append(key).append(">");
-                    if (value instanceof Bean) {
-                        sb.append(toXml(null, (Bean) value));
+                    if (value instanceof Map) {
+                        sb.append(toXml(null, (Map) value));
                     } else if (value instanceof List) {
                         sb.append(toXml(String.valueOf(key), (List<?>) value));
                     } else if (value instanceof Map) {
@@ -155,10 +155,10 @@ public class XmlUtil {
     /**
      * bean转化为xml字符串，支持嵌套
      * @param nodeName 节点名称
-     * @param bean	Bean对象
+     * @param bean	Map对象
      * @return	xml字符串
      */
-    public static String toXml(String nodeName, Bean bean) {
+    public static String toXml(String nodeName, Map bean) {
         StringBuilder sb = new StringBuilder();
         if ((nodeName != null) && (nodeName.length() > 0)) {
             sb.append("<").append(nodeName).append(">");
@@ -167,8 +167,8 @@ public class XmlUtil {
             Object value = bean.get(key);
             if (value != null) {
                 sb.append("<").append(key).append(">");
-                if (value instanceof Bean) {
-                    sb.append(toXml(null, (Bean) value));
+                if (value instanceof Map) {
+                    sb.append(toXml(null, (Map) value));
                 } else if (value instanceof List) {
                     sb.append(toXml(String.valueOf(key), (List<?>) value));
                 } else if (value instanceof Map) {
@@ -199,50 +199,16 @@ public class XmlUtil {
         for (Object bean : list) {
             if (bean != null) {
                 sb.append("<").append(nodeName).append(">");
-                sb.append(toXml(null, (Bean) bean));
+                sb.append(toXml(null, (Map) bean));
                 sb.append("</").append(nodeName).append(">").append("\r\n");
             }
         }
     	return sb.toString();
     }
+     
     
     /**
-     * map转化为xml字符串，支持嵌套
-     * @param   nodeName 节点名称
-     * @param   map    map对象
-     * @return  xml字符串
-     */
-    public static String toXml(String nodeName, Map<?, ?> map) {
-        StringBuilder sb = new StringBuilder();
-        if ((nodeName != null) && (nodeName.length() > 0)) {
-            sb.append("<").append(nodeName).append(">");
-        }
-        for (Object key : map.keySet()) {
-            Object value = map.get(key);
-            if (value != null) {
-                sb.append("<").append(key).append(">");
-                if ((value instanceof String) || value.getClass().isPrimitive()) {
-                    sb.append(encode(String.valueOf(value)));
-                } else if (value instanceof Bean) {
-                    sb.append(toXml(null, (Bean) value));
-                } else if (value instanceof List) {
-                    sb.append(toXml(String.valueOf(key), (List<?>) value));
-                } else if (value instanceof Map) {
-                    sb.append(toXml(null, (Map<?, ?>) value));
-                } else {
-                    sb.append(encode(String.valueOf(value)));
-                }
-                sb.append("</").append(key).append(">").append("\r\n");
-            }
-        }
-        if ((nodeName != null) && (nodeName.length() > 0)) {
-            sb.append("</").append(nodeName).append(">");
-        }
-        return sb.toString();
-    }
-    
-    /**
-     * 对象转化为xml字符串，支持嵌套，自动识别类型：Bean、List、Map
+     * 对象转化为xml字符串，支持嵌套，自动识别类型：Map、List、Map
      * @param   nodeName    节点名称
      * @param   obj         需要被转换的对象
      * @return  xml字符串
@@ -250,8 +216,6 @@ public class XmlUtil {
     public static String toXml(String nodeName, Object obj) {
         if (obj == null) {
             return  "";
-        } else if (obj instanceof Bean) {
-            return toXml(nodeName, (Bean) obj);
         } else if (obj instanceof List<?>) {
             return toXml(nodeName, (List<?>) obj);
         } else if (obj instanceof Map<?, ?>) {

@@ -1,12 +1,11 @@
 package com.controller;
 
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import util.Bean;
 import util.Tools;
 
 /**
@@ -17,13 +16,13 @@ import util.Tools;
 public class WebHelp {
 
 	/**
-	 * 获取request所有参数Map
+	 * 获取request所有参数Bean
 	 * @param request
-	 * @return Map
+	 * @return Bean
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Map getRequestMap(HttpServletRequest request){
-		Map res = new HashMap();
+	public static Bean getRequestBean(HttpServletRequest request){
+		Bean res = new Bean();
 		Enumeration enu=request.getParameterNames();  
 		while(enu.hasMoreElements()){  
 			String name=(String)enu.nextElement();  
@@ -33,16 +32,24 @@ public class WebHelp {
 		return res;
 	}
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Map getParam(HttpServletRequest request, List<Object> colNames){
-		Map res = new HashMap();
+	public static Bean getParam(HttpServletRequest request, List<Object> colNames){
+		Bean res = new Bean();
 		for(Object key : colNames){
 			res.put(key, WebHelp.getKey(request, key));
 		}
 		return res;
 	}
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Map getKeyParam(HttpServletRequest request, String keyName){
-		Map res = new HashMap();
+	public static Bean getParam(HttpServletRequest request, Object...colNames){
+		Bean res = new Bean();
+		for(Object key : colNames){
+			res.put(key, WebHelp.getKey(request, key));
+		}
+		return res;
+	}
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Bean getKeyParam(HttpServletRequest request, String keyName){
+		Bean res = new Bean();
 		res.put(keyName, request.getParameter(keyName));
 		return res;
 	}
@@ -55,6 +62,7 @@ public class WebHelp {
 		if(!Tools.notNull(value)){	//兼容全大写
 			value = request.getParameter(((String)name).toUpperCase());
 		}
+		if(value == null)value = "";
 		return value;
 	}
 	

@@ -2,10 +2,19 @@ package util.cache;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.collections.CollectionUtils;
+
+import util.Bean;
+import util.MapListUtil;
+import util.Tools;
 
 
 /**
@@ -13,10 +22,25 @@ import java.util.concurrent.ConcurrentHashMap;
  * 缓存池支持
  * 缓存时间支持
  */
-public class CacheMapImpl implements Cache {
+public class CacheMapImpl implements Cache<String> {
+	static int ALL_COUNT = 0; //所有缓存访问get次数
+
+	/**
+	 * 附加数据记录
+	 */
+	class Index{
+		int count;	//命中次数
+		long expire;	//过期时间
+		long mtime;	//修改时间
+		public boolean isExpire(){ //是否过期
+			return System.currentTimeMillis() > mtime + expire;
+		}
+	}
+	
 	
     /** 存储缓存 */
-    private Map<String, Object> map = new ConcurrentHashMap<String, Object>();
+    private static Map<String, Object> map = new ConcurrentHashMap<>();
+    private static Map<String, Index> mapIndex = new ConcurrentHashMap<>();
     
 	@Override
 	public int size() {
@@ -34,7 +58,7 @@ public class CacheMapImpl implements Cache {
 	}
 
 	@Override
-	public boolean containsKey(Object key) {
+	public boolean containsKey(String key) {
 		return map.containsKey(key);
 	}
 
@@ -44,18 +68,22 @@ public class CacheMapImpl implements Cache {
 	}
 
 	@Override
-	public void putAll(Map<String, Object> map) {
-		map.putAll(map);
+	public void putAll(Map map) {
+		for(Object key : map.keySet()){
+			put(key.toString(), map.get(key));
+		}
+//		map.putAll(map);
 	}
 
 	@Override
-	public Map<?, ?> getAll() {
+	public Map getAll() {
 		return map;
 	}
 
 	@Override
 	public void clear() {
 		map.clear();
+		mapIndex.clear();
 	}
 
 	@Override
@@ -69,48 +97,266 @@ public class CacheMapImpl implements Cache {
 	}
 
 	@Override
-	public <V> V get(Object key) {
+	public <V> V get(String key) {
+		return get(key, null);
+	}
+
+	@Override
+	public <V> V get(String key, V defaultValue) {
+		ALL_COUNT++;
 		if(map.containsKey(key)){
-			return (V)key;
+			Index index = mapIndex.get(key);
+			if(index.isExpire()){
+				out("expire." + key + "." + map.get(key) + "." + index.expire);
+				map.remove(key);
+				mapIndex.remove(key);	
+				return defaultValue;
+			}else{
+				index.count += 1;
+				return (V)map.get(key);
+			}
 		}
-		return null;
+		return defaultValue;
 	}
 
 	@Override
-	public <V> V get(Object key, V defaultValue) {
-		
-		return null;
+	public <V> Cache put(String key, V value) {
+		put(key, value, 600 * 1000L);
+		return this;
 	}
 
 	@Override
-	public <K, V> boolean put(K key, V value) {
-		// TODO Auto-generated method stub
-		return false;
+	public <V> Cache put(String key, V value, long expire) {
+		map.put(key, value);
+		Index index;
+		if(mapIndex.containsKey(key)){
+			index = mapIndex.get(key);
+		}else{
+			index = new Index();
+			mapIndex.put(key, index);
+		}
+		index.mtime = System.currentTimeMillis();
+		index.expire = expire;
+		index.count = 0;
+		return this;
 	}
 
 	@Override
-	public <K, V> boolean put(K key, V value, long expiry) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public <K> boolean remove(K key) {
-		// TODO Auto-generated method stub
+	public boolean remove(String key) {
+		if(containsKey(key)){
+			map.remove(key);
+			return true;
+		}
 		return false;
 	}
 
 	@Override
 	public void shutdown() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void startup() {
-		// TODO Auto-generated method stub
 		
 	}
 
+	@Override
+	public Map findCacheList(Bean bean) {
+//		String[] table = {"HASHCODE", "KEY", "VALUE", "MTIME", "EXPIRE", "COUNT", "TOURL"};
+		String urls = bean.get("URL", ""); //树形选择url
+		String key = bean.get("KEY", ""); //过滤key
+		String value = bean.get("VALUE", "");
+		int expire = bean.get("EXPIRE", 0); //0, 1未过期, 2已过期 下次获取remove
+		int type = bean.get("TYPE", -1);
+
+		Object obj = map;
+		Object temp = null;
+		String rootKey = "";
+		String toUrl = ""; //实际路径
+		String itemCopy = "";
+		if(urls.length() > 0){	//非查询root
+			String[] arr = urls.split("\\."); // map.list[0].map.aaa   map.list
+			int cc = -1;
+			for(String item : arr){
+				itemCopy = item;
+				//list[0] -> list 0
+				cc = -1;
+				if(item.charAt(item.length() - 1) == ']'){ //数组
+					item = item.substring(0, item.length() - 1); //去除]
+					item = item.replace('[', ' ');
+					String[] ss = item.split(" ");
+					if(ss.length >= 2){
+						item = ss[0];
+						cc = Tools.parseInt(ss[1], -1);
+					}
+				}
+				if(obj instanceof List){ //数组 list 不出现该情况
+					break;
+				}else if(obj instanceof Map){//最后查询层级应该是此 
+					Map objMap = (Map)obj;
+					temp = objMap.get(item); //预读取取出值为 map list ? 否则中断跳出
+					if(temp == null) break;
+					if(temp instanceof Map){	//取出对象为map
+						obj = temp;
+					}else if(temp instanceof List){ //输出对象为list
+						List tempList = (List)temp;
+						if(cc >= 0 && cc < tempList.size()){ //后续判定是否有选中某项 list[2]
+							Object objTemp = tempList.get(cc);
+							if(objTemp instanceof Map || objTemp instanceof List){ //list中选出为map list
+								obj = objTemp;
+							}else{ //基本类型 则返回所有list
+								obj = temp;
+							}
+						}else{
+							obj = temp;
+						}
+					}else{ //基本类型
+						break;
+					}
+				}else{ //已经是基本类型则 不再继续子层级查询 理应不存在访问此
+					break;
+				}
+				toUrl += itemCopy + ".";
+				if(rootKey.length() <= 0)
+					rootKey = item;
+			}
+			if(toUrl.length() > 0)
+				toUrl = toUrl.substring(0, toUrl.length() - 1);
+		}
+		List<Map> res = new ArrayList<>();
+		if(obj instanceof Map){
+			res = mapToList((Map)obj, rootKey, toUrl, key, value, expire, type);
+		}else if(obj instanceof List){
+			res = listToList((List)obj, rootKey, toUrl, key, value, expire, type);
+		}else{
+			res = new ArrayList<>();
+		}
+		Tools.sort(res, true, "TYPE", "KEY", "COUNT", "EXPIRE");
+		return new Bean().put("urls", toUrl).put("list", res);
+	}
+	public List mapToList(Map theMap, String rootKey, String toUrl, String key, String value, int expire, int type){
+		List<Map> res = new ArrayList<>();
+		Set<Entry<String, Object>> set = theMap.entrySet();
+		Index index = null;
+		boolean ffExpire = false;
+		if(rootKey.length() > 0){
+			index = mapIndex.get(rootKey);
+			ffExpire = index.isExpire();
+		}
+		for(Entry<String, Object> item : set){
+			String ikey = item.getKey();
+			if(rootKey.length() <= 0){
+				index = mapIndex.get(ikey);
+				ffExpire = index.isExpire();
+			}
+			int ihash = ikey.hashCode();
+			Object ivalue = item.getValue();
+			int itype = Tools.getType(ivalue);
+			Bean temp = new Bean();
+			temp.set("HASHCODE", ihash);
+			if(key.length() > 0 && ikey.indexOf(key) < 0) continue;
+			temp.set("KEY", ikey);
+			if(itype == 0){ //只对基本类型做值查询
+				temp.set("VALUE", ivalue);
+			}
+			if(type != -1 && type != itype) continue;
+			temp.set("TYPE", itype);
+			temp.set("MTIME", index.mtime);
+			if(expire == 1 && ffExpire) continue;
+			if(expire == 2 && !ffExpire) continue;
+			temp.set("EXPIRE", index.expire);
+			temp.set("COUNT", index.count);
+//			temp.set("TOURL", toUrl);
+			res.add(temp);
+		}
+		return res;
+	}
+	public List listToList(List theList, String rootKey, String toUrl, String key, String value, int expire, int type){
+		List<Map> res = new ArrayList<>();
+		Index index = null;
+		boolean ffExpire = false;
+		if(rootKey.length() > 0){
+			index = mapIndex.get(rootKey);
+			ffExpire = index.isExpire();
+		}else{
+			index = new Index();
+		}
+		for(int i = 0; i < theList.size(); i++){
+			Object ivalue = theList.get(i);
+			String ikey = "[" + i + "]";
+			int ihash = ikey.hashCode();
+			int itype = Tools.getType(ivalue);
+			Bean temp = new Bean();
+			temp.set("HASHCODE", ihash);
+			if(key.length() > 0 && ikey.indexOf(key) < 0) continue;
+			temp.set("KEY", ikey);
+			if(itype == 0){ //只对基本类型做值查询
+				if(value.length() > 0  && ivalue != null && ivalue.toString().indexOf(key) < 0) continue;
+				temp.set("VALUE", ivalue);
+			}
+			if(type != -1 && type != itype) continue;
+			temp.set("TYPE", itype);
+			temp.set("MTIME", index.mtime);
+			if(expire == 1 && ffExpire) continue;
+			if(expire == 2 && !ffExpire) continue;
+			temp.set("EXPIRE", index.expire);
+			temp.set("COUNT", index.count);
+//			temp.set("TOURL", toUrl);
+
+			res.add(temp);
+		}
+		return res;
+	}
+	
+	public static void main(String[] argv){
+		Cache cache = new CacheMapImpl();
+		cache.put("str01", "000", 3600 * 1000);
+		cache.put("str01", "001", 60 * 1000);
+		cache.put("str02", "000", 100);
+		cache.put("str03", "000", 10);
+		cache.put("str04", "000", 1);
+		cache.put("mmm.bbb", "000", 1);
+		cache.put("map", Bean.getBean().put("b1", "bk1").put("b2", "bk2"), 186 * 1000);
+		List<Object> list = new ArrayList<>();
+		list.add("list str1");
+		list.add("list str2");
+		list.add(Bean.getBean().put("b1", "bk1").put("b2", "bk2"));
+		list.add(Bean.getBean().put("listStr", "bk1").put("listMap", Bean.getBean().put("listMapStr", "bk1").put("b2", "bk2")));
+		cache.put("list", list, 186 * 1000);
+		
+		for(int i = 0; i < 100; i ++){
+			cache.get(cache.keySet().toArray()[(int) (Math.random() * cache.keySet().size())]);
+		}
+		
+		
+		Tools.out("--------------全");
+//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "")).get(key));
+//		Tools.out("--------------基本数据");
+//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "str01")));
+//		Tools.out("--------------map");
+//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "map")));
+//		Tools.out("--------------list");
+//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "list")));
+//		Tools.out("--------------list[099]不存在");
+//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "list[099]")));
+//		Tools.out("--------------list[03]存在");
+//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "list[03]")));
+//
+//		Tools.out("--------------list[03].listMap");
+//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "list[03].listMap")));
+
+		Tools.out("--------------list[03].listMap.listMapStr");
+//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "list[03].listMap.listMapStr")));
+		String str = "..aaa.bbb.ccc.";
+		Tools.out(str.split("\\."));
+		
+		Tools.out(MapListUtil.getMapUrl(cache.getAll(), "list[03].listMap"));
+		Tools.out(MapListUtil.getMapUrl(cache.getAll(), "list[03].listMap.listMapStr"));
+		
+	}
+	
+	private void out(Object...objects){
+		Tools.out(objects);
+	}
 
 }

@@ -62,7 +62,7 @@ public class LoginInterceptors implements HandlerInterceptor{
 	        String url = requestUri.substring(contextPath.length());  //[/student/listm]
 	        //sequenceid time userid url ip host 端口     
 	        String ip = request.getRemoteAddr();//返回发出请求的IP地址
-	        String params = WebHelp.getRequestMap(request).toString();
+	        String params = WebHelp.getRequestBean(request).toString();
 	        String host=request.getRemoteHost();//返回发出请求的客户机的主机名
 	        int port =request.getRemotePort();//返回发出请求的客户机的端口号。
 	        

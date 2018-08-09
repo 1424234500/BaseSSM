@@ -55,7 +55,7 @@ public class LogInterceptors implements HandlerInterceptor{
         String requestUri = request.getRequestURI();  
         String contextPath = request.getContextPath();  
         String url = requestUri.substring(contextPath.length());  //[/student/listm]
-        String params = WebHelp.getRequestMap(request).toString();
+        String params = WebHelp.getRequestBean(request).toString();
         
         logService.exeStatis(url, params, time);
 
@@ -105,7 +105,7 @@ public class LogInterceptors implements HandlerInterceptor{
         }
         //日志 记录 输出       
 //        logger.info("++++++++ ");
-	    logger.info("[" + url + "] [" + cla + "." + name + "]" + WebHelp.getRequestMap(request).toString());
+	    logger.info("[" + url + "] [" + cla + "." + name + "]" + WebHelp.getRequestBean(request).toString());
  
         return true;  
     }  

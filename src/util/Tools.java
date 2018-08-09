@@ -5,8 +5,11 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class Tools {
 
@@ -153,14 +156,22 @@ public class Tools {
 	}
 
 	/**
-	 * 有效 true 都不为null 且不为” “
+	 * 都不为null && ” “
 	 */
 	public static boolean notNull(Object... objects) {
 		for (int i = 0; i < objects.length; i++) {
-			if (objects[i] == null) {
+			if (objects[i] == null || objects[i].toString().equals("")) {
 				return false;
 			}
-			if (objects[i].toString().equals("")) {
+		}
+		return true;
+	}
+	/**
+	 * 都为null || ” “
+	 */
+	public static boolean isNull(Object... objects) {
+		for (int i = 0; i < objects.length; i++) {
+			if (objects[i] != null && !objects[i].toString().equals("")) {
 				return false;
 			}
 		}
@@ -302,7 +313,23 @@ public class Tools {
 		}
 		return res;
 	}
-
+	/**
+	 * 解析数字
+	 */
+	public static int parseInt(String num, int defaultValue) {
+		int res = 0;
+		if (!Tools.notNull(num)) {
+			res = defaultValue;
+		} else {
+			try {
+				res = Integer.parseInt(num);
+			} catch (Exception e) {
+				Tools.out("解析:" + num + "数字失败");
+				res = defaultValue;
+			}
+		}
+		return res;
+	}
 	/**
 	 * 解获取时间yyyyMMddHHmmss
 	 */
@@ -332,7 +359,12 @@ public class Tools {
 	public static String getNowTimeL() {
 		return getTime("yyyy-MM-dd HH:mm:ss");
 	}
-
+	/**
+	 * 获取当前时间 yyyy-MM-dd HH:mm:ss:sss
+	 */
+	public static String getNowTimeLS() {
+		return getTime("yyyy-MM-dd HH:mm:ss:SSS");
+	}
 	/**
 	 * 格式化时间 yyyy-MM-dd
 	 */
@@ -514,4 +546,43 @@ public class Tools {
 		return -1;
 	}
 
+	/**
+	 * 获取对象类型 基本数据类型0 map1 list2
+	 */
+	public static int getType(Object obj){
+		if(obj == null) return 0;
+		if(obj instanceof Map) return 1;
+		if(obj instanceof List) return 2;
+		return 0;
+	}
+	
+	/**
+	 * 排序工具 list<Map> 多字段
+	 */
+	
+	public static void sort(final List<Map> list, final boolean ifReverse, final String...keys){
+		Collections.sort(list, new Comparator<Map>() {
+			@Override
+			public int compare(Map o1, Map o2) {
+				int res = 0;
+				if(o1 != null && o2 != null){
+					for(String key : keys){
+						Object ov1 = o1.get(key);
+						Object ov2 = o2.get(key);
+						if(ov1 != null && ov2 != null){
+							res = ov1.toString().compareTo(ov2.toString());
+							if(res != 0){
+								break;
+							}
+						}else{
+							res = ov1 == null ? -1:1;
+						}
+					}
+				}else{
+					res = o1 == null ? -1 : 1;
+				}
+				return (ifReverse?1:-1) * res;
+			}
+		});
+	}
 }

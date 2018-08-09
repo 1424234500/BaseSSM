@@ -357,7 +357,70 @@ public class MapListUtil {
 
 		return res;
 	}
-
+	/**
+	 * 根据url 获取对象 map.key1.listcc[0].list[2].key3
+	 * @param map
+	 * @param urls
+	 * @return
+	 */
+	public static <T> T getMapUrl(Map map, String urls){
+		return getMapUrl(map, urls, null);
+	}
+	public static <T> T getMapUrl(Map map, String urls, T defaultValue){
+		T res = defaultValue;
+		Object obj = map;
+		Object temp = null;
+		String toUrl = ""; //实际路径
+		String itemCopy = "";
+		if(urls.length() > 0){	//非查询root
+			String[] arr = urls.split("\\."); // map.list[0].map.aaa   map.list
+			int cc = -1;
+			for(int i = 0; i < arr.length; i++){
+				String item = arr[i];
+				itemCopy = item;
+				//list[0] -> list 0
+				cc = -1;
+				if(item.charAt(item.length() - 1) == ']'){ //数组
+					item = item.substring(0, item.length() - 1); //去除]
+					item = item.replace('[', ' ');
+					String[] ss = item.split(" ");
+					if(ss.length >= 2){
+						item = ss[0];
+						cc = Tools.parseInt(ss[1], -1);
+					}
+				}
+				if(obj instanceof List){ //数组 list 不出现该情况
+					break;
+				}else if(obj instanceof Map){//最后查询层级应该是此 
+					Map objMap = (Map)obj;
+					temp = objMap.get(item); //预读取取出值为 map list ? 否则中断跳出
+					if(temp == null) break;
+					if(temp instanceof Map){	//取出对象为map
+						obj = temp;
+					}else if(temp instanceof List){ //输出对象为list
+						List tempList = (List)temp;
+						if(cc >= 0 && cc < tempList.size()){ //后续判定是否有选中某项 list[2]
+							obj = tempList.get(cc);
+						}else{
+							break;
+						}
+					}else{ //基本类型
+						obj = temp;
+					}
+				}else{ //已经是基本类型则 不再继续子层级查询 理应不存在访问此
+					break;
+				}
+				toUrl += itemCopy + ".";
+			}
+			if(toUrl.length() > 0)
+				toUrl = toUrl.substring(0, toUrl.length() - 1);
+			if(toUrl.equals(urls)){ 
+				res = (T)obj;
+			}
+		} 
+		return res;
+	}
+	
 
 
 
