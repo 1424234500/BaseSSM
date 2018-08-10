@@ -67,7 +67,9 @@ public class Bean extends HashMap{
 				if (defaultValue instanceof Integer) {
 					res = (T)(new Integer(Tools.parseInt(obj.toString(), (Integer)defaultValue)));
 				} else if (defaultValue instanceof Double) {
-					res = (T)(new Double(Tools.parseDouble(obj.toString())));
+					res = (T)(new Double(Tools.parseDouble(obj.toString(), (Double)defaultValue)));
+				} else if (defaultValue instanceof Long) {
+					res = (T)(new Long(Tools.parseLong(obj.toString(), (Long)defaultValue)));
 				}else{
 					res = (T)obj;
 				}

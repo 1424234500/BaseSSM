@@ -372,7 +372,10 @@ public class MapListUtil {
 		Object temp = null;
 		String toUrl = ""; //实际路径
 		String itemCopy = "";
-		if(urls.length() > 0){	//非查询root
+		
+		if(urls.length() <= 0){	//非查询root
+			res = (T)map;
+		} else{
 			String[] arr = urls.split("\\."); // map.list[0].map.aaa   map.list
 			int cc = -1;
 			for(int i = 0; i < arr.length; i++){
@@ -399,10 +402,10 @@ public class MapListUtil {
 						obj = temp;
 					}else if(temp instanceof List){ //输出对象为list
 						List tempList = (List)temp;
-						if(cc >= 0 && cc < tempList.size()){ //后续判定是否有选中某项 list[2]
+						if(cc >= 0 && cc < tempList.size()){ //list[2]
 							obj = tempList.get(cc);
-						}else{
-							break;
+						}else{ //list
+							obj = temp;
 						}
 					}else{ //基本类型
 						obj = temp;

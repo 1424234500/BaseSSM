@@ -14,7 +14,10 @@ import java.util.Map;
 public class Tools {
 
 	public static void main(String argc[]) {
-
+		Tools.out(Tools.parseInt("1-2-3"));
+		Tools.out(Tools.parseInt("1 2 3"));
+		Tools.out(Tools.parseInt("1\t2   3"));
+		Tools.out(Tools.parseInt("- [1] -[2-3  5]3"));
 	}
 	
 	
@@ -260,19 +263,24 @@ public class Tools {
 		return -1;
 	}
 
+	public static long parseLong(String num) {
+		return parseLong(num, 0);
+	}
+
 	/**
 	 * 解析数字
 	 */
-	public static long parseLong(String num) {
+	public static long parseLong(String num, long defaultValue) {
 		long res = 0;
+		num = filterNum(num);
 		if (!Tools.notNull(num)) {
-			res = 0;
+			res = defaultValue;
 		} else {
 			try {
 				res = Long.parseLong(num);
 			} catch (Exception e) {
 				Tools.out("解析:" + num + "数字失败");
-				res = 0;
+				res = defaultValue;
 			}
 		}
 		return res;
@@ -282,15 +290,19 @@ public class Tools {
 	 * 解析数字
 	 */
 	public static double parseDouble(String num) {
+		return parseDouble(num, 0);
+	}
+	public static double parseDouble(String num, double defaultValue) {
 		double res = 0;
+		num = filterNum(num);
 		if (!Tools.notNull(num)) {
-			res = 0;
+			res = defaultValue;
 		} else {
 			try {
 				res = Double.parseDouble(num);
 			} catch (Exception e) {
 				Tools.out("解析:" + num + "数字失败");
-				res = 0;
+				res = defaultValue;
 			}
 		}
 		return res;
@@ -300,25 +312,19 @@ public class Tools {
 	 * 解析数字
 	 */
 	public static int parseInt(String num) {
-		int res = 0;
-		if (!Tools.notNull(num)) {
-			res = 0;
-		} else {
-			try {
-				res = Integer.parseInt(num);
-			} catch (Exception e) {
-				Tools.out("解析:" + num + "数字失败");
-				res = 0;
-			}
-		}
-		return res;
+		return parseInt(num, 0);
+	}
+	public static String filterNum(String num){
+		//字符串筛选 筛选出特殊字符 [ ' ' ] - 这类 0-21-23 [133]  [^(\\d)]+
+		return num.replaceAll("-+|\\s+|\\[+|\\]+", "");
 	}
 	/**
 	 * 解析数字
 	 */
 	public static int parseInt(String num, int defaultValue) {
 		int res = 0;
-		if (!Tools.notNull(num)) {
+		num = filterNum(num);
+		if (Tools.isNull(num)) {
 			res = defaultValue;
 		} else {
 			try {

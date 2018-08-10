@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.service.StudentService;
 
 import util.Bean;
+import util.JsonUtil;
 import util.MapListUtil;
 import util.Tools;
 import util.cache.CacheMapImpl;
@@ -35,13 +36,50 @@ public class TomcatControll extends BaseControll{
 	public TomcatControll( ) {
 		super(TomcatControll.class, "");
 	}
-
+/**
+ * 缓存监控 map实现
+ */
+	
+	@RequestMapping("/addCacheMap.do") 
+	public void addCacheMap(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		Bean args = WebHelp.getParam(request, new String[]{"URL", "KEY", "VALUE", "EXPIRE", "TYPE"});
+		String url = args.get("URL", "");
+		String key = args.get("KEY", "");
+		Object value = args.get("VALUE", new Object());
+		long expire = args.get("EXPIRE", 10000L);
+		int type = args.get("TYPE", 1); // str / obj
+		if(type == 1){
+			value = JsonUtil.get(value.toString());
+		}
+		String res = new CacheMapImpl().put(url, key, value, expire);
+		if(res.equals("true")){
+			echo(value);
+		}else{
+			echo(false, res);
+		}
+		
+	}
+	@RequestMapping("/deleteCacheMap.do") 
+	public void deleteCacheMap(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String url = WebHelp.getKey(request, "URL");
+		String key = WebHelp.getKey(request, "KEY");
+		
+		String res = new CacheMapImpl().remove(url, key);
+		if(res.equals("true")){
+			echo("true");
+		}else{
+			echo(false, res);
+		}
+	}
 	@RequestMapping("/listCacheMap.do") 
 	public void listCacheMap(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Bean map = WebHelp.getParam(request, new String[]{"URL", "KEY", "VALUE", "EXPIRE", "TYPE"});
 		Map res = new CacheMapImpl().findCacheList(map);
 		echo(res);
 	}
+
+
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping("/statis.do") 
 	public void statis(HttpServletRequest request, HttpServletResponse response) throws IOException {

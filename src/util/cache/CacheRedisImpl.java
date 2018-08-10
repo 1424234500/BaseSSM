@@ -18,11 +18,9 @@ import util.Tools;
 
 
 /**
- * 缓存服务实现类，直接采用内存做缓存服务
- * 缓存池支持 ?
- * 缓存时间支持
+ * 缓存服务实现类，直接采用redis做缓存服务
  */
-public class CacheMapImpl implements Cache<String> {
+public class CacheRedisImpl implements Cache<String> {
 	static int ALL_COUNT = 0; //所有缓存访问get次数
 
 	/**
@@ -403,7 +401,7 @@ public class CacheMapImpl implements Cache<String> {
 	}
 	
 	public static void main(String[] argv){
-		Cache cache = new CacheMapImpl();
+		Cache cache = new CacheRedisImpl();
 		cache.put("str01", "000", 3600 * 1000);
 		cache.put("str01", "001", 60 * 1000);
 		cache.put("str02", "000", 100);

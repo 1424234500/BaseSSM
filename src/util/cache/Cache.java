@@ -32,7 +32,10 @@ public interface Cache<K> {
 	 */
 	public static final int interfaceDefaultStaticFinalInt = 0;
 	
-	
+	/**
+	 * 默认的缓存周期
+	 */
+	long TIME_DEFAULT_EXPIRE = 600 * 1000L;
 	
 	
 //具体缓存实现
@@ -70,6 +73,26 @@ public interface Cache<K> {
      * 缓存时间
      */
     <V> Cache put(K key, V value, long expiry);
+
+    /**
+     *  map1.list1[01].map2 
+     *  key2 value2
+     * url添加缓存 return "true" "error info"
+     */
+    <V> String put(String url, K key, V value);
+    
+    /**
+     * map1.list1[01].map2 key2
+     * url添加缓存 return "true" "error info"
+     */
+    <V> String put(String url, K key, V value, long expiry);
+    
+    /**
+     * map1.list1[01].map2 key2
+     * url移除key return "true" "error info"
+     */
+    String remove(String url, K key); 
+    
     boolean remove(K key); 
     /**
      * 关闭缓存
