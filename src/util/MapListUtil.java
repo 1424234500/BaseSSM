@@ -97,7 +97,7 @@ public class MapListUtil {
 	}
 
 	public static int getMapSize(Map map){
-		return map.keySet().size();
+		return map.size();
 	}
 
 
@@ -361,7 +361,7 @@ public class MapListUtil {
 	 * 根据url 获取对象 map.key1.listcc[0].list[2].key3
 	 * @param map
 	 * @param urls
-	 * @return
+	 * @return null/obj
 	 */
 	public static <T> T getMapUrl(Map map, String urls){
 		return getMapUrl(map, urls, null);
