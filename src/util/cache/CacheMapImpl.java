@@ -12,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import com.controller.Page;
+
 import util.Bean;
 import util.MapListUtil;
 import util.Tools;
@@ -59,7 +61,19 @@ public class CacheMapImpl implements Cache<String> {
 
 	@Override
 	public boolean containsKey(String key) {
-		return map.containsKey(key);
+
+		if(map.containsKey(key) && mapIndex.containsKey(key)){
+			Index index = mapIndex.get(key);
+			if(index.isExpire()){
+				out("expire." + key + "." + map.get(key) + "." + index.expire);
+				remove(key);
+				return false;
+			}
+		}else{
+			remove(key);
+			return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -104,17 +118,10 @@ public class CacheMapImpl implements Cache<String> {
 	@Override
 	public <V> V get(String key, V defaultValue) {
 		ALL_COUNT++;
-		if(map.containsKey(key)){
+		if(containsKey(key)){
 			Index index = mapIndex.get(key);
-			if(index.isExpire()){
-				out("expire." + key + "." + map.get(key) + "." + index.expire);
-				map.remove(key);
-				mapIndex.remove(key);	
-				return defaultValue;
-			}else{
-				index.count += 1;
-				return (V)map.get(key);
-			}
+			index.count += 1;
+			return (V)map.get(key);
 		}
 		return defaultValue;
 	}
@@ -137,7 +144,7 @@ public class CacheMapImpl implements Cache<String> {
 		}
 		index.mtime = System.currentTimeMillis();
 		index.expire = expire;
-		index.count = 0;
+//		index.count += 1;
 		return this;
 	}
 	public <V> String put(String url, String key, V value) {
@@ -225,11 +232,9 @@ public class CacheMapImpl implements Cache<String> {
 	
 	@Override
 	public boolean remove(String key) {
-		if(containsKey(key)){
-			map.remove(key);
-			return true;
-		}
-		return false;
+		map.remove(key);
+		mapIndex.remove(key);
+		return true;
 	}
 
 	@Override
@@ -243,14 +248,15 @@ public class CacheMapImpl implements Cache<String> {
 	}
 
 	@Override
-	public Map findCacheList(Bean bean) {
+	public Bean findCacheList(Bean bean) {
 //		String[] table = {"HASHCODE", "KEY", "VALUE", "MTIME", "EXPIRE", "COUNT", "TOURL"};
 		String urls = bean.get("URL", ""); //树形选择url
 		String key = bean.get("KEY", ""); //过滤key
 		String value = bean.get("VALUE", "");
 		int expire = bean.get("EXPIRE", 0); //0, 1未过期, 2已过期 下次获取remove
 		int type = bean.get("TYPE", -1);
-
+		Page page = Page.getPage(bean); //分页
+		
 		Object obj = map;
 		Object temp = null;
 		String rootKey = "";
@@ -317,20 +323,26 @@ public class CacheMapImpl implements Cache<String> {
 				toUrl = toUrl.substring(0, toUrl.length() - 1);
 		}
 		List<Map> res = new ArrayList<>();
+		int size = 0;
 		if(obj instanceof Map){
-			res = mapToList((Map)obj, rootKey, toUrl, key, value, expire, type);
+			res = mapToList((Map)obj, page, rootKey, toUrl, key, value, expire, type);
+			size = ((Map)obj).size();
 		}else if(obj instanceof List){
-			res = listToList((List)obj, rootKey, toUrl, key, value, expire, type);
+			res = listToList((List)obj, page, rootKey, toUrl, key, value, expire, type);
+			size = ((List)obj).size();
 		}else{
 			res = new ArrayList<>();
 		}
-		Tools.sort(res, false, "TYPE", "COUNT", "KEY", "EXPIRE");
-		return new Bean().put("ok", toUrl==urls).put("urls", toUrl).put("list", res).put("oftype", oftype);
+		Tools.sort(res, page.getDESC().length()==0, page.getORDER(), "TYPE", "COUNT", "KEY", "EXPIRE");
+		return new Bean().put("ok", toUrl==urls).put("urls", toUrl).put("list", res).put("oftype", oftype).put("size", size);
 	}
-	public List mapToList(Map theMap, String rootKey, String toUrl, String key, String value, int expire, int type){
+	public List mapToList(Map theMap, Page page, String rootKey, String toUrl, String key, String value, int expire, int type){
 		List<Map> res = new ArrayList<>();
 		Set<Entry<String, Object>> set = theMap.entrySet();
 		Index index = null;
+		int start = page.start();
+		int stop = page.stop();
+		int count = 0;
 		boolean ffExpire = false;
 		if(rootKey.length() > 0){
 			index = mapIndex.get(rootKey);
@@ -361,13 +373,23 @@ public class CacheMapImpl implements Cache<String> {
 			temp.set("EXPIRE", index.expire);
 			temp.set("COUNT", index.count);
 //			temp.set("TOURL", toUrl);
-			res.add(temp);
+			if(count >= start){
+				if(count < stop){
+					res.add(temp);
+				}else{
+					break;
+				}
+			}
+			count++;
 		}
 		return res;
 	}
-	public List listToList(List theList, String rootKey, String toUrl, String key, String value, int expire, int type){
+	public List listToList(List theList, Page page, String rootKey, String toUrl, String key, String value, int expire, int type){
 		List<Map> res = new ArrayList<>();
 		Index index = null;
+		int start = page.start();
+		int stop = page.stop();
+		int count = 0;
 		boolean ffExpire = false;
 		if(rootKey.length() > 0){
 			index = mapIndex.get(rootKey);
@@ -397,7 +419,14 @@ public class CacheMapImpl implements Cache<String> {
 			temp.set("COUNT", index.count);
 //			temp.set("TOURL", toUrl);
 
-			res.add(temp);
+			if(count >= start){
+				if(count < stop){
+					res.add(temp);
+				}else{
+					break;
+				}
+			}
+			count++;
 		}
 		return res;
 	}

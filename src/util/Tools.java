@@ -355,6 +355,7 @@ System.out.println(s3 == s4); // false
 	 * 解析数字
 	 */
 	public static long parseLong(String num, long defaultValue) {
+		if(Tools.isNull(num))return defaultValue;
 		long res = 0;
 		num = filterNum(num);
 		if (!Tools.notNull(num)) {
@@ -406,6 +407,7 @@ System.out.println(s3 == s4); // false
 	 * 解析数字
 	 */
 	public static int parseInt(String num, int defaultValue) {
+		if(Tools.isNull(num)) return defaultValue;
 		int res = 0;
 		num = filterNum(num);
 		if (Tools.isNull(num)) {

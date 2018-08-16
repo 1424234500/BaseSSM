@@ -7,6 +7,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -14,20 +15,23 @@ import com.dao.Redis;
 import com.dao.hibernate.BaseDao;
 import com.service.LogService;
 
+import util.Bean;
 import util.MapListUtil;
 import util.Tools;
+import util.cache.Cache;
+import util.cache.CacheMapImpl;
 
 @Service("logService")
 @Scope("prototype") 
 public class LogServiceImpl implements LogService,Serializable {
 	private static final long serialVersionUID = 8304941820771045214L;
 	static public Logger logger = LoggerFactory.getLogger(LogServiceImpl.class); 
-
+	final static String CACHE_KEY = "cache-url-request";
     @Autowired
     protected BaseDao baseDao;    
- 
+
+	protected Cache<String> cache = new CacheMapImpl();
     
- 
     
     //info:
     //id,userid,time,url,ip,mac,port,about
@@ -47,42 +51,43 @@ public class LogServiceImpl implements LogService,Serializable {
 	
 	@Override
 	public void exeStatis(String url, String params, long costtime) {
-		Redis redis = Redis.getInstance();
-
-		if(redis != null && redis.exists(url)){ 
-			Map<String, String> map = redis.getMap(url);
-			map.put("costtime", (Tools.parseLong(map.get("costtime")) + costtime) + "");
-			map.put("count", (Tools.parseInt(map.get("count")) + 1) + "");
-			redis.setMap(url, map); 
+		url = url.split("\\.")[0]; //url编码
+		Bean bean = cache.get(CACHE_KEY);
+		if(bean != null){
 		}else{
-			redis.setMap(url, MapListUtil.map()
-					.put("url", ""+url)
-					.put("costtime", ""+costtime)
-					.put("count", ""+1)
-					.build());
-		} 
-		//redis.show();
+			bean = new Bean();
+		}
+		Bean beanUrl = bean.get(url, new Bean());
+		beanUrl.put("url", url);
+		beanUrl.put("costtime", bean.get("costtime", 0L) + costtime);
+		beanUrl.put("count", bean.get("count", 0) + 1);
+		
+		bean.put(url, beanUrl);
+		cache.put(CACHE_KEY, bean, 120000);
+
 	}
 
 
 	@Override
 	public void saveStatis() { 
-		Redis redis = Redis.getInstance();
+		Bean bean = cache.get(CACHE_KEY, new Bean());
+//		Redis redis = Redis.getInstance();
 		//redis.show();
-		Set<String> keys = redis.getKeys();
-		if(keys != null && !keys.isEmpty())
-			for(String key : keys){
-				if(redis.exists(key)){ 
-					Map map = redis.getMap(key); 
+		Set keys = bean.keySet();
+		if(keys != null)
+			for(Object key : keys){
+				if(bean.containsKey(key)){ 
+					Bean map = bean.get(key, new Bean()); 
 					int res = baseDao.executeSql("insert into log_time"
 							+ "(id, url, count, time, costtime) "
 							+ "values"
 							+ "(seq_log_time.nextval, ?, ?, sysdate, ?) "
-							,map.get("url"), map.get("count"), map.get("costtime") 
+							,map.get("url") + ".do", map.get("count"), map.get("costtime") 
 						); 
 				}
 			}
-		redis.clearKeys();
+		cache.remove(CACHE_KEY);
+//		redis.clearKeys();
 		//redis.show();
 	}
 

@@ -67,10 +67,12 @@ public class FileUtil {
 	public static boolean mkfile(String path){
 		if(path == null)return false;
 		File file = new File(path);
-		if(file.exists() || file.isDirectory()){
+		if(file.exists() || file.isFile()){
 			return  true;
 		}else{ 
 			try {
+				mkdir(file.getParent());
+				out("新建文件" + path);
 				return file.createNewFile();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -84,6 +86,7 @@ public class FileUtil {
 		if(file.exists()){
 			return  true;
 		}
+		out("新建文件夹" + dir);
 		return file.mkdirs();
 	}
 	/**
@@ -398,57 +401,101 @@ public class FileUtil {
 		e.printStackTrace(); 
 	} 
 
-} 
-
-	/** 
-	* 复制整个文件夹内容 
-	* @param oldPath String 原文件路径 如：c:/fqf 
-	* @param newPathth String 复制后路径 如：f:/fqf/ff 
-	* @return boolean 
-	*/ 
-	public static void copyFolder(String oldPath, String newPath) { 
-
-		try { 
-		(new File(newPath)).mkdirs(); //如果文件夹不存在 则建立新文件夹 
-		File a=new File(oldPath); 
-		String[] file=a.list(); 
-		File temp=null; 
-		for (int i = 0; i < file.length; i++) { 
-			if(oldPath.endsWith(File.separator)){ 
-				temp=new File(oldPath+file[i]); 
-			} 
-			else{ 
-				temp=new File(oldPath+File.separator+file[i]); 
-			} 
+}  
+	/**
+	 * 定点文件复制或者移动
+	 * @param oldPath
+	 * @param newPath
+	 */
+	private static void cpFile(String oldPath, String newPath, boolean ifMove){
+		if(oldPath.equals(newPath))return;
 		
-			if(temp.isFile()){ 
-				FileInputStream input = new FileInputStream(temp); 
-				FileOutputStream output = new FileOutputStream(newPath + "/" + 
-				(temp.getName()).toString()); 
-				byte[] b = new byte[1024 * 5]; 
-				int len; 
-				while ( (len = input.read(b)) != -1) { 
-					output.write(b, 0, len); 
-				} 
-				output.flush(); 
-				output.close(); 
-				input.close(); 
-			} 
-			if(temp.isDirectory()){//如果是子文件夹 
-				copyFolder(oldPath+"/"+file[i],newPath+"/"+file[i]); 
-			} 
-		} 
-		} 
-		catch (Exception e) { 
-		//out("复制整个文件夹内容操作出错"); 
-		e.printStackTrace(); 
+		FileUtil.mkfile(newPath);
+		out((ifMove?"移动":"复制") + "文件" + oldPath + "->" + newPath);
+		FileInputStream input = null;
+		FileOutputStream output = null;
+		try {
+			input = new FileInputStream(oldPath);
+			output = new FileOutputStream(newPath);
+			byte[] b = new byte[1024 * 5];
+			int len;
+			while ((len = input.read(b)) != -1) {
+				output.write(b, 0, len);
+			}
+			output.flush();
+			output.close();
+			input.close();
+			if(ifMove){
+				new File(oldPath).delete();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally{
+			if(input != null){
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if(output != null){
+				try {
+					output.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 	
-		} 
+	private static void cpIfMove(String oldPath, String newPath, boolean ifMove) {
+		try {
+			int fromType = check(oldPath); //0 文件 1文件夹 -1不存在
+			if(fromType == -1){
+				out("文件操作失败", oldPath, newPath);
+			}else if(fromType == 0){//文件 cp file1.txt dir1/   cp file1.txt file1
+				if (newPath.endsWith(File.separator)) { //原名字 操作到 新目录下面
+					newPath = newPath + File.separator + getFileName(oldPath);
+				}
+				cpFile(oldPath, newPath, ifMove);
+			}else{//文件夹 操作
+				if (newPath.endsWith(File.separator)) { //原名字 操作到 新目录下面
+					newPath = newPath + File.separator + getFileName(oldPath);
+				}
+				File dir = new File(oldPath);
+				mkdir(newPath);
+				String[] file = dir.list();
+				for (int i = 0; i < file.length; i++) { //c:/dir1 -> c:/dir2 
+					cpIfMove(oldPath + "/" + file[i], newPath + "/" + file[i], ifMove);
+				}
+				if(ifMove) dir.delete();
+			}
+		} catch (Exception e) {
+			// out("复制整个文件夹内容操作出错");
+			e.printStackTrace();
+
+		}
 
 	}
-    
-    
-    
+	/**
+	 * 复制 文件夹 或 文件
+	 *  cp c:/dir1 c:/dir2
+	 * 	cp c:/file1 c:/dir2/
+	 *  cp c:/file1 c:/file2
+	 * @param oldPath 原文件路径 如：c:/fqf
+	 * @param newPathth 复制后路径 如：f:/fqf/ff
+	 */
+    public static void cp(String oldPath, String newPath){
+    	cpIfMove(oldPath, newPath, false);
+    }
+    /**
+     * 移动文件 或文件夹
+     * @param oldPath
+     * @param newPath
+     */
+    public static void mv(String oldPath, String newPath){
+    	cpIfMove(oldPath, newPath, true);
+    }
     
     
     
@@ -549,8 +596,8 @@ public class FileUtil {
 		res.add("CHILDS");
 		return res;
 	}
-	public static Map fileToMap(File coder){
-		Map map = new LinkedHashMap<String, Object>();
+	public static Bean fileToMap(File coder){
+		Bean map = new Bean();
 		map.put("PATH", coder.getAbsolutePath());
 		map.put("NAME", coder.getName());
 		map.put("SIZE", calcSize(coder.length()));
@@ -590,7 +637,7 @@ public class FileUtil {
 	/**
 	 * 检查文件类型 
 	 * @param path
-	 * @return 0 文件 1文件夹 -1异常
+	 * @return 0 文件 1文件夹 -1不存在
 	 */
 	public static int check(String path){
 		int res = -1;
@@ -601,10 +648,10 @@ public class FileUtil {
 			}else if(file.isDirectory()){
 				res = 1;
 			}else{
-				out("文件：" + path + "不存在或者不是文件");
+				out("文件：" + path + "不是文件夹也不是文件");
 			}
 		}else{
-			out("文件：" + path + "不存在或者不是文件");
+			out("文件：" + path + "不存在");
 		}
 		return res;
 	}
@@ -731,7 +778,7 @@ public class FileUtil {
 		
 	}
 	public static void out(Object...objects){
-//		Tools.out(objects);
+		Tools.out("FileUtil", objects);
 	}
 	
 	

@@ -45,7 +45,7 @@ public class TomcatControll extends BaseControll{
 		Bean args = WebHelp.getParam(request, new String[]{"URL", "KEY", "VALUE", "EXPIRE", "TYPE"});
 		String url = args.get("URL", "");
 		String key = args.get("KEY", "");
-		Object value = args.get("VALUE", new Object());
+		Object value = args.get("VALUE", new Bean());
 		long expire = args.get("EXPIRE", 10000L);
 		int type = args.get("TYPE", 1); // str / obj
 		if(type == 1){
@@ -73,8 +73,11 @@ public class TomcatControll extends BaseControll{
 	}
 	@RequestMapping("/listCacheMap.do") 
 	public void listCacheMap(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Bean map = WebHelp.getParam(request, new String[]{"URL", "KEY", "VALUE", "EXPIRE", "TYPE"});
-		Map res = new CacheMapImpl().findCacheList(map);
+		Bean map = WebHelp.getParam(request); //, new String[]{"URL", "KEY", "VALUE", "EXPIRE", "TYPE"}
+		Page page = Page.getPage(request);
+		Bean res = new CacheMapImpl().findCacheList(map);
+		page.setNUM(res.get("size", 0));
+		res.put("page", page);
 		echo(res);
 	}
 
@@ -94,11 +97,11 @@ public class TomcatControll extends BaseControll{
 		 
 	 	 
 	 	List listLineNames = MapListUtil.array().add("action").build();
-		List listSeries =  MapListUtil.array().add(list.size() > 0 ? (List) list.get(1) : new Object()).build();
+		List listSeries =  MapListUtil.array().add(list.size() > 0 ? (List) list.get(1) : new Bean()).build();
 		String type = "bar";	 
 		Map title = MapListUtil.map().put("text", "操作耗时统计").build();		//标题
 		Map legend = MapListUtil.map().put("data", listLineNames).build();   //线条名字集合
-		Map xAxis = MapListUtil.map().put("data", list.size() > 0 ? (List) list.get(0) : new Object()).build();  	//x坐标集合 多线条共x轴
+		Map xAxis = MapListUtil.map().put("data", list.size() > 0 ? (List) list.get(0) : new Bean()).build();  	//x坐标集合 多线条共x轴
 		List series = MapListUtil.array().build();
 		for(int i = 0; i < listSeries.size(); i++){
 			//type = i / 2 == 0 ? "bar" : "line"; 
@@ -112,7 +115,7 @@ public class TomcatControll extends BaseControll{
 		Map option = MapListUtil.map()
 				.put("title", title)  
 				.put("legend", legend)		
-				.put("tooltip", new Object())  
+				.put("tooltip", new Bean())  
 				.put("xAxis", xAxis) 
 				.put("yAxis", new HashMap()) //若无报错YAxis 0 not found
 				.put("series", series) 
@@ -141,11 +144,11 @@ public class TomcatControll extends BaseControll{
 		
 	 	 
 	 	List listLineNames = MapListUtil.array().add("action").build();
-		List listSeries =  MapListUtil.array().add(list.size() > 0 ? (List) list.get(1) : new Object()).build();
+		List listSeries =  MapListUtil.array().add(list.size() > 0 ? (List) list.get(1) : new Bean()).build();
 		String type = "bar";	 
 		Map title = MapListUtil.map().put("text", "操作频率统计").build();		//标题
 		Map legend = MapListUtil.map().put("data", listLineNames).build();   //线条名字集合
-		Map xAxis = MapListUtil.map().put("data", list.size() > 0 ? (List) list.get(0) : new Object()).build();  	//x坐标集合 多线条共x轴
+		Map xAxis = MapListUtil.map().put("data", list.size() > 0 ? (List) list.get(0) : new Bean()).build();  	//x坐标集合 多线条共x轴
 		List series = MapListUtil.array().build();
 		for(int i = 0; i < listSeries.size(); i++){
 			//type = i / 2 == 0 ? "bar" : "line"; 

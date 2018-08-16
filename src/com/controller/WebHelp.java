@@ -20,7 +20,6 @@ public class WebHelp {
 	 * @param request
 	 * @return Bean
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Bean getRequestBean(HttpServletRequest request){
 		Bean res = new Bean();
 		Enumeration enu=request.getParameterNames();  
@@ -31,7 +30,6 @@ public class WebHelp {
 		}
 		return res;
 	}
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Bean getParam(HttpServletRequest request, List<Object> colNames){
 		Bean res = new Bean();
 		for(Object key : colNames){
@@ -39,15 +37,17 @@ public class WebHelp {
 		}
 		return res;
 	}
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Bean getParam(HttpServletRequest request, Object...colNames){
 		Bean res = new Bean();
-		for(Object key : colNames){
-			res.put(key, WebHelp.getKey(request, key));
+		if(colNames.length <= 0){
+			res = getRequestBean(request);
+		}else{
+			for(Object key : colNames){
+				res.put(key, WebHelp.getKey(request, key));
+			}
 		}
 		return res;
 	}
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Bean getKeyParam(HttpServletRequest request, String keyName){
 		Bean res = new Bean();
 		res.put(keyName, request.getParameter(keyName));

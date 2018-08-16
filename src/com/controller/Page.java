@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Component;
 
+import util.Bean;
 import util.Tools;
 
 @Component
@@ -14,20 +15,9 @@ public class Page {
 	int NOWPAGE = 1;	//当前页码
 	int PAGENUM = 0;	//总页数
 	String ORDER;	//排序
-	String DESC;	//倒序
-	Page(){}
-	public Page(HttpServletRequest request){
-		Page res = this;
-		res.setNOWPAGE(request.getParameter("NOWPAGE"));
-		res.setSHOWNUM(request.getParameter("SHOWNUM"));
-		res.setORDER(request.getParameter("ORDER"));
-		res.setDESC(request.getParameter("DESC"));
-		
-		if(res.getSHOWNUM() <= 0)
-			res.setSHOWNUM(""+defaultEachPageNum);
-		if(res.getNOWPAGE() <= 0)
-			res.setNOWPAGE("1");
-	}
+	String DESC;	//倒序 有值则倒序
+	public Page(){}
+	
 	/**
 	 * 通过request获取 查询第几页 每页多少条
 	 */
@@ -37,17 +27,24 @@ public class Page {
 		res.setSHOWNUM(request.getParameter("SHOWNUM"));
 		res.setORDER(request.getParameter("ORDER"));
 		res.setDESC(request.getParameter("DESC"));
-		
-		if(res.getSHOWNUM() <= 0)
-			res.setSHOWNUM(""+defaultEachPageNum);
-		if(res.getNOWPAGE() <= 0)
-			res.setNOWPAGE("1");
 		return res;
 	}
-	public int getStart(){
+	/**
+	 * 通过request获取 查询第几页 每页多少条
+	 */
+	public static Page getPage(Bean bean){
+		Page res = new Page();
+		res.setNOWPAGE(bean.get("NOWPAGE", "0"));
+		res.setSHOWNUM(bean.get("SHOWNUM", "0"));
+		res.setORDER(bean.get("ORDER", ""));
+		res.setDESC(bean.get("DESC", ""));
+		return res;
+	}
+	
+	public int start(){
 		return (NOWPAGE-1) * SHOWNUM;
 	}
-	public int getStop(){
+	public int stop(){
 		return NOWPAGE * SHOWNUM;
 	}
 	public long getNUM() {
@@ -67,7 +64,10 @@ public class Page {
 	}
 
 	public void setSHOWNUM(String eachPageNum) {
-		this.SHOWNUM = Tools.parseInt(eachPageNum);
+		this.SHOWNUM = Tools.parseInt(eachPageNum, defaultEachPageNum);
+		if(this.SHOWNUM <= 0){
+			this.SHOWNUM = defaultEachPageNum;
+		}
 	}
 
 	public int getNOWPAGE() {
@@ -75,7 +75,10 @@ public class Page {
 	}
 
 	public void setNOWPAGE(String nowPage) {
-		this.NOWPAGE = Tools.parseInt(nowPage);
+		this.NOWPAGE = Tools.parseInt(nowPage, 1);
+		if(this.NOWPAGE < 1){
+			this.NOWPAGE = 1;
+		}
 	}
 
 	public int getPAGENUM() {
