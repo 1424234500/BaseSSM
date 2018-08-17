@@ -273,7 +273,7 @@ public class ClassUtil {
 				}
 			}
 		}
-		SortUtil.sort(res, false, "BASE", "TYPE");
+		SortUtil.sort(res, false, "BASE");
 		
 		return res;
 	}
