@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.service.StudentService;
 
+import util.Bean;
 import util.MapListUtil;
 import util.Tools;
 
@@ -84,9 +85,9 @@ public class AngularControll extends BaseControll{
 		Map option = MapListUtil.map()
 				.put("title", title)  
 				.put("legend", legend) 
-				.put("tooltip", new Object()) //若无则不能预览
+				.put("tooltip", new Bean()) //若无则不能预览
 				.put("xAxis", xAxis) 
-				.put("yAxis", new Object()) //若无则报错YAxis 0 not found
+				.put("yAxis",  new Bean()) //若无则报错YAxis 0 not found
 				.put("series", series) 
 				.build();
 		 

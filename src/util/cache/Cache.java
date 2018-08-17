@@ -24,7 +24,7 @@ public interface Cache<K> {
 	/**
 	 * 查询键值缓存时间计数 list urls
 	 */
-	Map findCacheList(Bean args);
+	Bean findCacheList(Bean args);
 	
 	
 	/**

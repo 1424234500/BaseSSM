@@ -1,7 +1,10 @@
 package util;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 排序汇总 学习
@@ -9,6 +12,34 @@ import java.util.Comparator;
  */
 public class SortUtil {
 
+	/**
+	 * 排序工具 list<Map> 多字段
+	 */
+	public static void sort(final List<? extends Map> list, final boolean ifReverse, final String...keys){
+		Collections.sort(list, new Comparator<Map>() {
+			@Override
+			public int compare(Map o1, Map o2) {
+				int res = 0;
+				if(o1 != null && o2 != null){
+					for(String key : keys){
+						Object ov1 = o1.get(key);
+						Object ov2 = o2.get(key);
+						if(ov1 != null && ov2 != null){
+							res = ov1.toString().compareTo(ov2.toString());
+							if(res != 0){
+								break;
+							}
+						}else{
+							res = ov1 == null ? -1:1;
+						}
+					}
+				}else{
+					res = o1 == null ? -1 : 1;
+				}
+				return (ifReverse?1:-1) * res;
+			}
+		});
+	}
 	
 	/**
 	 * Java官方 timSort 排序 

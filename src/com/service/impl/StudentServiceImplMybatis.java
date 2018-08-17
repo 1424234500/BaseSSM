@@ -46,8 +46,8 @@ public class StudentServiceImplMybatis implements StudentService, Serializable {
 				.put("id", id)
 				.put("timefrom", timefrom)
 				.put("timeto", timeto)
-				.put("pagestart", page.getStart())
-				.put("pagestop", page.getStop())
+				.put("pagestart", page.start())
+				.put("pagestop", page.stop())
 				.build();  
 		page.setNUM(baseMapper.count(map));
 		return baseMapper.find(map);

@@ -117,22 +117,43 @@ public class FileControll extends BaseControll{
 		int count = 0;
 		String info = "";
 		if(Tools.notNull(path)){
-			if(path.indexOf(UtilTools.getUploadDir()) == 0){
-				count = baseService.executeSql("delete from fileinfo where path=?", path);
+			if(path.startsWith(UtilTools.getUploadDir())){
+//				count = baseService.executeSql("delete from fileinfo where path=?", path);
 				FileUtil.delete(path);
 			}else{
-				info = "无权限删除" + path;
+				info = "无修改权限" + path;
 			}
 		}else{
 			info = "路径为null";
 		}
 		
-	    Map res = MapListUtil.getMap().put("res", count).put("info",  info).build();
-		echo( res);
+		echo(info.length()==0, info, count);
 	}
-	
 	@RequestMapping("/update.do")
 	public void update(HttpServletRequest request, HttpServletResponse response) throws IOException { 
+		String path = request.getParameter("PATH");  //新路径 
+		String oldPath = request.getParameter("OLDPATH");   //全路径 path/file
+		String oldName = request.getParameter("OLDNAME");  
+		String name = request.getParameter("NAME");  //新名字
+		
+		int count = 0;
+		String info = "";
+		if(Tools.notNull(path)){
+			if((path+File.separator).startsWith(UtilTools.getUploadDir()) 
+					&& (oldPath).startsWith(UtilTools.getUploadDir())
+					&& Tools.notNull(oldPath, path)){
+				FileUtil.mv(oldPath, path + File.separator + name);
+			}else{
+				info = "无修改权限" + path;
+			}
+		}else{
+			info = "路径为null";
+		}
+		echo(info.length()==0, info, count);
+	}
+	
+	@RequestMapping("/updatetable.do")
+	public void updateTable(HttpServletRequest request, HttpServletResponse response) throws IOException { 
 		String id = request.getParameter("PATH"); 
 		String about = request.getParameter("ABOUT"); 
 	    
@@ -212,11 +233,17 @@ public class FileControll extends BaseControll{
     }  
 	@RequestMapping(value="/upload.do",method=RequestMethod.POST)
     public void upload(HttpServletRequest request,  PrintWriter pw) throws IOException{
-    	long starttime = System.currentTimeMillis();
+		long starttime = System.currentTimeMillis();
 
         MultipartHttpServletRequest mreq = (MultipartHttpServletRequest)request;
         MultipartFile file = mreq.getFile("file");
         String uppath = request.getParameter("path");
+
+		if(uppath.indexOf(UtilTools.getUploadDir()) != 0){
+			echo(false, "无修改权限" + uppath);
+			return;
+		}
+        
         String name = file.getOriginalFilename();
         String newName = name; // Tools.getTimeSequence() + "-" + 
         String dir = Tools.notNull(uppath) ? uppath : UtilTools.getUploadDir();

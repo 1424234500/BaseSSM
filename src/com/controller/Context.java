@@ -77,7 +77,7 @@ public class Context {
 	 * @return
 	 */
 	public static Page getPage(){
-		return new Page(Context.getRequest());
+		return Page.getPage(Context.getRequest());
 	}
 	/**
 	 * 设置request
