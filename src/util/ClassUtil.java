@@ -1,15 +1,18 @@
 package util;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -97,7 +100,20 @@ public class ClassUtil {
 		if (method != null) {
 			try {
 				newClass = cls.newInstance();
-				return method.invoke(newClass, objs);
+				int len = method.getParameterTypes().length;
+				if(len != objs.length){//方法参数 和 传入参数不同  多 或者 少 
+					List<Object> args = new ArrayList<>();
+					int i = 0;
+					for(; i < objs.length && i < len; i++){ //多了 就截取
+						args.add(objs[i]);
+					}
+					for(; i < len; i++){ //少了  填充null
+						args.add(null);
+					}
+					return method.invoke(newClass, args.toArray());
+				}else{
+					return method.invoke(newClass, objs);
+				}
 			} catch (Exception arg6) {
 				throw new RuntimeException("执行方法[" + cls.getName() + "." + mtdName + "]错误", arg6);
 			}
@@ -208,33 +224,87 @@ public class ClassUtil {
         return myClassName;  
     }  
   
+	public static List<Bean> getMethod(String className){
+		return getMethod(className, true, false);
+	}
     /**
      * 获取包文件列表 
-     * 文件夹 package
-     * 文件 class
-     * return new Map(list,size)
+     * 类路径 util.Bean
+     * 是否显示成员变量
+     * 是否包括父级
+     * return new Map(list,size)  <NAME,RETURNTYPE,PARAMETERTYPES,TOSTRING,BASE:0/1,TYPE:method/field>
      */
-	public static List<Bean> getMethod(String className){
+	public static List<Bean> getMethod(String className, boolean ifArgs, boolean ifFather){
 		Class<?> cls = loadClass(className);
 		List<Bean> res = new ArrayList<>();
+		
+
+		List<Method> methodAll = new ArrayList<>();//所有方法
+		Collections.addAll(methodAll, cls.getMethods());
+
+		List<Method> methodSelf = new ArrayList<>();//自有方法
+		Collections.addAll(methodAll, cls.getDeclaredMethods());
+
+		methodAll.removeAll(methodSelf); //余下的是基类的方法
+		
 		if(cls != null){
-			Method[] methods = cls.getMethods();
-			for(Method item : methods){
-				Bean bean = new Bean();
-				//int aaa = 0;
-				bean.put("NAME", item.getName()); //aaa
-				bean.put("RETURNTYPE", item.getReturnType());//int
-				bean.put("DEFAULTVALUE", item.getDefaultValue());
-				bean.put("PARAMETERTYPES", Arrays.toString(item.getParameterTypes()));
-				bean.put("TOSTRING", item.toString());
-				res.add(bean);
+			if(ifArgs){//如果要变量 则先附加变量
+				if(ifFather){ //显示父类 以及自己 的 所有方法 不要变量
+					for(Field item : cls.getFields()){
+						Bean bean = turnField(className, item);
+						res.add(bean);
+					}
+				}else{//只显示自己的
+					for(Field item : cls.getDeclaredFields()){
+						Bean bean = turnField(className, item);
+						res.add(bean);
+					}
+				}
+			} 
+			if(ifFather){ //显示父类 以及自己 的 所有方法 不要变量
+				for(Method item : cls.getMethods()){
+					Bean bean = turnMethod(className, item);
+					res.add(bean);
+				}
+			}else{//只显示自己的
+				for(Method item : cls.getDeclaredMethods()){
+					Bean bean = turnMethod(className, item);
+					res.add(bean);
+				}
 			}
 		}
-		
+		SortUtil.sort(res, false, "BASE", "TYPE");
 		
 		return res;
 	}
-
+	private static Bean turnMethod(String className, Method item){
+		Bean bean = new Bean();
+		//int aaa = 0;
+		bean.put("NAME", item.getName()); //aaa
+		bean.put("RETURNTYPE", item.getReturnType());//int
+		bean.put("PARAMETERTYPES", Arrays.toString(item.getParameterTypes())
+				.replaceAll(className+".", "")
+				.replaceAll("java.lang.", ""));
+		bean.put("TOSTRING", item.toString()
+				.replaceAll(className + ".", "")
+				.replaceAll("java.lang.", ""));
+		bean.put("TYPE", "method");
+		bean.put("BASE", item.getDeclaringClass().getName().equals(className)?"self":"base");
+		return bean;
+	}
+	private static Bean turnField(String className, Field item){
+		Bean bean = new Bean();
+		//int aaa = 0;
+		bean.put("NAME", item.getName()); //aaa
+		bean.put("RETURNTYPE", item.getType());//int
+		bean.put("PARAMETERTYPES", item.getType());
+		bean.put("TOSTRING", item.toString()
+				.replaceAll(className + ".", "")
+				.replaceAll("java.lang.", ""));
+		bean.put("TYPE", "field");
+		bean.put("BASE", item.getDeclaringClass().getName().equals(className)?"self":"base");
+		return bean;
+	}
     
     
     

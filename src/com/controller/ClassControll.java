@@ -3,6 +3,7 @@ package com.controller;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,14 +55,25 @@ public class ClassControll extends BaseControll{
 		if(bean.containsKey(toName)){ 
 			list = (List<?>) bean.get(toName);
 		}else{//若子级未存过 detail map
-			list = ClassUtil.getMethod(className);
+			list = ClassUtil.getMethod(className, true, true);
 			bean.put(toName, list);
 			cache.put("/class/detail", bean);
 		}
 		Page page = Page.getPage(request);
 		page.setNUM(list.size());
 		echo(list, page);
-	} 
+	}
+	
+	@RequestMapping("/do.do")
+	public void doMethod(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String className = getValue(request, "CLASS");
+		String methodName = getValue(request, "METHOD");
+		Bean args = WebHelp.getRequestBean(request);
+		args.remove("CLASS");
+		args.remove("METHOD");
+
+		echo(ClassUtil.doClassMethod(className, methodName, args.values().toArray()));
+	}
 	
 	 
     

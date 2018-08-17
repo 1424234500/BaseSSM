@@ -16,6 +16,7 @@ import com.controller.Page;
 
 import util.Bean;
 import util.MapListUtil;
+import util.SortUtil;
 import util.Tools;
 
 
@@ -333,7 +334,7 @@ public class CacheMapImpl implements Cache<String> {
 		}else{
 			res = new ArrayList<>();
 		}
-		Tools.sort(res, page.getDESC().length()==0, page.getORDER(), "TYPE", "COUNT", "KEY", "EXPIRE");
+		SortUtil.sort(res, page.getDESC().length()==0, page.getORDER(), "TYPE", "COUNT", "KEY", "EXPIRE");
 		return new Bean().put("ok", toUrl==urls).put("urls", toUrl).put("list", res).put("oftype", oftype).put("size", size);
 	}
 	public List mapToList(Map theMap, Page page, String rootKey, String toUrl, String key, String value, int expire, int type){
