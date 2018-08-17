@@ -16,7 +16,6 @@ import com.controller.Context;
 import com.controller.WebHelp;
 import com.service.LogService;
 
-import util.Tools;
 
 /**
  * 拦截器 日志 登录/访问权限 事务  监控所有访问地址和参数打印 
@@ -80,7 +79,7 @@ public class LogInterceptors implements HandlerInterceptor{
      */  
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object method) throws Exception {  
         //logger.info("==============执行顺序: 1、preHandle================");    
-    	String s = request.getCharacterEncoding();
+//    	String s = request.getCharacterEncoding();
     	request.setCharacterEncoding("UTF-8");
     	response.setCharacterEncoding("UTF-8");
     	

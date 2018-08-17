@@ -20,7 +20,7 @@ public interface BaseDao {
 	 *            SQL语句
 	 * @return String List数组
 	 */
-	public List findColumns(String sql);
+	public List<?> findColumns(String sql);
 
 	/**
 	 * 获得结果集

@@ -1,8 +1,8 @@
 package util;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
@@ -11,17 +11,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.tools.Tool;
-
-import com.controller.Page;
 
 import util.cache.Cache;
 import util.cache.CacheMapImpl;
@@ -52,24 +43,20 @@ public class ClassUtil {
 //		Bean bean = cache.get(CACHE_KEY);
 //		Class cls = (Class)bean.get(className, null);
 		Class<?> cls = null;
-		if (cls != null) {
-			return cls;
-		} else {
-			try {
-				cls = Thread.currentThread().getContextClassLoader().loadClass(className);
+		try {
+			cls = Thread.currentThread().getContextClassLoader().loadClass(className);
 //				bean.put(className, cls);
-				return cls;
-			} catch (ClassNotFoundException arg4) {
-				try {
-					return Class.forName(className);
-				} catch (Exception arg3) {
-					throw new RuntimeException(arg3.getMessage(), arg3);
-				} finally{
+			return cls;
+		} catch (ClassNotFoundException arg4) {
+			try {
+				return Class.forName(className);
+			} catch (Exception arg3) {
+				throw new RuntimeException(arg3.getMessage(), arg3);
+			} finally{
 //					cache.put(CACHE_KEY, bean);
-				}
-			}finally{
-//				cache.put(CACHE_KEY, bean);
 			}
+		}finally{
+//				cache.put(CACHE_KEY, bean);
 		}
 
 	}
@@ -100,20 +87,7 @@ public class ClassUtil {
 		if (method != null) {
 			try {
 				newClass = cls.newInstance();
-				int len = method.getParameterTypes().length;
-				if(len != objs.length){//方法参数 和 传入参数不同  多 或者 少 
-					List<Object> args = new ArrayList<>();
-					int i = 0;
-					for(; i < objs.length && i < len; i++){ //多了 就截取
-						args.add(objs[i]);
-					}
-					for(; i < len; i++){ //少了  填充null
-						args.add(null);
-					}
-					return method.invoke(newClass, args.toArray());
-				}else{
-					return method.invoke(newClass, objs);
-				}
+				return method.invoke(newClass, objs);
 			} catch (Exception arg6) {
 				throw new RuntimeException("执行方法[" + cls.getName() + "." + mtdName + "]错误", arg6);
 			}
@@ -122,7 +96,23 @@ public class ClassUtil {
 		}
 
 	}
-
+/*
+	int len = method.getParameterTypes().length;
+	if(len != objs.length){//方法参数 和 传入参数不同  多 或者 少 
+//		List<Object> args = new ArrayList<>();
+		Object[] args = (Object[]) Array.newInstance(Object.class, len); //反射创建数组
+		int i = 0;
+		for(; i < objs.length && i < len; i++){ //多了 就截取
+//			args.add(objs[i]);
+			args[i] = objs[i];
+		}
+		for(; i < len; i++){ //少了  填充null
+//			args.add(null);
+			args[i] = null;
+		}
+		return method.invoke(newClass, args);
+	}else{
+	}*/
     /** 
      * 获取某包下所有类 
      * @param packageName 包名 
@@ -339,10 +329,18 @@ public class ClassUtil {
 		Tools.out("noReturn");
 	}
 	
+	public <T> T[] testCreate(T type){
+		return (T[]) Array.newInstance(type.getClass(), 10);
+	}
+
+	public <T> T[] testCreate(Class<T> cls){
+		return (T[]) Array.newInstance(cls, 10);
+	}
+	//推断 协变类型  下转
+	public <T> T[] testCreate1(Class<?> cls){
+		return (T[]) Array.newInstance(cls, 10);
+	}
 	public static void main(String argc[]){
-		new ClassUtil().testObjects(new String[]{"1","2"});
-		new ClassUtil().testObjects("1","2");
-		new ClassUtil().testNoReturn();
 		Tools.out(ClassUtil.doClassMethod("util.ClassUtil", "testNoArgs"));
 		Tools.out(ClassUtil.doClassMethod("util.ClassUtil", "testInt", 1));
 		Tools.out(ClassUtil.doClassMethod("util.ClassUtil", "testStr", "str"));
@@ -350,8 +348,8 @@ public class ClassUtil {
 //		Tools.out(ClassUtil.doClassMethod("util.ClassUtil", "testObjects", new String[]{"str", "str2"}));
 		Tools.out(ClassUtil.doClassMethod("util.ClassUtil", "testNoReturn"));
 		
-		Tools.formatOut(ClassUtil.getPackage("", true));
-		Tools.formatOut(ClassUtil.getMethod("com.mode.User"));
+//		Tools.formatOut(ClassUtil.getPackage("", true));
+//		Tools.formatOut(ClassUtil.getMethod("com.mode.User"));
 		
 //		Tools.formatOut(ClassUtil.getClassName("util", true));
 //		Tools.formatOut(ClassUtil.getClassName("org.dom4j", true));

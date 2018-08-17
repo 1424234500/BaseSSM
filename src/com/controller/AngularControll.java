@@ -44,7 +44,6 @@ public class AngularControll extends BaseControll{
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping("/statis.do") 
 	public void statis(HttpServletRequest request, HttpServletResponse response) throws IOException { 
-		  
 //		        legend: {      data: ['线条1', '线条2']   },
 //		        xAxis: {  data: xNames  }, 
 //		        series: [   

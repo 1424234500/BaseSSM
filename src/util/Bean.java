@@ -54,15 +54,19 @@ public class Bean extends HashMap{
 	public <T> T get(Object key, T defaultValue){
 		Object obj = get(key);
 		T res = null;
+//		匹配大小写命名
 //		if(obj == null)obj = get(key.toString().toLowerCase());
 //		if(obj == null)obj = get(key.toString().toUpperCase());
 
 		if(obj == null) {
 			res = defaultValue;
 		}else{
+			if(key.getClass().isInstance(defaultValue)){
+				
+			}
 			if (defaultValue instanceof String) {
 				res = (T)(obj.toString());
-			} else if (obj instanceof String) {
+			} else if (obj instanceof String) { 
 				if (defaultValue instanceof Integer) {
 					res = (T)(new Integer(Tools.parseInt(obj.toString(), (Integer)defaultValue)));
 				} else if (defaultValue instanceof Double) {

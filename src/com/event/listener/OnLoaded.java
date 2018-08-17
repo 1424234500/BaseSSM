@@ -29,7 +29,7 @@ public class OnLoaded implements ApplicationListener<ContextRefreshedEvent> {
 			
 			new FileServiceImpl().initDirs();
 			
-			List list = new ArrayList<>();
+			List<Object> list = new ArrayList<>();
 			list.add("string item");
 			list.add(1111111);
 			list.add(Bean.getBean().put("key of list map", "aldkjfakljf").put("keyint", 2222));
@@ -40,7 +40,7 @@ public class OnLoaded implements ApplicationListener<ContextRefreshedEvent> {
 			list.add(bean2);
 			list.add(map);
 			
-			Cache cache = new CacheMapImpl();
+			Cache<String> cache = new CacheMapImpl();
 			cache.put("int", 1);
 			cache.put("long", 998);
 			cache.put("string", "the is a string");
