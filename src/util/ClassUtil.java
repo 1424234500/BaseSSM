@@ -1,14 +1,9 @@
 package util;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.tools.Tool;
 
 /**
  * 
@@ -16,19 +11,20 @@ import javax.tools.Tool;
  *
  */
 public class ClassUtil {
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
 	private static Map<String, Class> clsMap = new ConcurrentHashMap<String, Class>();
 
 	public static Object newInstance(String clsName) {
 		try {
+//			loadClass(clsName).getMethods()
 			return loadClass(clsName).newInstance();
 		} catch (Exception arg1) {
 			throw new RuntimeException(arg1.getMessage(), arg1);
 		}
 	}
 
-	private static Class loadClass(String className) {
-		Class cls = clsMap.get(className);
+	public static Class<?> loadClass(String className) {
+		Class<?> cls = clsMap.get(className);
 		if (cls != null) {
 			return cls;
 		} else {
