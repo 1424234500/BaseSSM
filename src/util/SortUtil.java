@@ -13,15 +13,17 @@ import java.util.Map;
 public class SortUtil {
 
 	/**
-	 * 排序工具 list<Map> 多字段
+	 * 排序工具 List<Map> 多字段
+	 * 都是List参数的情况 不能自动转换 List<Bean> -> List<Map>  但是可以转换 Bean -> Map
+	 * ? extends 的用处
 	 */
-	public static void sort(final List<? extends Map> list, final boolean ifReverse, final String...keys){
+	public static void sort(final List<? extends Map> list, final boolean ifReverse, final Object...keys){
 		Collections.sort(list, new Comparator<Map>() {
 			@Override
 			public int compare(Map o1, Map o2) {
 				int res = 0;
 				if(o1 != null && o2 != null){
-					for(String key : keys){
+					for(Object key : keys){
 						Object ov1 = o1.get(key);
 						Object ov2 = o2.get(key);
 						if(ov1 != null && ov2 != null){

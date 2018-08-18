@@ -323,11 +323,11 @@ public class CacheMapImpl implements Cache<String> {
 			if(toUrl.length() > 0)
 				toUrl = toUrl.substring(0, toUrl.length() - 1);
 		}
-		List<Map> res = new ArrayList<>();
+		List<Map<?,?>> res = new ArrayList<>();
 		int size = 0;
 		if(obj instanceof Map){
-			res = mapToList((Map)obj, page, rootKey, toUrl, key, value, expire, type);
-			size = ((Map)obj).size();
+			res = mapToList((Map<?,?>)obj, page, rootKey, toUrl, key, value, expire, type);
+			size = ((Map<?,?>)obj).size();
 		}else if(obj instanceof List){
 			res = listToList((List)obj, page, rootKey, toUrl, key, value, expire, type);
 			size = ((List)obj).size();
