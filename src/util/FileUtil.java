@@ -21,6 +21,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
+
 public class FileUtil {
 
 	/**
@@ -320,6 +322,7 @@ public class FileUtil {
             fw = new FileWriter(new File(path), false);
             if (content != null) {
                 fw.write(content);
+                fw.flush();
             }    
         } catch (IOException e) {
             e.printStackTrace();
@@ -327,7 +330,6 @@ public class FileUtil {
         } finally {
             if (fw != null) {
                 try {
-                    fw.flush();
                     fw.close();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -348,15 +350,10 @@ public class FileUtil {
     	if(check(path) != 0) {
     		return "false";
     	}
+    	String exts[] = new String[]{"txt", "c", "cpp", "html", "jsp", "java", "class", "py", "bat", "sh"};
+		Arrays.sort(exts);
     	String ext = getFileType(path);
-    	if(ext.equals("txt") || 
-    			ext.equals("c") || 
-    			ext.equals("cpp") || 
-    			ext.equals("html") || 
-    			ext.equals("jsp") || 
-    			ext.equals("java") || 
-    			ext.equals("class")  ){
-			
+    	if(Arrays.binarySearch(exts, ext, String.CASE_INSENSITIVE_ORDER) >= 0){
 			 return  readByLines(path, fun);
     	}else if(ext.equals("xls") || ext.equals("xlsx")){
     		ArrayList<ArrayList<Object>> res = ExcelUtil.readExcel(new File(path));
@@ -447,8 +444,29 @@ public class FileUtil {
 			}
 		}
 	}
-	
+	/**
+	 * 只支持同路径下的重命名?
+	 * @param oldPath
+	 * @param newPath
+	 * @return
+	 */
+	private static boolean mvFile(String oldPath, String newPath){
+		if(oldPath.equals(newPath)){
+			out("源路径文件" + oldPath + "和目标文件路径相同");
+			return false;
+		}
+		
+		if(!new File(oldPath).exists()){
+			out("文件" + oldPath + " 不存在");
+			return false;
+		}
+		boolean res = new File(oldPath).renameTo(new File(newPath));
+		out( "移动文件?" + oldPath + "->" + newPath + " 结果=" + res);
+		return res;
+	}
 	private static void cpIfMove(String oldPath, String newPath, boolean ifMove) {
+
+
 		try {
 			int fromType = check(oldPath); //0 文件 1文件夹 -1不存在
 			if(fromType == -1){
@@ -457,18 +475,26 @@ public class FileUtil {
 				if (newPath.endsWith(File.separator)) { //原名字 操作到 新目录下面
 					newPath = newPath + File.separator + getFileName(oldPath);
 				}
-				cpFile(oldPath, newPath, ifMove);
+//				if(!ifMove)
+					cpFile(oldPath, newPath, ifMove);
+//				else{
+//					mvFile(oldPath, newPath);
+//				}
 			}else{//文件夹 操作
 				if (newPath.endsWith(File.separator)) { //原名字 操作到 新目录下面
 					newPath = newPath + File.separator + getFileName(oldPath);
 				}
-				File dir = new File(oldPath);
 				mkdir(newPath);
-				String[] file = dir.list();
-				for (int i = 0; i < file.length; i++) { //c:/dir1 -> c:/dir2 
-					cpIfMove(oldPath + "/" + file[i], newPath + "/" + file[i], ifMove);
-				}
-				if(ifMove) dir.delete();
+//				if(!ifMove){
+					File dir = new File(oldPath);
+					String[] file = dir.list();
+					for (int i = 0; i < file.length; i++) { //c:/dir1 -> c:/dir2 
+						cpIfMove(oldPath + File.separator + file[i], newPath + File.separator + file[i], ifMove);
+					}
+					if(ifMove) dir.delete();
+//				}else{
+//					mvFile(oldPath, newPath);
+//				}
 			}
 		} catch (Exception e) {
 			// out("复制整个文件夹内容操作出错");
@@ -774,6 +800,17 @@ public class FileUtil {
 		List<Map> res = (FileUtil.ls(dirpath));
 		
 		Tools.formatOut(res);
+		
+		cp("C:\\tomcat\\download\\dd.txt", "C:\\tomcat\\download\\cc.txt");
+		cp("C:\\tomcat\\download\\dd.txt", "C:\\tomcat\\download\\eef");
+		cp("C:\\tomcat\\download\\dd.txt", "C:\\tomcat\\download\\eee\\");
+		cp("C:\\tomcat\\download\\fff", "C:\\tomcat\\download\\ggg");
+		cp("C:\\tomcat\\download\\fff", "C:\\tomcat\\download\\ggg\\");
+		
+		mv("C:\\tomcat\\download\\fff", "C:\\tomcat\\download\\ff2");
+		mv("C:\\tomcat\\download\\ggg", "C:\\tomcat\\download\\ff2\\");
+		mv("C:\\tomcat\\download\\ff2", "C:\\tomcat\\download\\ff21\\ff22\\ff33");
+
 		
 		
 	}
