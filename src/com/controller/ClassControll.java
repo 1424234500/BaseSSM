@@ -4,6 +4,7 @@ package com.controller;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import util.Bean;
 import util.ClassUtil;
 import util.FileUtil;
+import util.JsonUtil;
 import util.Tools;
 import util.cache.Cache;
 import util.cache.CacheMapImpl; 
@@ -66,13 +68,14 @@ public class ClassControll extends BaseControll{
 	
 	@RequestMapping("/do.do")
 	public void doMethod(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String className = getValue(request, "CLASS");
-		String methodName = getValue(request, "METHOD");
-		Bean args = WebHelp.getRequestBean(request);
-		args.remove("CLASS");
-		args.remove("METHOD");
+		String className = getValue(request, "do_class");
+		String methodName = getValue(request, "do_method");
+		String args = getValue(request, "do_args");//[sss, ssaa, lll, *]
+		args = "[" + args + "]";
+		//参数顺序问题 
+		List<?> objs = JsonUtil.getList(args);
 
-		echo(ClassUtil.doClassMethod(className, methodName, args.values().toArray()));
+		echo(ClassUtil.doClassMethod(className, methodName, objs.toArray()));
 	}
 	
 	 

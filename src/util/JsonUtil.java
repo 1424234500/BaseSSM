@@ -1,6 +1,7 @@
 package util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -109,8 +110,8 @@ public class JsonUtil {
     /**
      * 递归 解析JSONArray为list
      */
-    private static List toList(JSONArray ja) throws JSONException{
-    	List list = new ArrayList<>();
+    private static List<?> toList(JSONArray ja) throws JSONException{
+    	List<Object> list = new ArrayList<>();
     	for(int i = 0; i < ja.length(); i++){
         	Object object = ja.get(i);
             if (object instanceof JSONArray) {  
@@ -193,8 +194,8 @@ public class JsonUtil {
      * 解析json为list
      * @param jsonstr
      */
-    public static List<Map<String, Object>> getList(String jsonstr) {
-        List<Map<String, Object>> res = new ArrayList<>();
+    public static List<?> getList(String jsonstr) {
+        List<?> res = new ArrayList<>();
         try {
         	JSONArray ja = new JSONArray(jsonstr);
             res = toList(ja);

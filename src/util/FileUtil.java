@@ -11,12 +11,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.nio.file.WatchEvent.Kind;
+import java.nio.file.WatchEvent.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -364,93 +373,87 @@ public class FileUtil {
     		return "File:" + path + " 不能识别";
     	}
     }
-    
-    
-    
-    /** 
-	* 复制单个文件 
-	* @param oldPath String 原文件路径 如：c:/fqf.txt 
-	* @param newPath String 复制后路径 如：f:/fqf.txt 
-	* @return boolean 
-	*/ 
-	public static void copyFile(String oldPath, String newPath) { 
-	try { 
-		mkdir(getFilePath(newPath));
-		
-		int bytesum = 0; 
-		int byteread = 0; 
-		File oldfile = new File(oldPath); 
-		if (oldfile.exists()) { //文件存在时 
-			InputStream inStream = new FileInputStream(oldPath); //读入原文件 
-			FileOutputStream fs = new FileOutputStream(newPath); 
-			byte[] buffer = new byte[1444]; 
-			int length; 
-			while ( (byteread = inStream.read(buffer)) != -1) { 
-				bytesum += byteread; //字节数 文件大小 
-				//out(bytesum); 
-				fs.write(buffer, 0, byteread); 
-			} 
-			inStream.close(); 
-		} 
-	} 
-	catch (Exception e) { 
-		out("复制单个文件操作出错"); 
-		e.printStackTrace(); 
-	} 
-
-}  
+     
+    /**
+	 * 全路径 明确路径 文件夹复制或者移动 使用org.apache.commons.io.FileUtils实现 
+	 * @param oldPath
+	 * @param newPath
+	 */
+	private static void cpDir(String oldPath, String newPath, boolean ifMove){
+		if(oldPath.equals(newPath))return;
+		out((ifMove?"移动":"复制") + "文件夹" + oldPath + "->" + newPath);
+		try{
+			if(ifMove){
+				FileUtils.moveDirectory(new File(oldPath), new File(newPath));
+			}else{
+				FileUtils.copyDirectory(new File(oldPath), new File(newPath));
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 	/**
-	 * 定点文件复制或者移动
+	 * 定点文件复制或者移动 使用org.apache.commons.io.FileUtils实现 
 	 * @param oldPath
 	 * @param newPath
 	 */
 	private static void cpFile(String oldPath, String newPath, boolean ifMove){
 		if(oldPath.equals(newPath))return;
-		
-		FileUtil.mkfile(newPath);
 		out((ifMove?"移动":"复制") + "文件" + oldPath + "->" + newPath);
-		FileInputStream input = null;
-		FileOutputStream output = null;
-		try {
-			input = new FileInputStream(oldPath);
-			output = new FileOutputStream(newPath);
-			byte[] b = new byte[1024 * 5];
-			int len;
-			while ((len = input.read(b)) != -1) {
-				output.write(b, 0, len);
-			}
-			output.flush();
-			output.close();
-			input.close();
+		try{
 			if(ifMove){
-				new File(oldPath).delete();
+				FileUtils.moveFile(new File(oldPath), new File(newPath));
+			}else{
+				FileUtils.copyFile(new File(oldPath), new File(newPath));
 			}
-		} catch (Exception e) {
+		}catch(Exception e){
 			e.printStackTrace();
-		} finally{
-			if(input != null){
-				try {
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if(output != null){
-				try {
-					output.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
+		
+//		FileUtil.mkfile(newPath);
+//		out((ifMove?"移动":"复制") + "文件" + oldPath + "->" + newPath);
+//		FileInputStream input = null;
+//		FileOutputStream output = null;
+//		try {
+//			input = new FileInputStream(oldPath);
+//			output = new FileOutputStream(newPath);
+//			byte[] b = new byte[1024 * 5];
+//			int len;
+//			while ((len = input.read(b)) != -1) {
+//				output.write(b, 0, len);
+//			}
+//			output.flush();
+//			output.close();
+//			input.close();
+//			if(ifMove){
+//				new File(oldPath).delete();
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally{
+//			if(input != null){
+//				try {
+//					input.close();
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			if(output != null){
+//				try {
+//					output.close();
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}
 	}
 	/**
-	 * 只支持同路径下的重命名?
+	 * 只支持同路径下的重命名? File.rename
 	 * @param oldPath
 	 * @param newPath
 	 * @return
 	 */
-	private static boolean mvFile(String oldPath, String newPath){
+	private static boolean rename(String oldPath, String newPath){
 		if(oldPath.equals(newPath)){
 			out("源路径文件" + oldPath + "和目标文件路径相同");
 			return false;
@@ -464,8 +467,14 @@ public class FileUtil {
 		out( "移动文件?" + oldPath + "->" + newPath + " 结果=" + res);
 		return res;
 	}
+	
+	/**
+	 * 移动或复制文件 适配 类似linux shell命令 
+	 * @param oldPath
+	 * @param newPath
+	 * @param ifMove
+	 */
 	private static void cpIfMove(String oldPath, String newPath, boolean ifMove) {
-
 
 		try {
 			int fromType = check(oldPath); //0 文件 1文件夹 -1不存在
@@ -475,29 +484,21 @@ public class FileUtil {
 				if (newPath.endsWith(File.separator)) { //原名字 操作到 新目录下面
 					newPath = newPath + File.separator + getFileName(oldPath);
 				}
-//				if(!ifMove)
-					cpFile(oldPath, newPath, ifMove);
-//				else{
-//					mvFile(oldPath, newPath);
-//				}
+				cpFile(oldPath, newPath, ifMove);
 			}else{//文件夹 操作
 				if (newPath.endsWith(File.separator)) { //原名字 操作到 新目录下面
 					newPath = newPath + File.separator + getFileName(oldPath);
 				}
-				mkdir(newPath);
-//				if(!ifMove){
-					File dir = new File(oldPath);
-					String[] file = dir.list();
-					for (int i = 0; i < file.length; i++) { //c:/dir1 -> c:/dir2 
-						cpIfMove(oldPath + File.separator + file[i], newPath + File.separator + file[i], ifMove);
-					}
-					if(ifMove) dir.delete();
-//				}else{
-//					mvFile(oldPath, newPath);
+				cpDir(oldPath, newPath, ifMove);
+//				mkdir(newPath);
+//				File dir = new File(oldPath);
+//				String[] file = dir.list();
+//				for (int i = 0; i < file.length; i++) { //c:/dir1 -> c:/dir2 
+//					cpIfMove(oldPath + File.separator + file[i], newPath + File.separator + file[i], ifMove);
 //				}
+//				if(ifMove) dir.delete();
 			}
 		} catch (Exception e) {
-			// out("复制整个文件夹内容操作出错");
 			e.printStackTrace();
 
 		}
@@ -611,7 +612,7 @@ public class FileUtil {
 	/**
 	 * 获取文件 map样式键集合
 	 */
-	public static List getFileMap(){
+	public static List<?> getFileMap(){
 		List<String> res = new ArrayList<String>();
 		res.add("PATH");
 		res.add("NAME");
@@ -792,7 +793,7 @@ public class FileUtil {
 
 	
 	
-	public static void main(String[] argv){
+	public static void main(String[] argv) throws IOException{
 		String dirpath = "C:\\tomcat\\download";
 		String path = "C:\\tomcat\\download\\20180717150340-compareTo2.c";
 		
@@ -801,16 +802,20 @@ public class FileUtil {
 		
 		Tools.formatOut(res);
 		
-		cp("C:\\tomcat\\download\\dd.txt", "C:\\tomcat\\download\\cc.txt");
-		cp("C:\\tomcat\\download\\dd.txt", "C:\\tomcat\\download\\eef");
-		cp("C:\\tomcat\\download\\dd.txt", "C:\\tomcat\\download\\eee\\");
-		cp("C:\\tomcat\\download\\fff", "C:\\tomcat\\download\\ggg");
-		cp("C:\\tomcat\\download\\fff", "C:\\tomcat\\download\\ggg\\");
+//		cp("C:\\tomcat\\download\\dd.txt", "C:\\tomcat\\download\\cc.txt");
+//		cp("C:\\tomcat\\download\\dd.txt", "C:\\tomcat\\download\\eef");
+//		cp("C:\\tomcat\\download\\dd.txt", "C:\\tomcat\\download\\eee\\");
+//		cp("C:\\tomcat\\download\\fff", "C:\\tomcat\\download\\ggg");
+//		cp("C:\\tomcat\\download\\fff", "C:\\tomcat\\download\\ggg\\");
+//		
+//		mv("C:\\tomcat\\download\\fff", "C:\\tomcat\\download\\ff2");
+//		mv("C:\\tomcat\\download\\ggg", "C:\\tomcat\\download\\ff2\\");
+//		mv("C:\\tomcat\\download\\ff2", "C:\\tomcat\\download\\ff21\\ff22\\ff33");
 		
-		mv("C:\\tomcat\\download\\fff", "C:\\tomcat\\download\\ff2");
-		mv("C:\\tomcat\\download\\ggg", "C:\\tomcat\\download\\ff2\\");
-		mv("C:\\tomcat\\download\\ff2", "C:\\tomcat\\download\\ff21\\ff22\\ff33");
 
+//		FileUtils.moveFile(new File("C:\\tomcat\\download\\meet.c"), new File("C:\\tomcat\\download\\cc\\mm.c"));
+		FileUtils.copyFile(new File("C:\\tomcat\\download\\meet.c"), new File("C:\\tomcat\\download\\dd\\mm.c"));
+		FileUtils.copyDirectory(new File("C:\\tomcat\\download\\b"), new File("C:\\tomcat\\download\\dfdf\\dd"));
 		
 		
 	}

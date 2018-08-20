@@ -347,14 +347,14 @@ System.out.println(s3 == s4); // false
 		return -1;
 	}
 
-	public static long parseLong(String num) {
-		return parseLong(num, 0);
+	public static Long parseLong(String num) {
+		return parseLong(num, 0L);
 	}
 
 	/**
 	 * 解析数字
 	 */
-	public static long parseLong(String num, long defaultValue) {
+	public static Long parseLong(String num, Long defaultValue) {
 		if(Tools.isNull(num))return defaultValue;
 		long res = 0;
 		num = filterNum(num);
@@ -374,10 +374,10 @@ System.out.println(s3 == s4); // false
 	/**
 	 * 解析数字
 	 */
-	public static double parseDouble(String num) {
-		return parseDouble(num, 0);
+	public static Double parseDouble(String num) {
+		return parseDouble(num, 0D);
 	}
-	public static double parseDouble(String num, double defaultValue) {
+	public static double parseDouble(String num, Double defaultValue) {
 		double res = 0;
 		num = filterNum(num);
 		if (!Tools.notNull(num)) {
@@ -406,7 +406,7 @@ System.out.println(s3 == s4); // false
 	/**
 	 * 解析数字
 	 */
-	public static int parseInt(String num, int defaultValue) {
+	public static int parseInt(String num, Integer defaultValue) {
 		if(Tools.isNull(num)) return defaultValue;
 		int res = 0;
 		num = filterNum(num);

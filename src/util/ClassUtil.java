@@ -267,17 +267,29 @@ public class ClassUtil {
 		
 		return res;
 	}
+	private static String filterString(String className, String str){
+		return str
+				.replaceAll(className+".", "")
+				.replaceAll("java.lang.", "")
+				.replaceAll("class ", "")
+				.replaceAll("java.util.", "")
+				.replaceAll("javax.servlet.http.", "")
+				.replaceAll("interface ", "");
+	}
 	private static Bean turnMethod(String className, Method item){
 		Bean bean = new Bean();
 		//int aaa = 0;
 		bean.put("NAME", item.getName()); //aaa
 		bean.put("RETURNTYPE", item.getReturnType());//int
-		bean.put("PARAMETERTYPES", Arrays.toString(item.getParameterTypes())
-				.replaceAll(className+".", "")
-				.replaceAll("java.lang.", ""));
-		bean.put("TOSTRING", item.toString()
-				.replaceAll(className + ".", "")
-				.replaceAll("java.lang.", ""));
+		
+		String str = filterString(className, Arrays.toString(item.getParameterTypes()));
+		if(str.length() >= 2){//[*, *]
+			str = str.substring(1,  str.length() - 1);
+		}
+		bean.put("PARAMETERTYPES", str.split(", "));
+		
+		bean.put("TOSTRING", filterString(className, item.toString()));
+
 		bean.put("TYPE", "method");
 		bean.put("BASE", item.getDeclaringClass().getName().equals(className)?"self":"base");
 		return bean;
@@ -288,9 +300,7 @@ public class ClassUtil {
 		bean.put("NAME", item.getName()); //aaa
 		bean.put("RETURNTYPE", item.getType());//int
 		bean.put("PARAMETERTYPES", item.getType());
-		bean.put("TOSTRING", item.toString()
-				.replaceAll(className + ".", "")
-				.replaceAll("java.lang.", ""));
+		bean.put("TOSTRING", filterString(className, item.toString()));
 		bean.put("TYPE", "field");
 		bean.put("BASE", item.getDeclaringClass().getName().equals(className)?"self":"base");
 		return bean;
