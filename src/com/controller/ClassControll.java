@@ -1,10 +1,6 @@
 package com.controller;
  
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import util.Bean;
 import util.ClassUtil;
-import util.FileUtil;
 import util.JsonUtil;
-import util.Tools;
 import util.cache.Cache;
 import util.cache.CacheMapImpl; 
 
@@ -33,16 +27,18 @@ public class ClassControll extends BaseControll{
 	public void list(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		//page, package -> page, list
 		String packageName = getValue(request, "package");
+		String keyName = "/class/list/" + packageName;
 		List<?> list = null;
 		Cache<String> cache = new CacheMapImpl();
-		if(cache.containsKey("/class/list")){
-			list = (List<?>) cache.get("/class/list");
+		if(cache.containsKey(keyName)){
+			list = (List<?>) cache.get(keyName);
 		}else{
 			list = ClassUtil.getPackage(packageName, true);
-			cache.put("/class/list", list, 120 * 1000);
+			if(list != null && list.size() > 0)
+				cache.put(keyName, list, 120 * 1000);
 		}
 		Page page = Page.getPage(request);
-		page.setNUM(list.size());
+		page.setNUM(list==null?-1:list.size());
 		echo(list, page);
 	}
 	@RequestMapping("/detail.do")
@@ -74,8 +70,8 @@ public class ClassControll extends BaseControll{
 		args = "[" + args + "]";
 		//参数顺序问题 
 		List<?> objs = JsonUtil.getList(args);
-
-		echo(ClassUtil.doClassMethod(className, methodName, objs.toArray()));
+		Object[] ppp = objs.toArray();
+		echo(ClassUtil.doClassMethod(className, methodName, ppp));
 	}
 	
 	 

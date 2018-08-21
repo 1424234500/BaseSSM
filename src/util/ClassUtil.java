@@ -5,6 +5,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,7 +36,9 @@ public class ClassUtil {
 		try {
 			return loadClass(clsName).newInstance();
 		} catch (Exception arg1) {
-			throw new RuntimeException(arg1.getMessage(), arg1);
+//			throw new RuntimeException(arg1.getMessage(), arg1);
+			Tools.out(arg1.getMessage());
+			return null;
 		}
 	}
 
@@ -51,7 +54,9 @@ public class ClassUtil {
 			try {
 				return Class.forName(className);
 			} catch (Exception arg3) {
-				throw new RuntimeException(arg3.getMessage(), arg3);
+//				throw new RuntimeException(arg3.getMessage(), arg3);
+				Tools.out(arg3.getMessage());
+				return null;
 			} finally{
 //					cache.put(CACHE_KEY, bean);
 			}
@@ -82,17 +87,21 @@ public class ClassUtil {
 			}
 			method = cls.getMethod(mtdName, e);
 		} catch (Exception arg7) {
-			arg7.printStackTrace();
+//			arg7.printStackTrace();
 		}
 		if (method != null) {
 			try {
 				newClass = cls.newInstance();
 				return method.invoke(newClass, objs);
 			} catch (Exception arg6) {
-				throw new RuntimeException("执行方法[" + cls.getName() + "." + mtdName + "]错误", arg6);
+//				throw new RuntimeException(, arg6);
+				Tools.out("执行方法[" + cls.getName() + "." + mtdName + "]错误");
+				return null;
 			}
 		}else{
-			throw new RuntimeException("执行方法[" + cls.getName() + "." + mtdName + "] 不存在");
+//			throw new RuntimeException();
+			Tools.out("执行方法[" + cls.getName() + "." + mtdName + "] 不存在");
+			return null;
 		}
 
 	}
@@ -169,6 +178,13 @@ public class ClassUtil {
         return myClassName;  
     }  
   
+    private static List<Bean> getClassNameByJars(URL[] urls, String packagePath, boolean childPackage) {  
+    	List<Bean> res = new ArrayList<>();
+    	for(URL item : urls){
+    		res.addAll(getClassNameByJar(item.getPath(), childPackage));
+    	}
+    	return res;
+    }
     /** 
      * 从jar获取某包下所有类 
      * @param jarPath jar文件路径          //jar:file:/E:/workspace_my/BaseSSM/WebContent/WEB-INF/lib/dom4j-1.6.1.jar!/org/dom4j

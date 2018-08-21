@@ -17,6 +17,10 @@ import util.Tools;
  
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class Redis   { 
+
+	public interface Fun<T>{
+		public T make(Jedis obj) ;
+	} 
 	/**
 	 * Redis数据结构 ---- 数据库结构[ id:01, name: walker, age: 18 ]
 	 * set get key - value
@@ -96,6 +100,39 @@ public class Redis   {
 		return res;
 	}
 	
+	/**
+	 * 获取对象 自动解析键值类型
+	 * @param jedis
+	 */
+	public Object get(final String key){
+		return doJedis(new Fun<Object>() {
+			@Override
+			public Object make(Jedis obj) {
+				return get(obj, key);
+			}
+		});
+	}
+	
+	private Object get(Jedis jedis, String key){
+		Object res = null;
+		if(jedis.exists(key)){
+			String type = jedis.type(key);
+			if(type.equals("string")){
+				res = jedis.get(key);
+			}else if(type.equals("list")){
+				res = jedis.lrange(key, 0, -1);
+			}else if(type.equals("hash")){
+				res = (jedis.hgetAll(key));
+			}else if(type.equals("set")){
+				res = (jedis.smembers(key));
+			}else if(type.equals("zset")){
+				res = (jedis.zrange(key, 0, -1)); 
+			}else{
+				res = jedis.get(key); 
+			}
+		}
+		return res;
+	}
 	public boolean exists(String key){
 		Jedis jedis = this.getJedis();
 		boolean res = jedis.exists(key);
@@ -154,12 +191,14 @@ public class Redis   {
 	}
 	
 	
-	public void doJedis(Fun<Jedis> fun){
+	private <T> T doJedis(Fun<T> fun){
+		T res = null;
 		Jedis jedis = this.getJedis();
 		if(fun != null){
-			fun.make(jedis);
+			res = fun.make(jedis);
 		}
 		close(jedis);
+		return res;
 	}
 	public Jedis getJedis(){
 		return pool.getResource();
