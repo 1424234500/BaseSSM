@@ -13,6 +13,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import util.Fun;
 import util.MapListUtil;
+import util.SerializeUtil;
 import util.Tools;
  
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -79,23 +80,25 @@ public class Redis   {
 		return res;
 	}
 	/**
-	* 添加一个list，指定list中的map的keyName/id列值为键值
+	* 添加一个list 通过byte 序列化 lpush头插入 rpush尾插入
 	*/
-	public void setList(String keyName, List<Map<String, Object>> list){ 
-		for(int i = 0; i < list.size(); i++){
-			setMap(MapListUtil.getList(list, i, keyName), MapListUtil.map2ssmap(list.get(i)));
-		}  
+	public void setList(String keyName, List<Object> list){ 
+		Jedis jedis = this.getJedis();
+		if(jedis.exists(keyName)){
+			jedis.del(keyName);
+		}
+		for(Object item : list){
+			jedis.rpush(keyName.getBytes(), SerializeUtil.serialize(item));
+		}
+		close(jedis);
 	}
 	/**
-	 * 获取所有存储的map  list<map>
+	 * 获取list
 	 */
-	public List getList(){
+	public List<Object> getList(String key){
 		Jedis jedis = this.getJedis();
-
-		List res = new ArrayList();
-		for(String key : keys){
-			res.add(jedis.hgetAll(key));
-		}
+		List<Object> res = new ArrayList<>();
+		
 		close(jedis);
 		return res;
 	}

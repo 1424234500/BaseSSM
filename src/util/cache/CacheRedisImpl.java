@@ -15,6 +15,7 @@ import redis.clients.jedis.JedisPool;
 import util.Bean;
 import util.Fun;
 import util.MapListUtil;
+import util.SerializeUtil;
 import util.SortUtil;
 import util.Tools;
 
@@ -96,7 +97,8 @@ public class CacheRedisImpl implements Cache<String> {
 			@Override
 			public Boolean make(Jedis jedis) {
 				for(Object key : map.keySet()){
-					put(key.toString(), map.get(key));
+					if(key != null)
+						put(key.toString(), map.get(key));
 				}
 				return null;
 			}
@@ -161,27 +163,14 @@ public class CacheRedisImpl implements Cache<String> {
 			public Object make(Jedis jedis) {
 				Object res = defaultValue;
 				if(jedis.exists(key)){
-					String type = jedis.type(key);
-					if(type.equals("string")){
-						res = jedis.get(key);
-					}else if(type.equals("list")){
-						res = jedis.lrange(key, 0, -1);
-					}else if(type.equals("hash")){
-						res = (jedis.hgetAll(key));
-					}else if(type.equals("set")){
-						res = (jedis.smembers(key));
-					}else if(type.equals("zset")){
-						res = (jedis.zrange(key, 0, -1)); 
-					}else{
-						res = jedis.get(key); 
-					}
+					res = get(jedis, key, defaultValue);
 				}
 				return res;
 			}
 			
 		});
 	}
-
+	
 	@Override
 	public <V> Cache put(String key, V value) {
 		put(key, value, TIME_DEFAULT_EXPIRE);
@@ -190,21 +179,30 @@ public class CacheRedisImpl implements Cache<String> {
 
 	
 	@Override
-	public <V> Cache put(final String key, final V value, long expire) {
-//		TODO:设定过期时间
+	public <V> Cache put(final String key, final V value, final long expire) {
+		// NX是不存在时才set， XX是存在时才set， EX是秒，PX是毫秒 SET if Not eXists
 		doJedis(new Fun<Object>(){
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Object make(Jedis jedis) {
-				String type = jedis.type(key);
+				if(jedis.exists(key)){ //策略 存在 则先删除再存 因为不确定 key对应的值类型是否改变
+					jedis.del(key);
+				}
 				if(value instanceof String){ // type.equals("string")
-					jedis.set(key, (String)value);
+					jedis.set(key, (String)value, "NX", "PX", expire);
 				}else if(value instanceof List ){//type.equals("list")
+					List list = (List)value;
+					for(Object item : list){
+						jedis.rpush(key.getBytes(), SerializeUtil.serialize(item));
+					}
 				}else if(value instanceof Map){ //type.equals("hash")
 					jedis.hmset(key, (Map<String, String>)value);
 				}else{
 					jedis.set(key, value.toString());
 				}
+				//后置设定过期时间
+				jedis.expire(key, (int)Math.ceil(expire / 1000));
+
 				return null;
 			}
 		});
@@ -263,14 +261,23 @@ public class CacheRedisImpl implements Cache<String> {
 		int type = bean.get("TYPE", -1);
 		Page page = Page.getPage(bean); //分页
 		
-		Object obj = map;
+		Object obj = null; 
 		Object temp = null;
 		String rootKey = "";
 		String toUrl = ""; //实际路径
 		String itemCopy = "";
 		int oftype = 0;	//结果集来源于类型 用于前端判定生成url
-
-		if(urls.length() > 0){	//非查询root
+		
+		Jedis jedis = getJedis();
+		if(urls.length() <= 0){//root查询
+			Bean map = new Bean();
+			Set<String> keys = jedis.keys("*");
+			for(String item : keys){
+				map.put(item, get(item));
+			}
+			
+			obj = map;
+		} else if(urls.length() > 0){	//非查询root
 			if(urls.charAt(0) == '.') urls = urls.substring(1);
 			String[] arr = urls.split("\\."); // map.list[0].map.aaa   map.list
 			int cc = -1;
@@ -328,6 +335,7 @@ public class CacheRedisImpl implements Cache<String> {
 			if(toUrl.length() > 0)
 				toUrl = toUrl.substring(0, toUrl.length() - 1);
 		}
+		closeJedis(jedis);
 		List<Map<?,?>> res = new ArrayList<>();
 		int size = 0;
 		if(obj instanceof Map){
@@ -392,17 +400,10 @@ public class CacheRedisImpl implements Cache<String> {
 	}
 	public List listToList(List theList, Page page, String rootKey, String toUrl, String key, String value, int expire, int type){
 		List<Map> res = new ArrayList<>();
-		Index index = null;
 		int start = page.start();
 		int stop = page.stop();
 		int count = 0;
 		boolean ffExpire = false;
-		if(rootKey.length() > 0){
-			index = mapIndex.get(rootKey);
-			ffExpire = index.isExpire();
-		}else{
-			index = new Index();
-		}
 		for(int i = 0; i < theList.size(); i++){
 			Object ivalue = theList.get(i);
 			String ikey = "[" + i + "]";
