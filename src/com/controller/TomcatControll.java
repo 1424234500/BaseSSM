@@ -39,7 +39,7 @@ public class TomcatControll extends BaseControll{
 		super(TomcatControll.class, "");
 	}
 	
-	Cache cache =  new CacheRedisImpl();
+	Cache cache =  new CacheMapImpl();
 	
 	/**
 	 * 缓存监控 map实现
