@@ -12,9 +12,11 @@ import com.sun.xml.internal.bind.v2.TODO;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 import util.Bean;
 import util.Fun;
 import util.MapListUtil;
+import util.RedisUtil;
 import util.SerializeUtil;
 import util.SortUtil;
 import util.Tools;
@@ -25,14 +27,25 @@ import util.Tools;
  * redis实现
  */
 public class CacheRedisImpl implements Cache<String> {
-	static int ALL_COUNT = 0; //所有缓存访问get次数
 	public interface Fun<T>{
 		public T make(Jedis jedis) ;
 	} 
-	/**
-	 * 存储所有 添加到redis的map的key值集合 有序
-	 */
-	private Set<String> keys = new HashSet<>();
+	
+	static int ALL_COUNT = 0; //所有缓存访问get次数
+	
+	
+	public CacheRedisImpl(){
+		JedisPoolConfig config = new JedisPoolConfig();
+        // 设置最大连接数
+		config.setMaxTotal(100);
+		config.setMaxWaitMillis(1000); 
+        // 设置空闲连接
+        config.setMaxIdle(10); 
+        
+		pool = new JedisPool(config, "localhost");
+ 
+		out("CacheRedisImpl init");
+	}
 	private JedisPool pool;
 	public Jedis getJedis(){
 		return pool.getResource();
@@ -55,7 +68,12 @@ public class CacheRedisImpl implements Cache<String> {
 	
 	@Override
 	public int size() {
-		return keys.size();
+		return doJedis(new Fun<Integer>() {
+			@Override
+			public Integer make(Jedis obj) {
+				return obj.keys("*").size();
+			}
+		});
 	}
 
 	@Override
@@ -113,7 +131,7 @@ public class CacheRedisImpl implements Cache<String> {
 				Set<String> set = jedis.keys("*");
 				Map<String, Object> res = new HashMap<>();
 				for(String key : set){
-					res.put(key, get(key));
+					res.put(key, RedisUtil.get(jedis, key));
 				}
 				return res;
 			}
@@ -125,9 +143,9 @@ public class CacheRedisImpl implements Cache<String> {
 		doJedis(new Fun<Object>(){
 			@Override
 			public Object make(Jedis jedis) {
-				Set<String> set = jedis.keys("*");
-				for(String key : set){
-					jedis.del(key);
+				Set<String> keys = jedis.keys("*");
+				for(String item : keys){
+					jedis.del(item);
 				}
 				return null;
 			}
@@ -163,7 +181,7 @@ public class CacheRedisImpl implements Cache<String> {
 			public Object make(Jedis jedis) {
 				Object res = defaultValue;
 				if(jedis.exists(key)){
-					res = get(jedis, key, defaultValue);
+					res = RedisUtil.get(jedis, key, defaultValue);
 				}
 				return res;
 			}
@@ -188,21 +206,8 @@ public class CacheRedisImpl implements Cache<String> {
 				if(jedis.exists(key)){ //策略 存在 则先删除再存 因为不确定 key对应的值类型是否改变
 					jedis.del(key);
 				}
-				if(value instanceof String){ // type.equals("string")
-					jedis.set(key, (String)value, "NX", "PX", expire);
-				}else if(value instanceof List ){//type.equals("list")
-					List list = (List)value;
-					for(Object item : list){
-						jedis.rpush(key.getBytes(), SerializeUtil.serialize(item));
-					}
-				}else if(value instanceof Map){ //type.equals("hash")
-					jedis.hmset(key, (Map<String, String>)value);
-				}else{
-					jedis.set(key, value.toString());
-				}
-				//后置设定过期时间
-				jedis.expire(key, (int)Math.ceil(expire / 1000));
-
+				
+				RedisUtil.put(jedis, key, value, expire);
 				return null;
 			}
 		});
@@ -213,7 +218,7 @@ public class CacheRedisImpl implements Cache<String> {
 	}
 	@Override
 	public <V> String put(String url, String key, V value, long expire) {
-		return null;
+		return "false";
 	}
 	/**
 	 * 根据url 来移除key
@@ -223,7 +228,7 @@ public class CacheRedisImpl implements Cache<String> {
 	 */
 	@Override
 	public String remove(String url, String key) {
-		return null;
+		return "false";
 	}
 	
 	@Override
@@ -261,23 +266,14 @@ public class CacheRedisImpl implements Cache<String> {
 		int type = bean.get("TYPE", -1);
 		Page page = Page.getPage(bean); //分页
 		
-		Object obj = null; 
+		Object obj = getAll(); 
 		Object temp = null;
 		String rootKey = "";
 		String toUrl = ""; //实际路径
 		String itemCopy = "";
 		int oftype = 0;	//结果集来源于类型 用于前端判定生成url
 		
-		Jedis jedis = getJedis();
-		if(urls.length() <= 0){//root查询
-			Bean map = new Bean();
-			Set<String> keys = jedis.keys("*");
-			for(String item : keys){
-				map.put(item, get(item));
-			}
-			
-			obj = map;
-		} else if(urls.length() > 0){	//非查询root
+		if(urls.length() > 0){	//非查询root
 			if(urls.charAt(0) == '.') urls = urls.substring(1);
 			String[] arr = urls.split("\\."); // map.list[0].map.aaa   map.list
 			int cc = -1;
@@ -335,7 +331,6 @@ public class CacheRedisImpl implements Cache<String> {
 			if(toUrl.length() > 0)
 				toUrl = toUrl.substring(0, toUrl.length() - 1);
 		}
-		closeJedis(jedis);
 		List<Map<?,?>> res = new ArrayList<>();
 		int size = 0;
 		if(obj instanceof Map){
@@ -353,21 +348,12 @@ public class CacheRedisImpl implements Cache<String> {
 	public List mapToList(Map theMap, Page page, String rootKey, String toUrl, String key, String value, int expire, int type){
 		List<Map> res = new ArrayList<>();
 		Set<Entry<String, Object>> set = theMap.entrySet();
-		Index index = null;
 		int start = page.start();
 		int stop = page.stop();
 		int count = 0;
-		boolean ffExpire = false;
-		if(rootKey.length() > 0){
-			index = mapIndex.get(rootKey);
-			ffExpire = index.isExpire();
-		}
+//		boolean ffExpire = false;
 		for(Entry<String, Object> item : set){
 			String ikey = item.getKey();
-			if(rootKey.length() <= 0){
-				index = mapIndex.get(ikey);
-				ffExpire = index.isExpire();
-			}
 			int ihash = ikey.hashCode();
 			Object ivalue = item.getValue();
 			int itype = Tools.getType(ivalue);
@@ -381,11 +367,11 @@ public class CacheRedisImpl implements Cache<String> {
 			}
 			if(type != -1 && type != itype) continue;
 			temp.set("TYPE", itype);
-			temp.set("MTIME", index.mtime);
-			if(expire == 1 && ffExpire) continue;
-			if(expire == 2 && !ffExpire) continue;
-			temp.set("EXPIRE", index.expire);
-			temp.set("COUNT", index.count);
+			temp.set("MTIME", "");
+//			if(expire == 1 && ffExpire) continue;
+//			if(expire == 2 && !ffExpire) continue;
+			temp.set("EXPIRE", "");
+			temp.set("COUNT", "");
 //			temp.set("TOURL", toUrl);
 			if(count >= start){
 				if(count < stop){
@@ -419,11 +405,11 @@ public class CacheRedisImpl implements Cache<String> {
 			}
 			if(type != -1 && type != itype) continue;
 			temp.set("TYPE", itype);
-			temp.set("MTIME", index.mtime);
+			temp.set("MTIME", "");
 			if(expire == 1 && ffExpire) continue;
 			if(expire == 2 && !ffExpire) continue;
-			temp.set("EXPIRE", index.expire);
-			temp.set("COUNT", index.count);
+			temp.set("EXPIRE", "");
+			temp.set("COUNT", "");
 //			temp.set("TOURL", toUrl);
 
 			if(count >= start){
@@ -439,27 +425,42 @@ public class CacheRedisImpl implements Cache<String> {
 	}
 	
 	public static void main(String[] argv){
-		Cache cache = new CacheRedisImpl();
+		Cache<String> cache = new CacheRedisImpl();
+		Bean bean1 = Bean.getBean().put("b1", "bk1").put("b2", "bk2");
+		cache.clear();
+		Tools.out(cache.keySet(), cache.getAll());
 		cache.put("str01", "000", 3600 * 1000);
-		cache.put("str01", "001", 60 * 1000);
-		cache.put("str02", "000", 100);
-		cache.put("str03", "000", 10);
-		cache.put("str04", "000", 1);
-		cache.put("mmm.bbb", "000", 1);
-		cache.put("map", Bean.getBean().put("b1", "bk1").put("b2", "bk2"), 186 * 1000);
+		cache.put("map", bean1);
+		Tools.out(cache.keySet(), cache.getAll());
 		List<Object> list = new ArrayList<>();
-		list.add("list str1");
-		list.add("list str2");
-		list.add(Bean.getBean().put("b1", "bk1").put("b2", "bk2"));
-		list.add(Bean.getBean().put("listStr", "bk1").put("listMap", Bean.getBean().put("listMapStr", "bk1").put("b2", "bk2")));
-		cache.put("list", list, 186 * 1000);
+		list.add("str02");
+		list.add(22);
+		list.add(bean1);
 		
-		for(int i = 0; i < 100; i ++){
-			cache.get(cache.keySet().toArray()[(int) (Math.random() * cache.keySet().size())]);
-		}
+//		cache.put("map1", bean1, 3600 * 1000);
+		cache.put("list", list, 3600 * 1000);
+		Tools.out(cache.keySet(), cache.getAll());
+
+		Tools.out(cache.findCacheList(new Bean()));
+//		cache.put("str01", "001", 60 * 1000);
+//		cache.put("str02", "000", 100);
+//		cache.put("str03", "000", 10);
+//		cache.put("str04", "000", 1);
+//		cache.put("mmm.bbb", "000", 1);
+//		cache.put("map", Bean.getBean().put("b1", "bk1").put("b2", "bk2"), 186 * 1000);
+//		List<Object> list = new ArrayList<>();
+//		list.add("list str1");
+//		list.add("list str2");
+//		list.add(Bean.getBean().put("b1", "bk1").put("b2", "bk2"));
+//		list.add(Bean.getBean().put("listStr", "bk1").put("listMap", Bean.getBean().put("listMapStr", "bk1").put("b2", "bk2")));
+//		cache.put("list", list, 186 * 1000);
+//		
+//		for(int i = 0; i < 100; i ++){
+//			cache.get(cache.keySet().toArray()[(int) (Math.random() * cache.keySet().size())]);
+//		}
+//		
 		
-		
-		Tools.out("--------------全");
+//		Tools.out("--------------全");
 //		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "")).get(key));
 //		Tools.out("--------------基本数据");
 //		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "str01")));
@@ -475,14 +476,14 @@ public class CacheRedisImpl implements Cache<String> {
 //		Tools.out("--------------list[03].listMap");
 //		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "list[03].listMap")));
 
-		Tools.out("--------------list[03].listMap.listMapStr");
+//		Tools.out("--------------list[03].listMap.listMapStr");
 //		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "list[03].listMap.listMapStr")));
-		String str = "..aaa.bbb.ccc.";
-		Tools.out(str.split("\\."));
-		
-		Tools.out(MapListUtil.getMapUrl(cache.getAll(), "list[03].listMap"));
-		Tools.out(MapListUtil.getMapUrl(cache.getAll(), "list[03].listMap.listMapStr"));
-		
+//		String str = "..aaa.bbb.ccc.";
+//		Tools.out(str.split("\\."));
+//		
+//		Tools.out(MapListUtil.getMapUrl(cache.getAll(), "list[03].listMap"));
+//		Tools.out(MapListUtil.getMapUrl(cache.getAll(), "list[03].listMap.listMapStr"));
+//		
 	}
 	
 	private void out(Object...objects){

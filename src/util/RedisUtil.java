@@ -1,9 +1,11 @@
 package util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.collections.MapUtils;
@@ -36,48 +38,55 @@ public class RedisUtil   {
 	 * 					} 
 	 */
 	
-	public <V> void put(final Jedis jedis, final String key, final V value, final long expire) {
-		// NX是不存在时才set， XX是存在时才set， EX是秒，PX是毫秒 SET if Not eXists
-		if(value instanceof String){ // type.equals("string")
-			jedis.set(key, (String)value, "NX", "PX", expire);
-		}else if(value instanceof List ){//type.equals("list")
+	
+	/**
+	 * 处理list采用rpush结构 否则 全使用序列化 string byte[]
+	 * @param jedis
+	 * @param key
+	 * @param value
+	 * @param expire
+	 */
+	public static <V> void put(final Jedis jedis, final String key, final V value, final long expire) {
+		if(value instanceof List ){
 			List list = (List)value;
 			for(Object item : list){
 				jedis.rpush(key.getBytes(), SerializeUtil.serialize(item));
 			}
-		}else if(value instanceof Map){ //type.equals("hash")
-			jedis.hmset(key, (Map<String, String>)value);
 		}else{
-			jedis.set(key, value.toString());
+			jedis.set(key.getBytes(), SerializeUtil.serialize(value));
 		}
 		//后置设定过期时间
 		jedis.expire(key, (int)Math.ceil(expire / 1000));
 
 	}
-	
+	/**
+	 * 处理list采用rpush结构 否则 全使用序列化 string byte[]
+	 * @param jedis
+	 * @param key
+	 * @return
+	 */
 	public static <V> V get(Jedis jedis, String key){
 		return get(jedis, key, null);
 	}
+	/**
+	 * 处理list采用rpush结构 否则 全使用序列化 string byte[]
+	 * @param jedis
+	 * @param key
+	 * @return
+	 */
 	public static <V> V get(Jedis jedis, String key, V defaultValue){
 		V res = defaultValue;
 		String type = jedis.type(key);
-		if(type.equals("string")){
-			res = (V) jedis.get(key);
-		}else if(type.equals("list")){ //list采取 序列化 子元素策略
+
+		if(type.equals("list")){ //list采取 序列化 子元素策略
 			List<Object> list = new ArrayList<>();
 			List<byte[]> listBytes= jedis.lrange(key.getBytes(), 0, -1);
 			for(byte[] item : listBytes){
 				list.add(SerializeUtil.deserialize(item));
 			}
 			res = (V) list;
-		}else if(type.equals("hash")){
-			res = (V) (jedis.hgetAll(key));
-		}else if(type.equals("set")){
-			res = (V) (jedis.smembers(key));
-		}else if(type.equals("zset")){
-			res = (V) (jedis.zrange(key, 0, -1)); 
 		}else{
-			res = (V) jedis.get(key); 
+			res = (V) SerializeUtil.deserialize(jedis.get(key.getBytes())); 
 		}
 		return res;
 	}

@@ -43,6 +43,9 @@ public class SerializeUtil {
 		return res;
 	}
 
+	public static Object deserialize(String str) {
+		return deserialize(str.getBytes());
+	}
 	public static Object deserialize(byte[] in) {
 		Object res = null;
 		ByteArrayInputStream bis = null;
@@ -103,6 +106,9 @@ public class SerializeUtil {
 			}
 		}
 		return res;
+	}
+	public static List<Object> deserializeList(String str) {
+		return deserializeList(str.getBytes());
 	}
 	/**
 	 * 按照list分别解序列

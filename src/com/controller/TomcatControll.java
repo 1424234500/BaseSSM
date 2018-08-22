@@ -22,7 +22,9 @@ import util.Bean;
 import util.JsonUtil;
 import util.MapListUtil;
 import util.Tools;
+import util.cache.Cache;
 import util.cache.CacheMapImpl;
+import util.cache.CacheRedisImpl;
 
 /** 
  * Tomcat监控后台
@@ -36,10 +38,12 @@ public class TomcatControll extends BaseControll{
 	public TomcatControll( ) {
 		super(TomcatControll.class, "");
 	}
-/**
- * 缓存监控 map实现
- */
 	
+	Cache cache =  new CacheRedisImpl();
+	
+	/**
+	 * 缓存监控 map实现
+	 */
 	@RequestMapping("/addCacheMap.do") 
 	public void addCacheMap(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Bean args = WebHelp.getParam(request, new String[]{"URL", "KEY", "VALUE", "EXPIRE", "TYPE"});
@@ -51,7 +55,7 @@ public class TomcatControll extends BaseControll{
 		if(type == 1){
 			value = JsonUtil.get(value.toString());
 		}
-		String res = new CacheMapImpl().put(url, key, value, expire);
+		String res = cache.put(url, key, value, expire);
 		if(res.equals("true")){
 			echo(value);
 		}else{
@@ -64,7 +68,7 @@ public class TomcatControll extends BaseControll{
 		String url = WebHelp.getKey(request, "URL");
 		String key = WebHelp.getKey(request, "KEY");
 		
-		String res = new CacheMapImpl().remove(url, key);
+		String res = cache.remove(url, key);
 		if(res.equals("true")){
 			echo("true");
 		}else{
@@ -75,7 +79,7 @@ public class TomcatControll extends BaseControll{
 	public void listCacheMap(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Bean map = WebHelp.getParam(request); //, new String[]{"URL", "KEY", "VALUE", "EXPIRE", "TYPE"}
 		Page page = Page.getPage(request);
-		Bean res = new CacheMapImpl().findCacheList(map);
+		Bean res = cache.findCacheList(map);
 		page.setNUM(res.get("size", 0));
 		res.put("page", page);
 		echo(res);
