@@ -1,4 +1,4 @@
-package util.test;
+package util.design;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
@@ -67,7 +67,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 
-public class TestThread {
+public class ThreadSync {
 	int money;							//1.syn
 	volatile int lastMoney;				//2.volatile
 	Lock lock = new ReentrantLock();	//3.lock

@@ -10,6 +10,11 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 import util.Fun;
 
+/**
+ * 中文相关编码
+ * @author walker
+ *
+ */
 public class Pinyin {
 	/**
 	 * 将汉字转换为全拼

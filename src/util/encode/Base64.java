@@ -1,9 +1,61 @@
-package util;
+package util.encode;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class Base64Encoder {
+/**
+ * base64编码解码工具
+ * @author walker
+ *
+ */
+public class Base64 {
+	private static final Base64Encoder encoder = new Base64Encoder();
+
+	public static byte[] encode(byte[] data) {
+		ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+		try {
+			encoder.encode(data, 0, data.length, bOut);
+		} catch (IOException arg2) {
+			throw new RuntimeException("exception encoding base64 string: " + arg2);
+		}
+		return bOut.toByteArray();
+	}
+
+	public static int encode(byte[] data, OutputStream out) throws IOException {
+		return encoder.encode(data, 0, data.length, out);
+	}
+
+	public static int encode(byte[] data, int off, int length, OutputStream out) throws IOException {
+		return encoder.encode(data, off, length, out);
+	}
+
+	public static byte[] decode(byte[] data) {
+		ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+		try {
+			encoder.decode(data, 0, data.length, bOut);
+		} catch (IOException arg2) {
+			throw new RuntimeException("exception decoding base64 string: " + arg2);
+		}
+		return bOut.toByteArray();
+	}
+
+	public static byte[] decode(String data) {
+		ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+		try {
+			encoder.decode(data, bOut);
+		} catch (IOException arg2) {
+			throw new RuntimeException("exception decoding base64 string: " + arg2);
+		}
+		return bOut.toByteArray();
+	}
+
+	public static int decode(String data, OutputStream out) throws IOException {
+		return encoder.decode(data, out);
+	}
+}
+
+class Base64Encoder {
 	protected final byte[] encodingTable = new byte[] { 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
 			81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110,
 			111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 43,
