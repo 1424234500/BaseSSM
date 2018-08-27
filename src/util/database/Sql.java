@@ -16,6 +16,7 @@ public class Sql {
 
 	// 获取链接
 	public Connection getConnection()   {
+		
 		 return null;
 	}
 
@@ -206,7 +207,7 @@ public class Sql {
 				break;
 			}      
 		}catch(Exception e){
-			Tools.out("sql.executeQuery." + e.toString());
+			out("sql.executeQuery." + e.toString());
 		}finally{
 			close(resultSet, preparedStatement, conn);
 		}

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<c3p0-config>
+
+   <!--默认配置-->
+    <default-config>  
+        <property name="initialPoolSize">10</property>  
+        <property name="maxIdleTime">30</property>  
+        <property name="maxPoolSize">100</property>  
+        <property name="minPoolSize">10</property>  
+        <property name="maxStatements">200</property>  
+        
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="${ds.initialSize}"/>
+        <property name="minIdle" value="${ds.minIdle}"/>
+        <property name="maxActive" value="${ds.maxActive}"/>
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="${ds.maxWait}"/> 
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="${ds.timeBetweenEvictionRunsMillis}"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="${ds.minEvictableIdleTimeMillis}"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+	    <property name="validationQuery" value="select 1 from dual"  />
+    </default-config>  
+  
+   <!--配置连接池mysql-->
+    <named-config name="mysql">  
+        <property name="driverClass">com.mysql.jdbc.Driver</property>  
+        <property name="jdbcUrl">jdbc:mysql://localhost:3306/CoupleSpace</property>  
+        <property name="user">root</property>  
+        <property name="password">root</property>  
+    </named-config>  
+    
+    <!--配置连接池2-->
+    <named-config name="oracle">  
+        <property name="url" value="${jdbc.oracle.url}"/>
+        <property name="username" value="${jdbc.oracle.username}"/>
+        <property name="password" value="${jdbc.oracle.password}"/>
+        <property name="driverClassName" value="${jdbc.oracle.driver}"/>
+    </named-config>      
+    
+</c3p0-config>
