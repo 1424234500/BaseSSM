@@ -1,4 +1,4 @@
-package util.test;
+package util.design;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -11,14 +11,14 @@ import util.Tools;
  *
  */
 
-public class TestCreatorCoster {
+public class ThreadSyncCreatorCoster {
 	int num = 0; // 资源数量
 	Lock lock = new ReentrantLock();	//3.lock
 	int dd = 1;				//每片间隔
 	int maxdd = 60 / dd;	//最大分片
 	int sleep = 1200 / 5 *  dd;	//线程延时
 	int ff = 10;	//缩进
-	public TestCreatorCoster() {
+	public ThreadSyncCreatorCoster() {
 		startCreator();
 		startCoster();
 	}
@@ -89,7 +89,7 @@ public class TestCreatorCoster {
 	}
 
 	public static void main(String[] argv) {
-		new TestCreatorCoster();
+		new ThreadSyncCreatorCoster();
 
 	}
 
