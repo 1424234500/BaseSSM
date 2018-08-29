@@ -16,12 +16,10 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
  *
  */
 public class ConnC3p0Impl implements Conn {
-	static Logger logger = org.apache.log4j.Logger
-			.getLogger(ConnC3p0Impl.class);
+	static Logger logger = org.apache.log4j.Logger.getLogger(ConnC3p0Impl.class);
 
 	// 通过标识名来创建相应连接池
-	static ComboPooledDataSource dataSource = new ComboPooledDataSource(
-			"oracle");
+	static ComboPooledDataSource dataSource = new ComboPooledDataSource("oracle");
 
 	@Override
 	public Connection getConn() throws Exception {
