@@ -5,7 +5,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,7 +36,7 @@ public class ClassUtil {
 			return loadClass(clsName).newInstance();
 		} catch (Exception arg1) {
 //			throw new RuntimeException(arg1.getMessage(), arg1);
-			Tools.out(arg1.getMessage());
+			out(arg1.getMessage());
 			return null;
 		}
 	}
@@ -55,7 +54,7 @@ public class ClassUtil {
 				return Class.forName(className);
 			} catch (Exception arg3) {
 //				throw new RuntimeException(arg3.getMessage(), arg3);
-				Tools.out(arg3.getMessage());
+				out(arg3.getMessage());
 				return null;
 			} finally{
 //					cache.put(CACHE_KEY, bean);
@@ -95,16 +94,98 @@ public class ClassUtil {
 				return method.invoke(newClass, objs);
 			} catch (Exception arg6) {
 //				throw new RuntimeException(, arg6);
-				Tools.out("执行方法[" + cls.getName() + "." + mtdName + "]错误");
+				out("执行方法[" + cls.getName() + "." + mtdName + "]" + Arrays.toString(objs) + "错误");
 				return null;
 			}
 		}else{
 //			throw new RuntimeException();
-			Tools.out("执行方法[" + cls.getName() + "." + mtdName + "] 不存在");
+			out("执行方法[" + cls.getName() + "." + mtdName + "]" + Arrays.toString(objs) + "不存在");
 			return null;
 		}
 
 	}
+	private static void out(Object...objects){
+		Tools.out(objects);
+	}
+	private final static String defaultType = "String";
+	/**
+	 * 根据规则string获取对象列表
+	 * @param args     : String-sss@Bean-{"k":"v"}@Integer-111@Boolean-true
+	 * @param splitArr : @
+	 * @param splitArg : -
+	 * return [String(sss), Bean(k,v), Integer(111), Boolean(true)
+	 */
+	public static Object[] parseObject(String args, String splitArr, String splitArg){
+		List<Object> res = new ArrayList<>();
+		
+		if(splitArr == null || splitArr.length() == 0){
+			res.add(parseObject(defaultType, args));
+		}else if(args == null){
+			res.add(null);
+		}else{
+			String[] arr = args.split(splitArr);
+			if(splitArg == null || splitArg.length() == 0){
+				for(String item : arr){
+					res.add(parseObject(defaultType, item));
+				}
+			}else{
+				for(String item : arr){
+					String[] typeValue = item.split(splitArg);
+					if(typeValue.length > 1){
+						res.add(parseObject(typeValue[0], typeValue[1]));
+					}else{
+						res.add(parseObject(defaultType, item));
+					}
+				}
+			}
+		}
+		
+		return res.toArray();
+	}
+	public static Object parseObject(String type, String value){
+		Object res = null;
+		if(type == null || type.length() == 0){
+			type = defaultType;
+		}
+		type = type.toLowerCase();
+		if(value != null){
+			try{
+				if(type.equals("string")){
+					res = new String(value);
+				}else if(type.equals("int") || type.equals("integer")){
+					res = new Integer(value);
+				}else if(type.equals("long")){
+					res = new Long(value);
+				}else if(type.equals("double")){
+					res = new Double(value);
+				}else if(type.equals("float")){
+					res = new Float(value);
+				}else if(type.equals("boolean") || type.equals("bool")){
+					res = new Boolean(value);
+				}
+				//常用对象类型
+				else if(type.equals("hashmap")){ //无法实例化原生Map 
+					res = new HashMap<Object, Object>(JsonUtil.getMap(value));
+				}else if(type.equals("arraylist")){ //无法实例化原生List
+					res = new ArrayList<Object>(JsonUtil.getList(value));
+				}else if(type.equals("bean")){
+					res = new Bean(JsonUtil.getMap(value));
+				}
+				//序列化传输 必须使用序列化 完整的str byte[]的数据
+				else if(type.equals("seria") || type.equals("serializeUtil")){
+					res = SerializeUtil.deserialize(util.encode.Base64.decode(value));
+				}
+			
+			}catch(Exception e){
+				e.printStackTrace();
+				res = null;
+			}
+		}
+		
+		return res;		
+	}
+	
+	
 /*
 	int len = method.getParameterTypes().length;
 	if(len != objs.length){//方法参数 和 传入参数不同  多 或者 少 
@@ -326,33 +407,35 @@ public class ClassUtil {
     
 	
 	
-	
+	public String test(String str, Bean bean, Integer in, Boolean bool){
+		return Arrays.toString(new Object[]{str, bean, in, bool});
+	}
 	public String testNoArgs(){
-		Tools.out();
+		out();
 		return "testNoArgs";
 	}
 	//int 不行?
 	public String testInt(Integer i){
-		Tools.out(i);
+		out(i);
 		return "testInt";
 	}
 	public String testStr(String i){
-		Tools.out(i);
+		out(i);
 		return "testStr";
 	}
 	//需要指定实际map类型
 	public String testMap(HashMap<?,?> i){
-		Tools.out(i);
+		out(i);
 		return "testMap";
 	}
 	public String testObjects(Object... objs){
-		Tools.out(objs.getClass());
-		Tools.out(objs.length);
-		Tools.out(objs);
+		out(objs.getClass());
+		out(objs.length);
+		out(objs);
 		return "testObjects";
 	}
 	public void testNoReturn(){
-		Tools.out("noReturn");
+		out("noReturn");
 	}
 	
 	public <T> T[] testCreate(T type){
@@ -367,12 +450,24 @@ public class ClassUtil {
 		return (T[]) Array.newInstance(cls, 10);
 	}
 	public static void main(String argc[]){
-		Tools.out(ClassUtil.doClassMethod("util.ClassUtil", "testNoArgs"));
-		Tools.out(ClassUtil.doClassMethod("util.ClassUtil", "testInt", 1));
-		Tools.out(ClassUtil.doClassMethod("util.ClassUtil", "testStr", "str"));
-		Tools.out(ClassUtil.doClassMethod("util.ClassUtil", "testMap", MapListUtil.getMap().put("key", "vvv").build()));
-//		Tools.out(ClassUtil.doClassMethod("util.ClassUtil", "testObjects", new String[]{"str", "str2"}));
-		Tools.out(ClassUtil.doClassMethod("util.ClassUtil", "testNoReturn"));
+		out(ClassUtil.doClassMethod("util.ClassUtil", "testNoArgs"));
+		out(ClassUtil.doClassMethod("util.ClassUtil", "testInt", 1));
+		out(ClassUtil.doClassMethod("util.ClassUtil", "testStr", "str"));
+		out(ClassUtil.doClassMethod("util.ClassUtil", "testMap", MapListUtil.getMap().put("key", "vvv").build()));
+//		out(ClassUtil.doClassMethod("util.ClassUtil", "testObjects", new String[]{"str", "str2"}));
+		out(ClassUtil.doClassMethod("util.ClassUtil", "testNoReturn"));
+		
+		out(ClassUtil.doClassMethod("util.ClassUtil", "test", ClassUtil.parseObject("String-sss@Bean-{\"k\":\"v\"}@Integer-111@Boolean-true", "@", "-")));
+		byte[] bb = SerializeUtil.serialize(new Bean().set("key", "value").set("key2", "value2"));
+		String strSeria = new String(util.encode.Base64.encode(bb));
+		byte[] bt = util.encode.Base64.decode(strSeria);
+		out("seria", bb, strSeria);
+		out("dseria byte", SerializeUtil.deserialize(bb));
+		out("dseria str ", SerializeUtil.deserialize(bt));
+		out(ClassUtil.doClassMethod("util.ClassUtil", "test", ClassUtil.parseObject("String-sss@seria-"
+				+ strSeria + 
+				"@Integer-111@Boolean-true", "@", "-")));
+
 		
 //		Tools.formatOut(ClassUtil.getPackage("", true));
 //		Tools.formatOut(ClassUtil.getMethod("com.mode.User"));

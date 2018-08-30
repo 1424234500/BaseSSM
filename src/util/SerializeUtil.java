@@ -15,7 +15,6 @@ public class SerializeUtil {
 	private static void out(Object... objects) {
 		Tools.out(objects);
 	}
-
 	public static byte[] serialize(Object obj) {
 		byte[] res = null;
 
@@ -28,7 +27,7 @@ public class SerializeUtil {
 				oos.writeObject(obj);
 				res = baos.toByteArray();
 			} catch (IOException e) {
-				out("序列化异常");
+				out("序列化异常", obj.toString());
 			} finally {
 				try {
 					if(oos != null)
@@ -36,7 +35,7 @@ public class SerializeUtil {
 					if(baos != null)
 						baos.close();
 				} catch (IOException e) {
-					out("序列化关闭流异常");
+					out("序列化关闭流异常", obj.toString());
 				}
 			}
 		}
@@ -57,9 +56,9 @@ public class SerializeUtil {
 				res = is.readObject();
 			}
 		} catch (IOException e) {
-			out("反序列化异常");
+			out("反序列化异常", in.toString());
 		} catch (ClassNotFoundException e) {
-			out("反序列化 ClassNotFoundException");
+			out("反序列化 ClassNotFoundException", in.toString());
 		} finally {
 			try {
 				if (is != null)
@@ -67,7 +66,7 @@ public class SerializeUtil {
 				if (bis != null)
 					bis.close();
 			} catch (IOException e) {
-				out("反序列化流关闭异常");
+				out("反序列化流关闭异常", in.toString());
 			}
 		}
 		return res;

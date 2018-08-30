@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import util.Bean;
 import util.ClassUtil;
-import util.JsonUtil;
 import util.cache.Cache;
 import util.cache.CacheMapImpl; 
 
@@ -66,12 +65,18 @@ public class ClassControll extends BaseControll{
 	public void doMethod(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String className = getValue(request, "do_class");
 		String methodName = getValue(request, "do_method");
-		String args = getValue(request, "do_args");//[sss, ssaa, lll, *]
-		args = "[" + args + "]";
-		//参数顺序问题 
-		List<?> objs = JsonUtil.getList(args);
-		Object[] ppp = objs.toArray();
-		echo(ClassUtil.doClassMethod(className, methodName, ppp));
+		String args = getValue(request, "do_args");//String-sss@Bean-{"k":"v"}@Integer-111@Boolean-true, *
+		String splitArg = getValue(request, "do_split_arg");
+		String splitArr = getValue(request, "do_split_arr");
+		splitArg = splitArg.length()==0 ? "-" : splitArg;
+		splitArr = splitArr.length()==0 ? "@" : splitArr;
+		
+		if(args.length() > 0){
+			echo(ClassUtil.doClassMethod(className, methodName, ClassUtil.parseObject(args, splitArr, splitArg)));
+		}else{
+			echo(ClassUtil.doClassMethod(className, methodName));
+		}
+		
 	}
 	
 	 
