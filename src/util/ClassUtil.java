@@ -2,8 +2,12 @@ package util;
 
 import java.io.File;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,84 +29,106 @@ import util.cache.CacheMapImpl;
 public class ClassUtil {
 	public static Cache<String> cache = new CacheMapImpl();
 	final static String CACHE_KEY = "class-load-cache";
-
 	/**
-	 * 初始化目标对象类
-	 * @param clsName
-	 * @return
+	 * 加载类
+	 * @param className
 	 */
-	public static Object newInstance(String clsName) {
-		try {
-			return loadClass(clsName).newInstance();
-		} catch (Exception arg1) {
-//			throw new RuntimeException(arg1.getMessage(), arg1);
-			out(arg1.getMessage());
-			return null;
-		}
-	}
-
 	private static Class<?> loadClass(String className) {
-//		Bean bean = cache.get(CACHE_KEY);
-//		Class cls = (Class)bean.get(className, null);
 		Class<?> cls = null;
 		try {
 			cls = Thread.currentThread().getContextClassLoader().loadClass(className);
-//				bean.put(className, cls);
-			return cls;
-		} catch (ClassNotFoundException arg4) {
+		} catch (ClassNotFoundException tcne) {
 			try {
-				return Class.forName(className);
-			} catch (Exception arg3) {
-//				throw new RuntimeException(arg3.getMessage(), arg3);
-				out(arg3.getMessage());
-				return null;
-			} finally{
-//					cache.put(CACHE_KEY, bean);
+				cls = Class.forName(className);
+			} catch (ClassNotFoundException cne) {
+				out("反射类", className, "异常", cne.toString());
 			}
-		}finally{
-//				cache.put(CACHE_KEY, bean);
 		}
-
+		return cls;
 	}
-
 	/**
-	 * 调用 目标类 的 目标方法 动态参数 返回值
+	 * 实例化 类
+	 * @param cls
+	 */
+	private static Object newInstance(Class<?> cls, Object...constructorArgs) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		
+		Class<?>[] args = new Class[constructorArgs.length];
+		for (int i = 0; i < constructorArgs.length; ++i) {
+			args[i] = constructorArgs[i].getClass();
+		}
+		Object res = null;
+//		res = cls.newInstance(); //调用默认空构造<自动添加/手动编写>(不能是private!)
+
+		Constructor<?> constructor = cls.getDeclaredConstructor(args);
+		constructor.setAccessible(true);
+		res = constructor.newInstance(constructorArgs);
+		return res;
+	}
+	/**
+	 * 实例化方法
+	 * @param cls
+	 * @param methodName
+	 */
+	private static Method newMethod(Class<?> cls, String methodName, Object...methodArgs) throws NoSuchMethodException, SecurityException{
+		Class<?>[] args = new Class[methodArgs.length];
+		for (int i = 0; i < methodArgs.length; ++i) {
+			args[i] = methodArgs[i].getClass();
+		}
+		Method method = null;
+		try{
+			method = cls.getMethod(methodName, args); //查询非自己private函数
+		}catch(NoSuchMethodException noPrivateNsme){ 
+//			out("反射 非私有private函数域没有这个方法 即将查找private区域  " + noPrivateNsme.toString());
+			method = cls.getDeclaredMethod(methodName, args); //查询自己private函数
+		}
+		return method;
+	}
+	/**
+	 * 调用默认构造实例化的 目标方法 目标参数
 	 * @param className
 	 * @param methodName
 	 * @param objs
 	 * @return
 	 */
-	public static Object doClassMethod(String className, String methodName, Object... objs) {
-		return doClassMethod(loadClass(className), methodName, objs);
+	public static Object doClassMethod(String className, String methodName, Object... methodArgs) {
+		return doClassMethod(loadClass(className), new Object[]{}, methodName, methodArgs);
 	}
+	/**
+	 * 调用特定构造实例化的 目标方法 目标参数
+	 * @param className
+	 * @param constructorArgs
+	 * @param methodName
+	 * @param methodArgs
+	 * @return
+	 */
+	public static Object doClassMethod(String className, Object[] constructorArgs, String methodName, Object... methodArgs) {
+		return doClassMethod(loadClass(className), constructorArgs, methodName, methodArgs);
+	}
+	public static Object doClassMethod(Class<?> cls, String methodName, Object... methodArgs) {
+		return doClassMethod(cls, new Object[]{}, methodName, methodArgs);
+	}
+	public static Object doClassMethod(Class<?> cls, Object[] constructorArgs, String methodName, Object... methodArgs) {
+		Object res = null;
 
-	public static Object doClassMethod(Class<?> cls, String mtdName, Object... objs) {
-		Method method = null;
-		Object newClass = null;
 		try {
-			Class<?>[] e = new Class[objs.length];
-			for (int i = 0; i < objs.length; ++i) {
-				e[i] = objs[i].getClass();
-			}
-			method = cls.getMethod(mtdName, e);
-		} catch (Exception arg7) {
-//			arg7.printStackTrace();
+			Method method = newMethod(cls, methodName, methodArgs);
+			method.setAccessible(true);
+			Object instance = newInstance(cls, constructorArgs);
+			res = method.invoke(instance, methodArgs);
+		} catch(NoSuchMethodException nsme){
+			out("反射[" + cls.getName() + "." + methodName + "]" + Arrays.toString(methodArgs) + " 没有这个方法 " + nsme.toString());
+		} catch (InstantiationException ie) {
+			out("反射[" + cls.getName() + "." + methodName + "]" + Arrays.toString(methodArgs) + " 类实例化异常 " + ie.toString());
+		} catch (IllegalAccessException iae) {
+			out("反射[" + cls.getName() + "." + methodName + "]" + Arrays.toString(methodArgs) + " 函数参数违法 " + iae.toString());
+		} catch (InvocationTargetException iaee){
+			out("反射[" + cls.getName() + "." + methodName + "]" + Arrays.toString(methodArgs) + " 唤醒对象异常 " + iaee.toString());
+		} catch (Exception e){
+			out("反射[" + cls.getName() + "." + methodName + "]" + Arrays.toString(methodArgs) + " 其他异常 " + e.toString());
+		} finally {
+			
 		}
-		if (method != null) {
-			try {
-				newClass = cls.newInstance();
-				return method.invoke(newClass, objs);
-			} catch (Exception arg6) {
-//				throw new RuntimeException(, arg6);
-				out("执行方法[" + cls.getName() + "." + mtdName + "]" + Arrays.toString(objs) + "错误");
-				return null;
-			}
-		}else{
-//			throw new RuntimeException();
-			out("执行方法[" + cls.getName() + "." + mtdName + "]" + Arrays.toString(objs) + "不存在");
-			return null;
-		}
-
+		return res;
 	}
 	private static void out(Object...objects){
 		Tools.out(objects);
@@ -186,23 +212,6 @@ public class ClassUtil {
 	}
 	
 	
-/*
-	int len = method.getParameterTypes().length;
-	if(len != objs.length){//方法参数 和 传入参数不同  多 或者 少 
-//		List<Object> args = new ArrayList<>();
-		Object[] args = (Object[]) Array.newInstance(Object.class, len); //反射创建数组
-		int i = 0;
-		for(; i < objs.length && i < len; i++){ //多了 就截取
-//			args.add(objs[i]);
-			args[i] = objs[i];
-		}
-		for(; i < len; i++){ //少了  填充null
-//			args.add(null);
-			args[i] = null;
-		}
-		return method.invoke(newClass, args);
-	}else{
-	}*/
     /** 
      * 获取某包下所有类 
      * @param packageName 包名 
@@ -259,13 +268,6 @@ public class ClassUtil {
         return myClassName;  
     }  
   
-    private static List<Bean> getClassNameByJars(URL[] urls, String packagePath, boolean childPackage) {  
-    	List<Bean> res = new ArrayList<>();
-    	for(URL item : urls){
-    		res.addAll(getClassNameByJar(item.getPath(), childPackage));
-    	}
-    	return res;
-    }
     /** 
      * 从jar获取某包下所有类 
      * @param jarPath jar文件路径          //jar:file:/E:/workspace_my/BaseSSM/WebContent/WEB-INF/lib/dom4j-1.6.1.jar!/org/dom4j
@@ -341,6 +343,12 @@ public class ClassUtil {
 						Bean bean = turnField(className, item);
 						res.add(bean);
 					}
+					//附加自己私有域
+					for(Field item : cls.getDeclaredFields()){
+						if(getModifier(item).indexOf("private") >= 0){
+							res.add(turnField(className, item));
+						}
+					}
 				}else{//只显示自己的
 					for(Field item : cls.getDeclaredFields()){
 						Bean bean = turnField(className, item);
@@ -348,12 +356,18 @@ public class ClassUtil {
 					}
 				}
 			} 
-			if(ifFather){ //显示父类 以及自己 的 所有方法 不要变量
+			if(ifFather){ //显示父类(仅public) 以及自己 的(不包括private)所有方法 不要变量 
 				for(Method item : cls.getMethods()){
 					Bean bean = turnMethod(className, item);
 					res.add(bean);
 				}
-			}else{//只显示自己的
+				//附加自己私有域
+				for(Method item : cls.getDeclaredMethods()){
+					if(getModifier(item).indexOf("private") >= 0){
+						res.add(turnMethod(className, item));
+					}
+				}
+			}else{//只显示自己的(所有的 包括private)
 				for(Method item : cls.getDeclaredMethods()){
 					Bean bean = turnMethod(className, item);
 					res.add(bean);
@@ -386,10 +400,22 @@ public class ClassUtil {
 		bean.put("PARAMETERTYPES", str.split(", "));
 		
 		bean.put("TOSTRING", filterString(className, item.toString()));
-
+		bean.put("MODIFIER", getModifier(item));//public static
 		bean.put("TYPE", "method");
 		bean.put("BASE", item.getDeclaringClass().getName().equals(className)?"self":"base");
 		return bean;
+	}
+	/**
+	 * 获取Method 或者Field 的修饰符 public static final
+	 * @param member
+	 * @return
+	 */
+	private static String getModifier(Member member){
+		int mod = member.getModifiers() & Modifier.methodModifiers();
+        if (mod != 0) {
+            return Modifier.toString(mod);
+        }
+        return "";
 	}
 	private static Bean turnField(String className, Field item){
 		Bean bean = new Bean();
@@ -399,14 +425,24 @@ public class ClassUtil {
 		bean.put("PARAMETERTYPES", item.getType());
 		bean.put("TOSTRING", filterString(className, item.toString()));
 		bean.put("TYPE", "field");
+		bean.put("MODIFIER", getModifier(item));//public static
 		bean.put("BASE", item.getDeclaringClass().getName().equals(className)?"self":"base");
 		return bean;
 	}
     
     
     
+	private ClassUtil(){
+		out("private constructor");
+	}
+	private ClassUtil(String str){
+		out("private constructor str");
+	}
+	private ClassUtil(String str, Integer i){
+		out("private constructor str integer");
+	}
 	
-	
+
 	public String test(String str, Bean bean, Integer in, Boolean bool){
 		return Arrays.toString(new Object[]{str, bean, in, bool});
 	}
@@ -415,13 +451,21 @@ public class ClassUtil {
 		return "testNoArgs";
 	}
 	//int 不行?
-	public String testInt(Integer i){
+	public String testInt(int i){
 		out(i);
 		return "testInt";
+	}
+	public String testInt(Integer i){
+		out(i);
+		return "testIntger";
 	}
 	public String testStr(String i){
 		out(i);
 		return "testStr";
+	}
+	private String testBean(Bean i){
+		out(i);
+		return "testBean";
 	}
 	//需要指定实际map类型
 	public String testMap(HashMap<?,?> i){
@@ -451,9 +495,10 @@ public class ClassUtil {
 	}
 	public static void main(String argc[]){
 		out(ClassUtil.doClassMethod("util.ClassUtil", "testNoArgs"));
-		out(ClassUtil.doClassMethod("util.ClassUtil", "testInt", 1));
-		out(ClassUtil.doClassMethod("util.ClassUtil", "testStr", "str"));
-		out(ClassUtil.doClassMethod("util.ClassUtil", "testMap", MapListUtil.getMap().put("key", "vvv").build()));
+		out(ClassUtil.doClassMethod("util.ClassUtil", new Object[]{}, "testInt", 1));
+		out(ClassUtil.doClassMethod("util.ClassUtil", new Object[]{}, "testIntger", 1));
+		out(ClassUtil.doClassMethod("util.ClassUtil", new Object[]{"str"}, "testStr", "str"));
+		out(ClassUtil.doClassMethod("util.ClassUtil", new Object[]{"str", 111}, "testBean", new Bean().put("key", "vvv")));
 //		out(ClassUtil.doClassMethod("util.ClassUtil", "testObjects", new String[]{"str", "str2"}));
 		out(ClassUtil.doClassMethod("util.ClassUtil", "testNoReturn"));
 		

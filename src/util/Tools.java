@@ -172,8 +172,9 @@ System.out.println(s3 == s4); // false
 		out(objects2string(objects));
 	}
 	public static <T> void formatOut(Collection<T> list){
+		int i = 0;
 		for(T obj : list){
-			out(obj);
+			out(i++, obj);
 		}
 	}
 
