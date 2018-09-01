@@ -22,7 +22,7 @@ public class Tuple<V1, V2>{
 		return new Tuple<String, Bean>("sss", new Bean().put("key", "value"));
 	}
 	
-	public static void main(String[] argv){
+	public static void test(String[] argv){
 		Tuple<String, HashMap> tu = new Tuple<>("sss", new HashMap());
 		Tuple<?, ?> tt = fun();
 		Tools.out(tt.v1, tt.v2);

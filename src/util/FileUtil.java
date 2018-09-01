@@ -705,9 +705,11 @@ public class FileUtil {
   	 */
 	public static boolean delete(String path){
 		FileUtil.showDirAsync(path, new Fun<File>() {
+			@SuppressWarnings("unchecked")
 			@Override
-			public void make(File file) {
+			public Object make(File file) {
 				file.delete();
+				return file;
 			}
 		});
 		

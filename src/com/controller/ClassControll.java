@@ -32,7 +32,7 @@ public class ClassControll extends BaseControll{
 		if(cache.containsKey(keyName)){
 			list = (List<?>) cache.get(keyName);
 		}else{
-			list = ClassUtil.getPackage(packageName, true);
+			list = ClassUtil.getPackageClassBean(packageName, true);
 			if(list != null && list.size() > 0)
 				cache.put(keyName, list, 120 * 1000);
 		}

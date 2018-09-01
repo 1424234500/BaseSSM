@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import util.FunT;
 import util.Tools;
-import util.design.TestAnnotation;
 
 /**
  * 注解案例
@@ -18,13 +18,22 @@ import util.design.TestAnnotation;
  * 
  */
 
-public class DBTableTracker{
-	public static void track(Class<?> cl){
-		DBTable dbTable = cl.getAnnotation(DBTable.class);
-		if(dbTable == null){
-			Tools.out("没有相关注解");
-			return;
-		}
+public class DBTableTracker implements OnAnnotation{
+	
+
+	@Override
+	public Status make(Annotation annotation, ElementType type, Object object, Class<?> cls) {
+		Tools.out(this, annotation, type, object);
+		if(type.equals(ElementType.TYPE))	
+			track(annotation, (Class<?>)object);
+		return null;
+	} 
+	
+	public void track(Annotation anno, Class<?> cl){
+//		DBTable dbTable = cl.getAnnotation(DBTable.class);
+		DBTable dbTable = (DBTable)anno;
+		Tools.out("dbtable make");
+		
 		String tname = dbTable.name();
 		if(tname.length() < 1){ //默认类名
 			tname = cl.getName().toUpperCase();
@@ -62,7 +71,7 @@ public class DBTableTracker{
 		
 		
 	}
-	private static String getConstraints(DBConstraints con){
+	private  String getConstraints(DBConstraints con){
 		String res = "";
 		if(!con.allowNull()){
 			res += " not null";
@@ -76,10 +85,6 @@ public class DBTableTracker{
 		return res;
 	}
 	
-	
-	public static void main(String[] args){
-		track( TestAnnotation.class);
-	}
 	
 	
 	

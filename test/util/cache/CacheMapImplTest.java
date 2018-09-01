@@ -1,6 +1,7 @@
 package util.cache;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.Collection;
 import java.util.Map;
@@ -9,93 +10,110 @@ import org.junit.Test;
 
 import util.Bean;
 import util.Tools;
-
-public class CacheMapImplTest {
-	static CacheMapImpl cache = new CacheMapImpl();
-	static{
+import util.cache.CacheMapImpl;
+import util.cache.CacheRedisImpl;
+public class CacheMapImplTest extends CacheRedisImpl {
+//	static Cache<String> cache = new CacheEhcacheImpl();
+//	static{
+//		for(int i = 0; i < 3; i++){
+//			put("k" + i, "v" + i);
+//		}
+//	}
+	/**
+	 * 每次执行test函数 都会调用构造  测完就丢弃
+	 */
+	public CacheMapImplTest(){
 		for(int i = 0; i < 3; i++){
-			cache.put("k" + i, "v" + i);
+			put("k" + i, "v" + i);
 		}
 	}
+//	
+//	@TestObjectCreate static JunitTester create(){
+//		return new JunitTester("create");
+//	}
+//	
+
+//	@TestProperty static List<String> input = Arrays.asList("a,b,c".split(","));
+	
 	
 	@Test
 	public void testSize() {
-		assertEquals(3, cache.size());
+		assertEquals(3, size());
 	}
 
 	@Test
 	public void testIsStart() {
-		assertEquals(true, cache.isStart());;
+		assertEquals(true, isStart());;
 	}
 
 	@Test
 	public void testIsEmpty() {
-		assertEquals(false, cache.isEmpty());;
+		assertEquals(false, isEmpty());;
 	}
 
 	@Test
 	public void testContainsKey() {
-		assertEquals(true, cache.containsKey("k1"));
-		assertEquals(false, cache.containsKey("k999"));
+		assertEquals(true, containsKey("k1"));
+		assertEquals(false, containsKey("k999"));
 	}
 
 	@Test
 	public void testContainsValue() {
-		assertEquals(true, cache.containsValue(Bean.getBean().put("k1", "v1")));
-		assertEquals(false, cache.containsValue(Bean.getBean().put("k1", "v9991")));
+		assertEquals(true, containsValue(Bean.getBean().put("k1", "v1")));
+		assertEquals(false, containsValue(Bean.getBean().put("k1", "v9991")));
 	}
 
 	@Test
 	public void testPutAll() {
 		Bean bean = Bean.getBean().put("p1", "pv1").put("p2", "pv2");
-		cache.putAll(bean);
-		assertEquals(true, cache.containsKey("p1"));
-		assertEquals(true, cache.containsKey("p2"));
+		putAll(bean);
+		assertEquals(true, containsKey("p1"));
+		assertEquals(true, containsKey("p2"));
 	}
 
 	@Test
 	public void testGetAll() {
-		Map map = cache.getAll();
+		Map map = getAll();
 		Tools.out(map);
-		assertEquals(5, map.size());
+		assertEquals(3, map.size());
 	}
 
 	@Test
 	public void testClear() {
-		cache.clear();
-		assertEquals(0, cache.size());
+		clear();
+		assertEquals(0, size());
 	}
 
 	@Test
 	public void testKeySet() {
-		cache.put("kkk", "vvv");
-		Tools.out(cache.keySet());
-		assertEquals(1, cache.size());
+		put("kkk", "vvv");
+		Tools.out(keySet());
+		assertEquals(4, size());
 	}
 
 	@Test
 	public void testValues() {
-		Collection<Object> objs = cache.values();
+		Collection<Object> objs = values();
 		Tools.out(objs);
-		assertEquals(1, objs.size());
+		assertEquals(3, objs.size());
 	}
 
 	@Test
 	public void testGetString() {
-		assertEquals("vvv", cache.get("kkk"));
-		assertEquals(null, cache.get("kkdajdflk"));
+		assertEquals("vvv", get("kkk"));
+		assertEquals(null, get("kkdajdflk"));
 		
 	}
 
 	@Test
 	public void testGetStringV() {
-		assertEquals("vvv", cache.get("kkk", ""));
-		assertEquals("bbb", cache.get("askdfjals", "bbb"));
+		assertEquals("vvv", get("kkk", ""));
+		assertEquals("bbb", get("askdfjals", "bbb"));
 	}
 
 	@Test
 	public void testPutStringV() {
-		assertEquals("putsvalue", cache.put("puts", "putsvalue").get("puts", ""));
+		assertEquals("putsvalue", put("puts", "putsvalue").get("puts", ""));
 	}
 
 	@Test
@@ -105,8 +123,8 @@ public class CacheMapImplTest {
 
 	@Test
 	public void testRemove() {
-		assertEquals(true, cache.remove("puts"));
-		assertEquals(false, cache.remove("putsadfjk"));
+		assertEquals(true, remove("puts"));
+		assertEquals(false, remove("putsadfjk"));
 	}
 
 	@Test

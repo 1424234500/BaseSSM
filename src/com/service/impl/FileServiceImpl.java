@@ -50,7 +50,7 @@ public class FileServiceImpl implements FileService,Serializable {
 		//添加其它文件到表中
 		List<File> lf = FileUtil.showDirAsync(UtilTools.getScanDirs(), new Fun<File>() {
 			@Override
-			public void make(File obj) {
+			public Object make(File obj) {
 				if(obj.isFile()){
 					int flag = 0;
 					for(int i = 0; i < list.size(); i++){
@@ -73,6 +73,7 @@ public class FileServiceImpl implements FileService,Serializable {
 						logger.info("添加文件记录：" + name);
 					}
 				}
+				return obj;
 			}
 		});  
 

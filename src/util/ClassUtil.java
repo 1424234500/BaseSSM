@@ -33,7 +33,7 @@ public class ClassUtil {
 	 * 加载类
 	 * @param className
 	 */
-	private static Class<?> loadClass(String className) {
+	public static Class<?> loadClass(String className) {
 		Class<?> cls = null;
 		try {
 			cls = Thread.currentThread().getContextClassLoader().loadClass(className);
@@ -41,7 +41,8 @@ public class ClassUtil {
 			try {
 				cls = Class.forName(className);
 			} catch (ClassNotFoundException cne) {
-				out("反射类", className, "异常", cne.toString());
+				out("反射类", className, "异常", cne.toString(), cne.getCause());
+				cne.printStackTrace();
 			}
 		}
 		return cls;
@@ -106,6 +107,9 @@ public class ClassUtil {
 	}
 	public static Object doClassMethod(Class<?> cls, String methodName, Object... methodArgs) {
 		return doClassMethod(cls, new Object[]{}, methodName, methodArgs);
+	}
+	public static Object doClassMethod(Class<?> cls, Method method, Object... methodArgs) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException {
+		return method.invoke(newInstance(cls), methodArgs);
 	}
 	public static Object doClassMethod(Class<?> cls, Object[] constructorArgs, String methodName, Object... methodArgs) {
 		Object res = null;
@@ -213,12 +217,12 @@ public class ClassUtil {
 	
 	
     /** 
-     * 获取某包下所有类 
+     * 获取某包下所有类 及其文件信息
      * @param packageName 包名 
      * @param childPackage 是否遍历子包 
      * @return new Bean(FILE info, PACKAGE-类的完整名称)
      */  
-    public static List<Bean> getPackage(String packageName, boolean childPackage) {  
+    public static List<Bean> getPackageClassBean(String packageName, boolean childPackage) {  
         List<Bean> fileNames = new ArrayList<>();  
         ClassLoader loader = Thread.currentThread().getContextClassLoader();  
         String packagePath = packageName.replace(".", "/");  
@@ -229,31 +233,49 @@ public class ClassUtil {
         if (url != null) {  
             String type = url.getProtocol();  
             if (type.equals("file")) {  
-                fileNames = getClassNameByFile(url.getPath(), null, childPackage);  
+                fileNames = getClassBeanByFile(url.getPath(), childPackage);  
             } else if (type.equals("jar")) {  
-                fileNames = getClassNameByJar(url.getPath(), childPackage);  
+                fileNames = getClassBeanByJar(url.getPath(), childPackage);  
             }  
         } else {  
 //            fileNames = getClassNameByJars(((URLClassLoader) loader).getURLs(), packagePath, childPackage);  
         }  
         return fileNames;  
     }  
-  
+    public static List<String> getPackageClass(String packageName, boolean childPackage) {  
+        List<String> fileNames = new ArrayList<>();  
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();  
+        String packagePath = packageName.replace(".", "/");  
+        //只能拿到本项目下的class文件/jar文件
+        URL url = loader.getResource(packagePath); 
+        //jar:file:/E:/workspace_my/BaseSSM/WebContent/WEB-INF/lib/dom4j-1.6.1.jar!/org/dom4j
+        //file:/E:/workspace_my/BaseSSM/WebContent/WEB-INF/classes/util
+        if (url != null) {  
+            String type = url.getProtocol();  
+            if (type.equals("file")) {  
+                fileNames = getClassByFile(url.getPath(), childPackage);  
+            } else if (type.equals("jar")) {  
+//                fileNames = getClassBeanByJar(url.getPath(), childPackage);  
+            }  
+        } else {  
+//            fileNames = getClassNameByJars(((URLClassLoader) loader).getURLs(), packagePath, childPackage);  
+        }  
+        return fileNames;  
+    }  
     /** 
-     * 从项目文件获取某包下所有类 文件名
+     * 从项目文件获取某包下所有类 
      * @param filePath 文件路径 
-     * @param className 类名集合 
      * @param childPackage 是否遍历子包 
-     * @return 类的完整名称 
+     * @return 类的完整名称 及其 文件信息
      */  
-    private static List<Bean> getClassNameByFile(String filePath, List<Bean> className, boolean childPackage) {  
+    private static List<Bean> getClassBeanByFile(String filePath, boolean childPackage) {  
         List<Bean> myClassName = new ArrayList<>();  
         File file = new File(filePath);  
         File[] childFiles = file.listFiles();  
         for (File childFile : childFiles) {  
             if (childFile.isDirectory()) {  
                 if (childPackage) {  
-                    myClassName.addAll(getClassNameByFile(childFile.getPath(), myClassName, childPackage));  
+                    myClassName.addAll(getClassBeanByFile(childFile.getPath(), childPackage));  
                 }  
             } else {  
                 String childFilePath = childFile.getPath();  
@@ -266,15 +288,42 @@ public class ClassUtil {
         }  
   
         return myClassName;  
+    } 
+    /** 
+     * 从项目文件获取某包下所有class 类全路径
+     * @param filePath 文件路径 
+     * @param childPackage 是否遍历子包 
+     * @return 类的完整名称 
+     */  
+    private static List<String> getClassByFile(String filePath, boolean childPackage) {  
+        List<String> myClassName = new ArrayList<>();  
+        File file = new File(filePath);  
+        File[] childFiles = file.listFiles();  
+        for (File childFile : childFiles) {  
+            if (childFile.isDirectory()) {  
+                if (childPackage) {  
+                    myClassName.addAll(getClassByFile(childFile.getPath(), childPackage));  
+                }  
+            } else {  
+                String childFilePath = childFile.getPath();  
+                if (childFilePath.endsWith(".class")) {  
+                    childFilePath = childFilePath.substring(childFilePath.indexOf("\\classes") + 9, childFilePath.lastIndexOf("."));  
+                    childFilePath = childFilePath.replace("\\", ".");  
+                    myClassName.add(childFilePath);  
+                }  
+            }  
+        }  
+  
+        return myClassName;  
     }  
   
     /** 
      * 从jar获取某包下所有类 
      * @param jarPath jar文件路径          //jar:file:/E:/workspace_my/BaseSSM/WebContent/WEB-INF/lib/dom4j-1.6.1.jar!/org/dom4j
      * @param childPackage 是否遍历子包 
-     * @return 类的完整名称 
+     * @return 类的完整名称 及其 文件信息
      */  
-    private static List<Bean> getClassNameByJar(String jarPath, boolean childPackage) {  
+    private static List<Bean> getClassBeanByJar(String jarPath, boolean childPackage) {  
         List<Bean> myClassName = new ArrayList<>();  
         String[] jarInfo = jarPath.split("!");  
         String jarFilePath = jarInfo[0].substring(jarInfo[0].indexOf("/"));  
@@ -514,7 +563,7 @@ public class ClassUtil {
 				"@Integer-111@Boolean-true", "@", "-")));
 
 		
-//		Tools.formatOut(ClassUtil.getPackage("", true));
+		Tools.formatOut(ClassUtil.getPackageClassBean("", true));
 //		Tools.formatOut(ClassUtil.getMethod("com.mode.User"));
 		
 //		Tools.formatOut(ClassUtil.getClassName("util", true));
