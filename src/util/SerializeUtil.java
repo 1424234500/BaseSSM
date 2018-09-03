@@ -53,7 +53,8 @@ public class SerializeUtil {
 			if (in != null) {
 				bis = new ByteArrayInputStream(in);
 				is = new ObjectInputStream(bis);
-				res = is.readObject();
+				//此处序列化会执行构造函数 ! 如果在构造里放入特殊用途代码就会被执行
+				res = is.readObject(); 
 			}
 		} catch (IOException e) {
 			out("反序列化异常", in.toString());

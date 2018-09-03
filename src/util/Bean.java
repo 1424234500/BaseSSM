@@ -42,6 +42,22 @@ public class Bean extends HashMap{
     public Bean put(Object key, Object value){
     	super.put(key, value);
     	return this;
+    }    
+    public Bean put(String key, String value){
+    	super.put(key, value);
+    	return this;
+    }
+    public Bean set(String key, String value){
+    	super.put(key, value);
+    	return this;
+    }
+    public Bean set(String key, Bean value){
+    	super.put(key, value);
+    	return this;
+    }
+    public Object get(String key, String value){
+    	Object obj = super.get(key);
+    	return obj == null ? value : obj;
     }
 
     /**

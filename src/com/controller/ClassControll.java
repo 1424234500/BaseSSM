@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.map.TransformedMap;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -76,9 +77,26 @@ public class ClassControll extends BaseControll{
 		}else{
 			echo(ClassUtil.doClassMethod(className, methodName));
 		}
-		
 	}
-	
+	/**
+	 * 连续 反射 多注入 执行链 builder模式  代码注入？
+	 */
+	@RequestMapping("/docode.do")
+	public void doCode(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String className = getValue(request, "do_class");
+		String methodName = getValue(request, "do_method");
+		String args = getValue(request, "do_args");//String-sss@Bean-{"k":"v"}@Integer-111@Boolean-true, *
+		String splitArg = getValue(request, "do_split_arg");
+		String splitArr = getValue(request, "do_split_arr");
+		splitArg = splitArg.length()==0 ? "-" : splitArg;
+		splitArr = splitArr.length()==0 ? "@" : splitArr;
+		
+		if(args.length() > 0){
+			echo(ClassUtil.doClassMethod(className, methodName, ClassUtil.parseObject(args, splitArr, splitArg)));
+		}else{
+			echo(ClassUtil.doClassMethod(className, methodName));
+		}
+	}
 	 
     
 }

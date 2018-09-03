@@ -14,9 +14,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import org.junit.Test;
 
 import util.cache.Cache;
 import util.cache.CacheMapImpl;
@@ -41,8 +45,7 @@ public class ClassUtil {
 			try {
 				cls = Class.forName(className);
 			} catch (ClassNotFoundException cne) {
-				out("反射类", className, "异常", cne.toString(), cne.getCause());
-				cne.printStackTrace();
+				out("反射类", className, "加载异常", cne.toString(), cne.getCause());
 			}
 		}
 		return cls;
@@ -51,18 +54,24 @@ public class ClassUtil {
 	 * 实例化 类
 	 * @param cls
 	 */
-	private static Object newInstance(Class<?> cls, Object...constructorArgs) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
-		
-		Class<?>[] args = new Class[constructorArgs.length];
-		for (int i = 0; i < constructorArgs.length; ++i) {
-			args[i] = constructorArgs[i].getClass();
-		}
+	public static Object newInstance(String className, Object...constructorArgs){
+		return newInstance(loadClass(className), constructorArgs);
+	}
+	public static Object newInstance(Class<?> cls, Object...constructorArgs){
 		Object res = null;
-//		res = cls.newInstance(); //调用默认空构造<自动添加/手动编写>(不能是private!)
-
-		Constructor<?> constructor = cls.getDeclaredConstructor(args);
-		constructor.setAccessible(true);
-		res = constructor.newInstance(constructorArgs);
+		try{
+			Class<?>[] args = new Class[constructorArgs.length];
+			for (int i = 0; i < constructorArgs.length; ++i) {
+				args[i] = constructorArgs[i].getClass();
+			}
+	//		res = cls.newInstance(); //调用默认空构造<自动添加/手动编写>(不能是private!)
+	
+			Constructor<?> constructor = cls.getDeclaredConstructor(args);
+			constructor.setAccessible(true);
+			res = constructor.newInstance(constructorArgs);
+		} catch (Exception e){
+			out("反射[" + cls.getName() + ".构造]" + Arrays.toString(constructorArgs) + e.toString());
+		}
 		return res;
 	}
 	/**
@@ -70,7 +79,7 @@ public class ClassUtil {
 	 * @param cls
 	 * @param methodName
 	 */
-	private static Method newMethod(Class<?> cls, String methodName, Object...methodArgs) throws NoSuchMethodException, SecurityException{
+	public static Method newMethod(Class<?> cls, String methodName, Object...methodArgs){
 		Class<?>[] args = new Class[methodArgs.length];
 		for (int i = 0; i < methodArgs.length; ++i) {
 			args[i] = methodArgs[i].getClass();
@@ -78,62 +87,188 @@ public class ClassUtil {
 		Method method = null;
 		try{
 			method = cls.getMethod(methodName, args); //查询非自己private函数
-		}catch(NoSuchMethodException noPrivateNsme){ 
+		}catch(Exception noPrivateNsme){ 
 //			out("反射 非私有private函数域没有这个方法 即将查找private区域  " + noPrivateNsme.toString());
-			method = cls.getDeclaredMethod(methodName, args); //查询自己private函数
+			try {
+				//查询自己private函数
+				method = cls.getDeclaredMethod(methodName, args);
+			} catch (Exception e) {
+				out("加载类" + cls.getName() + " 方法" + methodName + " 异常" + e.toString());
+			}
 		}
 		return method;
 	}
 	/**
-	 * 调用默认构造实例化的 目标方法 目标参数
-	 * @param className
-	 * @param methodName
-	 * @param objs
-	 * @return
+	 * 默认构造
 	 */
 	public static Object doClassMethod(String className, String methodName, Object... methodArgs) {
-		return doClassMethod(loadClass(className), new Object[]{}, methodName, methodArgs);
+		return doClassMethod(className, new Object[]{}, methodName, methodArgs);
 	}
 	/**
-	 * 调用特定构造实例化的 目标方法 目标参数
-	 * @param className
-	 * @param constructorArgs
-	 * @param methodName
-	 * @param methodArgs
-	 * @return
+	 * 特定构造
 	 */
 	public static Object doClassMethod(String className, Object[] constructorArgs, String methodName, Object... methodArgs) {
 		return doClassMethod(loadClass(className), constructorArgs, methodName, methodArgs);
 	}
+
+	
+	
+	/**
+	 * class 默认构造
+	 */
 	public static Object doClassMethod(Class<?> cls, String methodName, Object... methodArgs) {
 		return doClassMethod(cls, new Object[]{}, methodName, methodArgs);
 	}
-	public static Object doClassMethod(Class<?> cls, Method method, Object... methodArgs) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException {
-		return method.invoke(newInstance(cls), methodArgs);
-	}
+	/**
+	 * class 特定构造
+	 */
 	public static Object doClassMethod(Class<?> cls, Object[] constructorArgs, String methodName, Object... methodArgs) {
-		Object res = null;
+		return doClassMethod(cls, newMethod(cls, methodName, methodArgs), methodArgs);
+	}
 
+	/**
+	 * method默认构造
+	 */
+	public static Object doClassMethod(Class<?> cls, Method method, Object... methodArgs) {
+		return doClassMethod(cls, new Object[]{}, method, methodArgs);
+	}
+	/**
+	 * method特定构造
+	 */
+	public static Object doClassMethod(Class<?> cls, Object[] constructorArgs, Method method, Object... methodArgs) {
+		return doClassMethod(newInstance(cls, constructorArgs), method, methodArgs);
+	}
+	/**
+	 * instance 构造
+	 */
+	public static Object doClassMethod(Object instance, String methodName, Object... methodArgs) {
+		return doClassMethod(instance, newMethod(instance.getClass(), methodName, methodArgs), methodArgs);
+	}
+	
+	/**
+	 * 调用 对象的目标方法
+	 * @param instance
+	 * @param method
+	 * @param methodArgs
+	 */
+	public static Object doClassMethod(Object instance, Method method, Object... methodArgs) {
+		Object res = null;
 		try {
-			Method method = newMethod(cls, methodName, methodArgs);
 			method.setAccessible(true);
-			Object instance = newInstance(cls, constructorArgs);
 			res = method.invoke(instance, methodArgs);
-		} catch(NoSuchMethodException nsme){
-			out("反射[" + cls.getName() + "." + methodName + "]" + Arrays.toString(methodArgs) + " 没有这个方法 " + nsme.toString());
-		} catch (InstantiationException ie) {
-			out("反射[" + cls.getName() + "." + methodName + "]" + Arrays.toString(methodArgs) + " 类实例化异常 " + ie.toString());
-		} catch (IllegalAccessException iae) {
-			out("反射[" + cls.getName() + "." + methodName + "]" + Arrays.toString(methodArgs) + " 函数参数违法 " + iae.toString());
-		} catch (InvocationTargetException iaee){
-			out("反射[" + cls.getName() + "." + methodName + "]" + Arrays.toString(methodArgs) + " 唤醒对象异常 " + iaee.toString());
 		} catch (Exception e){
-			out("反射[" + cls.getName() + "." + methodName + "]" + Arrays.toString(methodArgs) + " 其他异常 " + e.toString());
-		} finally {
-			
+			out("反射[" + instance.getClass().getName() + "." + method + "]" + Arrays.toString(methodArgs) + " 异常 " + e.toString());
 		}
 		return res;
 	}
+	/**
+	 *  注入代码段批量解析执行
+	 *  	词法解析 反射 缓存 临时变量
+	 */
+	public static Object doCode(List<String> list){
+		LinkedHashMap<String, Object> index = new LinkedHashMap<>();
+		for(String line : list){
+//			list.add("util.Bean bean = new util.Bean(); ");
+//			list.add("String str = new String(\"hello\"); ");
+//			list.add("bean.set(\"key\", str); ");
+//			list.add("Object res = bean.get(\"key\", \"default value\"); ");
+//			list.add("return res; ");
+			//1.new Object()
+			line = line.replace(";", "");
+			line = line.replace("  ", " ");
+			String args = "";
+			Object[] argsObj = new Object[0];
+			if(line.indexOf("(") >= 0 && line.indexOf(")") >= 0){
+				args = line.split("\\(")[1].split("\\)")[0]; // "hello", 22, 'c', 33L/D/F, false
+				argsObj = parseObject(index, args, ",");
+				line = line.substring(0, line.indexOf("(")); 
+			}
+			
+			String[] param = line.split(" ");
+			if(line.indexOf("return") >= 0){ 
+				//return bean;
+				return index.get(param[1]);
+			}else if(line.indexOf("new") > 0){ 
+				//String str = new String
+				index.put(param[1], ClassUtil.newInstance(param[4], argsObj));
+			}else if(line.indexOf("=") >= 0){ 
+				//Object res = bean.get
+				//Object res = ClassUtil.do
+				String key = param[3].split("\\.")[0];				// bean ClassUtil
+				String method = param[3].split("\\.")[1]; //get do
+				Object obj = null;
+				if(index.containsKey(key)){
+					obj = index.get(key);
+					index.put(param[1], ClassUtil.doClassMethod(obj, method, argsObj));
+				}else{
+					index.put(param[1], ClassUtil.doClassMethod(key, method, argsObj));
+				}
+			}else{//bean.set
+				//bean.get
+				//ClassUtil.do
+				String key = line.split("\\.")[0];				// bean ClassUtil
+				String method = line.split("\\.")[1]; //get do
+				Object obj = null;
+				if(index.containsKey(key)){
+					obj = index.get(key);
+					ClassUtil.doClassMethod(obj, method, argsObj);
+				}else{
+					ClassUtil.doClassMethod(key, method, argsObj);
+				}
+			}
+			
+		}
+		
+		Object[] keys = index.keySet().toArray();
+		return index.get(keys[keys.length - 1]);
+	}
+	
+	/**
+	 * "hello", 2, 3L, false
+	 */
+	private static Object[] parseObject(Map index, String args, String splitArr){
+		List<Object> res = new ArrayList<>();
+		splitArr = splitArr == null ? "," : splitArr;
+		if(args != null && args.length() > 0){
+			args = args.replace(", ", ",");
+			splitArr = splitArr == null ? "," : splitArr;
+			String[] params = args.split(splitArr);
+			for(String item : params){
+				String low = item.toLowerCase();
+				if(item.startsWith("\"")){
+					res.add(item.replace("\"", ""));
+				}else if(low.startsWith("'")){
+					res.add(item.charAt(1));
+				}else if(low.equals("true")){
+					res.add(Boolean.TRUE);
+				}else if(low.equals("false")){
+					res.add(Boolean.FALSE);
+				}else if(item.charAt(0) <= '9' && item.charAt(0) >= '0'){
+					if(low.indexOf("l") >= 0){
+						res.add(Long.valueOf(low));
+					}else if(low.indexOf("d") >= 0){
+						res.add(Double.valueOf(low));
+					}else if(low.indexOf("f") >= 0){
+						res.add(Float.valueOf(low));
+					}else{
+						res.add(Tools.parseInt(item));
+					}
+				}else{
+					if(index.containsKey(item)){
+						res.add(index.get(item));
+					}else{
+						out("没有在上文找到[" + item + "]的定义！！！！！！！");
+						res.add(null);
+					}
+				}
+				
+			}
+			
+		}
+		return res.toArray();
+	}
+ 
+
 	private static void out(Object...objects){
 		Tools.out(objects);
 	}
@@ -147,6 +282,8 @@ public class ClassUtil {
 	 */
 	public static Object[] parseObject(String args, String splitArr, String splitArg){
 		List<Object> res = new ArrayList<>();
+		splitArr = splitArr == null ? "@" : splitArr;
+		splitArg = splitArg == null ? "-" : splitArg;
 		
 		if(splitArr == null || splitArr.length() == 0){
 			res.add(parseObject(defaultType, args));
@@ -201,7 +338,7 @@ public class ClassUtil {
 				}else if(type.equals("bean")){
 					res = new Bean(JsonUtil.getMap(value));
 				}
-				//序列化传输 必须使用序列化 完整的str byte[]的数据
+				//序列化传输 必须使用序列化 完整的str byte[]的数据  注意!!此处序列化会执行构造函数
 				else if(type.equals("seria") || type.equals("serializeUtil")){
 					res = SerializeUtil.deserialize(util.encode.Base64.decode(value));
 				}
@@ -282,7 +419,7 @@ public class ClassUtil {
                 if (childFilePath.endsWith(".class")) {  
                     childFilePath = childFilePath.substring(childFilePath.indexOf("\\classes") + 9, childFilePath.lastIndexOf("."));  
                     childFilePath = childFilePath.replace("\\", ".");  
-                    myClassName.add(FileUtil.fileToMap(childFile).put("PACKAGE", childFilePath));  
+                    myClassName.add(FileUtil.fileToMap(childFile).set("PACKAGE", childFilePath));  
                 }  
             }  
         }  
@@ -339,7 +476,7 @@ public class ClassUtil {
                     if (childPackage) {  
                         if (entryName.startsWith(packagePath)) {  
                             entryName = entryName.replace("/", ".").substring(0, entryName.lastIndexOf("."));  
-                            myClassName.add(new Bean().put("PACKAGE", entryName));  
+                            myClassName.add(new Bean().set("PACKAGE", entryName));  
                         }  
                     } else {  
                         int index = entryName.lastIndexOf("/");  
@@ -351,7 +488,7 @@ public class ClassUtil {
                         }  
                         if (myPackagePath.equals(packagePath)) {  
                             entryName = entryName.replace("/", ".").substring(0, entryName.lastIndexOf("."));  
-                            myClassName.add(new Bean().put("PACKAGE", entryName));  
+                            myClassName.add(new Bean().set("PACKAGE", entryName));  
                         }  
                     }  
                 }  
@@ -481,14 +618,14 @@ public class ClassUtil {
     
     
     
-	private ClassUtil(){
-		out("private constructor");
+	public ClassUtil(){
+//		out("private constructor");
 	}
 	private ClassUtil(String str){
 		out("private constructor str");
 	}
 	private ClassUtil(String str, Integer i){
-		out("private constructor str integer");
+//		out("private constructor str integer");
 	}
 	
 
@@ -530,6 +667,29 @@ public class ClassUtil {
 	public void testNoReturn(){
 		out("noReturn");
 	}
+	public Object testDocode(){
+		List<String> list = new ArrayList<>();
+		list.add("util.Bean bean = new util.Bean(); ");
+		list.add("java.lang.String str = new java.lang.String(\"hello\"); ");
+		list.add("bean.set(\"key\", str); ");
+		list.add("Object res = bean.get(\"key\", \"default value\"); ");
+		list.add("return res; ");
+		Tools.formatOut(list);
+		out(doCode(list));
+		list.clear();
+		list.add("util.Bean bean = new util.Bean(); ");
+		list.add("bean.set(\"key1\", \"value1\")");
+		list.add("util.Bean bean2 = new util.Bean(); ");
+		list.add("bean2.set(\"key2\", bean); ");
+		list.add("bean2.set(\"key3\", \"value3\"); ");
+		list.add("return bean2; ");
+		list.add("return bean1; ");
+		Tools.formatOut(list);
+
+		out(doCode(list));
+		return "";
+	}
+	
 	
 	public <T> T[] testCreate(T type){
 		return (T[]) Array.newInstance(type.getClass(), 10);
@@ -550,6 +710,7 @@ public class ClassUtil {
 		out(ClassUtil.doClassMethod("util.ClassUtil", new Object[]{"str", 111}, "testBean", new Bean().put("key", "vvv")));
 //		out(ClassUtil.doClassMethod("util.ClassUtil", "testObjects", new String[]{"str", "str2"}));
 		out(ClassUtil.doClassMethod("util.ClassUtil", "testNoReturn"));
+		out("testDocode", ClassUtil.doClassMethod("util.ClassUtil", "testDocode"));
 		
 		out(ClassUtil.doClassMethod("util.ClassUtil", "test", ClassUtil.parseObject("String-sss@Bean-{\"k\":\"v\"}@Integer-111@Boolean-true", "@", "-")));
 		byte[] bb = SerializeUtil.serialize(new Bean().set("key", "value").set("key2", "value2"));
@@ -563,10 +724,11 @@ public class ClassUtil {
 				"@Integer-111@Boolean-true", "@", "-")));
 
 		
-		Tools.formatOut(ClassUtil.getPackageClassBean("", true));
+//		Tools.formatOut(ClassUtil.getPackageClassBean("", true));
 //		Tools.formatOut(ClassUtil.getMethod("com.mode.User"));
 		
 //		Tools.formatOut(ClassUtil.getClassName("util", true));
 //		Tools.formatOut(ClassUtil.getClassName("org.dom4j", true));
 	}
 }
+  
