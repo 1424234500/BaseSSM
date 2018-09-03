@@ -1,13 +1,10 @@
 package util.annotation;
-import java.lang.annotation.*;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import util.ClassUtil;
-import util.FunT;
 import util.Tools;
 
 /**
@@ -51,9 +48,7 @@ public class TestTracker implements OnAnnotation{
 						ClassUtil.doClassMethod(cls, method);
 						res = true;
 					}
-				} catch (IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException | NoSuchMethodException
-						| SecurityException | InstantiationException e) {
+				} catch (Exception e) {
 //					e.printStackTrace();
 					res = false;
 				}

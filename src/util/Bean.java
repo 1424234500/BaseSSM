@@ -55,10 +55,6 @@ public class Bean extends HashMap{
     	super.put(key, value);
     	return this;
     }
-    public Object get(String key, String value){
-    	Object obj = super.get(key);
-    	return obj == null ? value : obj;
-    }
 
     /**
      * 获取对象值，如果不存在则返回缺省对象
