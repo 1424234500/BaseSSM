@@ -98,7 +98,7 @@ public class ClassControll extends BaseControll{
 		List<String> list = Arrays.asList(args.split(splitArr));
 		
 		if(list.size() > 0){
-			 echo(ClassUtil.doCode(list));
+			echo(ClassUtil.doCode(list));
 		}else{
 			echo(false, "do_args: eg.Integer in = 0; Bean bean = new Bean();bean.set(\"int\", in)");
 		}

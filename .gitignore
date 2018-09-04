@@ -1,2 +1,10 @@
+
+.settings/
 /build/
+
 /WebContent/WEB-INF/classes
+
+*.class
+*.log
+
+
