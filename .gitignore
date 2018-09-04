@@ -1,10 +1,12 @@
-
+.idea/
 .settings/
-/build/
+build/
 
-/WebContent/WEB-INF/classes
+WebContent/WEB-INF/classes
 
 *.class
 *.log
-
+*.pyc
+*.apk
+*.db
 
