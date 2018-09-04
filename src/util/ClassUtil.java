@@ -4,7 +4,6 @@ import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -19,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import org.junit.Test;
 
 import util.cache.Cache;
 import util.cache.CacheMapImpl;
@@ -179,7 +176,7 @@ public class ClassUtil {
 			String args = "";
 			Object[] argsObj = new Object[0];
 			if(line.indexOf("(") >= 0 && line.indexOf(")") >= 0){
-				args = line.split("\\(")[1].split("\\)")[0]; // "hello", 22, 'c', 33L/D/F, false
+				args = line.split("\\(", -1)[1].split("\\)", -1)[0]; // "hello", 22, 'c', 33L/D/F, false
 				argsObj = parseObject(index, args, ",");
 				line = line.substring(0, line.indexOf("(")); 
 			}
@@ -193,9 +190,9 @@ public class ClassUtil {
 				index.put(param[1], ClassUtil.newInstance(param[4], argsObj));
 			}else if(line.indexOf("=") >= 0){ 
 				//Object res = bean.get
-				//Object res = ClassUtil.do
-				String key = param[3].split("\\.")[0];				// bean ClassUtil
-				String method = param[3].split("\\.")[1]; //get do
+				//Object res = util.ClassUtil.do
+				String key = param[3].substring(0, param[3].lastIndexOf("."));				// bean util.ClassUtil
+				String method = param[3].substring(param[3].lastIndexOf(".") + 1);//get do
 				Object obj = null;
 				if(index.containsKey(key)){
 					obj = index.get(key);
@@ -205,9 +202,9 @@ public class ClassUtil {
 				}
 			}else{//bean.set
 				//bean.get
-				//ClassUtil.do
-				String key = line.split("\\.")[0];				// bean ClassUtil
-				String method = line.split("\\.")[1]; //get do
+				//util.ClassUtil.do
+				String key = line.substring(0, line.lastIndexOf("."));// bean util.ClassUtil
+				String method = line.substring(line.lastIndexOf(".") + 1);//get do
 				Object obj = null;
 				if(index.containsKey(key)){
 					obj = index.get(key);
@@ -234,22 +231,22 @@ public class ClassUtil {
 			splitArr = splitArr == null ? "," : splitArr;
 			String[] params = args.split(splitArr);
 			for(String item : params){
-				String low = item.toLowerCase();
+				String low = item.toUpperCase();
 				if(item.startsWith("\"")){
 					res.add(item.replace("\"", ""));
 				}else if(low.startsWith("'")){
 					res.add(item.charAt(1));
-				}else if(low.equals("true")){
+				}else if(low.equals("TRUE")){
 					res.add(Boolean.TRUE);
-				}else if(low.equals("false")){
+				}else if(low.equals("FALSE")){
 					res.add(Boolean.FALSE);
 				}else if(item.charAt(0) <= '9' && item.charAt(0) >= '0'){
-					if(low.indexOf("l") >= 0){
-						res.add(Long.valueOf(low));
-					}else if(low.indexOf("d") >= 0){
-						res.add(Double.valueOf(low));
-					}else if(low.indexOf("f") >= 0){
-						res.add(Float.valueOf(low));
+					if(low.indexOf("L") >= 0){
+						res.add(Tools.parseLong(low));
+					}else if(low.indexOf("D") >= 0){
+						res.add(Tools.parseDouble(low));
+					}else if(low.indexOf("F") >= 0){
+						res.add(Tools.parseFloat(low));
 					}else{
 						res.add(Tools.parseInt(item));
 					}

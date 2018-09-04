@@ -378,7 +378,7 @@ System.out.println(s3 == s4); // false
 	public static Double parseDouble(String num) {
 		return parseDouble(num, 0D);
 	}
-	public static double parseDouble(String num, Double defaultValue) {
+	public static Double parseDouble(String num, Double defaultValue) {
 		double res = 0;
 		num = filterNum(num);
 		if (!Tools.notNull(num)) {
@@ -393,7 +393,24 @@ System.out.println(s3 == s4); // false
 		}
 		return res;
 	}
-
+	public static Float parseFloat(String num) {
+		return parseFloat(num, 0F);
+	}
+	public static Float parseFloat(String num, Float defaultValue) {
+		Float res = defaultValue;
+		num = filterNum(num);
+		if (!Tools.notNull(num)) {
+			res = defaultValue;
+		} else {
+			try {
+				res = Float.parseFloat(num);
+			} catch (Exception e) {
+				Tools.out("解析:" + num + "数字失败");
+				res = defaultValue;
+			}
+		}
+		return res;
+	}
 	/**
 	 * 解析数字
 	 */
@@ -402,7 +419,7 @@ System.out.println(s3 == s4); // false
 	}
 	public static String filterNum(String num){
 		//字符串筛选 筛选出特殊字符 [ ' ' ] - 这类 0-21-23 [133]  [^(\\d)]+
-		return num.replaceAll("-+|\\s+|\\[+|\\]+", "");
+		return num.replaceAll("-+|\\s+|\\[+|\\]+|L$|D$|F$|l$|d$|f$", "");
 	}
 	/**
 	 * 解析数字

@@ -28,6 +28,11 @@ public class TestTools {
 		}
 	}
 	
+	public void testSeria(){
+java.util.HashMap map = new java.util.HashMap();
+util.SerializeUtil.serialize(map);
+	}
+	
 	
 	
 	

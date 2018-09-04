@@ -1,6 +1,7 @@
 package com.controller;
  
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -83,19 +84,25 @@ public class ClassControll extends BaseControll{
 	 */
 	@RequestMapping("/docode.do")
 	public void doCode(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String className = getValue(request, "do_class");
-		String methodName = getValue(request, "do_method");
-		String args = getValue(request, "do_args");//String-sss@Bean-{"k":"v"}@Integer-111@Boolean-true, *
-		String splitArg = getValue(request, "do_split_arg");
+		String args = getValue(request, "do_args");//int i = 0; Bean bean = new Bean(); bean.set("key",i); return bean;
 		String splitArr = getValue(request, "do_split_arr");
-		splitArg = splitArg.length()==0 ? "-" : splitArg;
-		splitArr = splitArr.length()==0 ? "@" : splitArr;
+		splitArr = splitArr.length()==0 ? ";" : splitArr;
 		
-		if(args.length() > 0){
-			echo(ClassUtil.doClassMethod(className, methodName, ClassUtil.parseObject(args, splitArr, splitArg)));
+		args = args.replace("\n", splitArr);
+		args = args.replace("\r\n", splitArr);
+		args = args.replace(splitArr + " ", splitArr);// '; ' -> ';'
+		args = args.replace(splitArr+splitArr, splitArr);
+		args = args.replace(splitArr+splitArr, splitArr);
+		args = args.replace("  ", " ");
+		args = args.replace("  ", " ");
+		List<String> list = Arrays.asList(args.split(splitArr));
+		
+		if(list.size() > 0){
+			 echo(ClassUtil.doCode(list));
 		}else{
-			echo(ClassUtil.doClassMethod(className, methodName));
+			echo(false, "do_args: eg.Integer in = 0; Bean bean = new Bean();bean.set(\"int\", in)");
 		}
+
 	}
 	 
     
