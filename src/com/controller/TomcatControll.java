@@ -23,6 +23,7 @@ import util.JsonUtil;
 import util.MapListUtil;
 import util.Tools;
 import util.cache.Cache;
+import util.cache.CacheFactory;
 import util.cache.CacheMapImpl;
 import util.cache.CacheRedisImpl;
 
@@ -39,7 +40,7 @@ public class TomcatControll extends BaseControll{
 		super(TomcatControll.class, "");
 	}
 	
-	Cache cache =  new CacheMapImpl();
+	Cache cache =  CacheFactory.getInstance();
 	
 	/**
 	 * 缓存监控 map实现

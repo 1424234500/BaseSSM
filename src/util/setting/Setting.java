@@ -11,8 +11,9 @@ import java.util.Properties;
 import util.FileUtil;
 import util.Tools;
 
-/*
+/**
  * 配置文件 读写工具
+ * 针对某个properties文件的快捷实时存取
  */
 public class Setting {
 	 public static Properties openProperties(String filename){
