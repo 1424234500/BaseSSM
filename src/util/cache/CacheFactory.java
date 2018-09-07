@@ -2,8 +2,6 @@ package util.cache;
 
 import java.io.File;
 
-import org.apache.commons.io.FileUtils;
-
 import util.FileUtil;
 import util.Tools;
 import util.setting.SettingUtil;
@@ -55,10 +53,11 @@ public class CacheFactory {
 	private static void init(Cache<?> cache){
 		String classRoot = CacheFactory.class.getResource("/").getPath();
 		File dir = new File(classRoot);
-		Tools.out(dir.getPath(), dir.getAbsolutePath(), dir.getName(), dir.getPath(),dir.list());
+//		Tools.out(dir.getPath(), dir.getAbsolutePath(), dir.getName(), dir.getPath(),dir.list());
 		for(String item : dir.list()){
-			if(FileUtil.check(item) == 0 && item.endsWith(".properties")){
-				cache.putAll(SettingUtil.getSetting(classRoot + File.separator + item));
+			String path = classRoot + item;
+			if(FileUtil.check(path) == 0 && path.endsWith(".properties")){
+				cache.putAll(SettingUtil.getSetting(path));
 			}
 		}
 	}

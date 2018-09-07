@@ -424,8 +424,34 @@ public class MapListUtil {
 		return res;
 	} 
 
-
-
+	/**
+	 * 按照url添加
+	 * put map1.map11.cc test
+	 */
+	public static void putMapUrl(Map map, String urls, Object value){
+		if(urls.length() == 0) return;
+		
+		String[] keys = urls.split("\\."); //map1,   map1 map11
+		
+		Object make = value;
+		for(int i = keys.length - 1; i >= 0; i--){
+			urls = urls.substring(0, urls.length() - Math.min(urls.length(),(keys[i].length() + 1))); //map1.map11 -> map1 map11-value
+			if(i == 0){//
+				map.put(keys[i], make);
+				break;
+			}else{
+				Object temp = getMapUrl(map, urls);
+				if(temp == null){
+					make = new Bean().put(keys[i], make); //map{map11:value}
+				}else{ //必须为map
+					((Map)temp).put(keys[i], make);
+					break;
+				}
+			}
+		}
+		
+		
+	}
 
 
 

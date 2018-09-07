@@ -12,6 +12,13 @@ public class TestTools {
 	
 	@Test
 	public void makeDay(){
+		Bean map = new Bean();
+		MapListUtil.putMapUrl(map, "m", new Bean());
+		MapListUtil.putMapUrl(map, "m1.m2", new Bean());
+		MapListUtil.putMapUrl(map, "m1.m2.m3", "value123");
+		MapListUtil.putMapUrl(map, "m2.m2.m3", "value223");
+		Tools.out(map);
+		
 		List<String> list = new ArrayList<>();
 		String[] arr = {"Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ"};
 		String[] ttt = {"一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"};
@@ -24,7 +31,7 @@ public class TestTools {
 		}
 		Collections.reverse(list);
 		for(String str : list){
-			System.out.println(str);
+//			System.out.println(str);
 		}
 	}
 	

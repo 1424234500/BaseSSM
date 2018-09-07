@@ -32,7 +32,13 @@ public class SettingUtil {
             e.printStackTrace();
         }
         Bean bean = new Bean(proper); 
-        return bean;
+        Bean res = new Bean();
+        
+        for(Object item : bean.keySet()){
+        	MapListUtil.putMapUrl(res, item.toString(), bean.get(item));
+        }
+        
+        return res;
 	}
 	public static void saveSetting(String filename, Bean bean){
 		Properties proper = new Properties();     
