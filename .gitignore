@@ -3,7 +3,7 @@
 build/
 
 WebContent/WEB-INF/classes
-
+*.bak
 *.class
 *.log
 *.pyc
