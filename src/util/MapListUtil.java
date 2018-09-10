@@ -427,12 +427,13 @@ public class MapListUtil {
 	/**
 	 * 按照url添加
 	 * put map1.map11.cc test
+	 * @return 
 	 */
-	public static void putMapUrl(Map map, String urls, Object value){
-		if(urls.length() == 0) return;
-		
+	public static String putMapUrl(Map map, String urls, Object value){
+		if(urls.length() == 0) return null;
+		String key = "";
 		String[] keys = urls.split("\\."); //map1,   map1 map11
-		
+		key = keys[0];
 		Object make = value;
 		for(int i = keys.length - 1; i >= 0; i--){
 			urls = urls.substring(0, urls.length() - Math.min(urls.length(),(keys[i].length() + 1))); //map1.map11 -> map1 map11-value
@@ -449,8 +450,7 @@ public class MapListUtil {
 				}
 			}
 		}
-		
-		
+		return key;
 	}
 
 

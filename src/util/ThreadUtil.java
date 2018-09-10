@@ -14,11 +14,12 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import util.cache.CacheFactory;
 import util.setting.Setting;
 
 /**
  * 线程工具
- * @author Walker
+ * 管理四种线程池
  *
  */
 public class ThreadUtil {
@@ -31,7 +32,9 @@ public class ThreadUtil {
 
 	//存储三种池 统一
 	private static Map<Integer, ExecutorService>          mapExec = new HashMap<>();
-	
+	static{
+		CacheFactory.getInstance().put("static.ThreadUtil", "mapExec", mapExec);
+	}
 //	private static ScheduledExecutorService 			  scheduleExec;
 
 	/**
@@ -39,9 +42,6 @@ public class ThreadUtil {
 	 * @param type         线程池类型
 	 * @param corePoolSize 只对Fixed和Scheduled线程池起效
 	 */
-	private static ExecutorService getExecutorServiceInstance() {
-		return getExecutorServiceInstance(FixedThread);
-	}
 	private static ExecutorService getExecutorServiceInstance(int type) {
 		return getExecutorServiceInstance(type, Tools.parseInt(Setting.getProperty("corePoolSize", "5")));
 	}

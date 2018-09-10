@@ -12,12 +12,12 @@ import util.setting.SettingUtil;
  */
 public class CacheFactory {
 	
-	private static Cache<?> cache = null;
+	private static Cache<String> cache = null;
 	
 	private CacheFactory() {
 	}
 	
-	public static Cache<?> getInstance() {
+	public static Cache<String> getInstance() {
 		if(cache == null){
 			cache = getInstance(CacheType.MAP);
 			init(cache);
@@ -25,8 +25,8 @@ public class CacheFactory {
 		return cache;
 	}
 
-	public static Cache<?> getInstance(CacheType type) {
-		Cache<?> cache = null;
+	public static Cache<String> getInstance(CacheType type) {
+		Cache<String> cache = null;
 		switch (type) {
 		case MAP:
 			cache = new CacheMapImpl();

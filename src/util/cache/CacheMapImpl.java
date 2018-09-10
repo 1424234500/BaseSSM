@@ -156,8 +156,15 @@ public class CacheMapImpl implements Cache<String> {
 		String res = "false";
 		Object obj = MapListUtil.getMapUrl(map, url);
 		if(obj == null){
-			res = "寻址失败" + url;
-			out(res);
+//			res = "寻址失败" + url;
+			key =  url + "." + key;
+			key = MapListUtil.putMapUrl(map, key, value);
+			Index index = new Index();
+			index.mtime = System.currentTimeMillis();
+			index.expire = expire;
+			mapIndex.put(key, index);
+			res = "true";
+//			out(res);
 		}else{
 			if(obj instanceof List){
 				((List)obj).add(value);
