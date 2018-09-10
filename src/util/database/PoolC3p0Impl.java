@@ -15,30 +15,30 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
  * @author walker
  *
  */
-public class ConnC3p0Impl implements Conn {
-	static Logger logger = org.apache.log4j.Logger.getLogger(ConnC3p0Impl.class);
+class PoolC3p0Impl implements Pool {
+	static Logger logger = org.apache.log4j.Logger.getLogger(PoolC3p0Impl.class);
 
 	// 通过标识名来创建相应连接池
 	static ComboPooledDataSource dataSource = new ComboPooledDataSource("oracle");
 
 	@Override
-	public Connection getConn() throws Exception {
+	public Connection getConn() {
 		try {
 			return dataSource.getConnection();
 		} catch (Exception e) {
 			logger.error("Exception in C3p0Utils!", e);
-			throw new Exception("数据库连接出错!", e);
+			throw new RuntimeException("数据库连接出错!", e);
 		}
 	}
 
 	@Override
-	public void close(Connection conn, PreparedStatement pst, ResultSet rs) throws Exception {
+	public void close(Connection conn, PreparedStatement pst, ResultSet rs) {
 		if (rs != null) {
 			try {
 				rs.close();
 			} catch (SQLException e) {
 				logger.error("Exception in C3p0Utils! ResultSet", e);
-				throw new Exception("数据库连接关闭出错!", e);
+				throw new RuntimeException("数据库连接关闭出错!", e);
 			}
 		}
 		if (pst != null) {
@@ -46,7 +46,7 @@ public class ConnC3p0Impl implements Conn {
 				pst.close();
 			} catch (SQLException e) {
 				logger.error("Exception in C3p0Utils! PreparedStatement", e);
-				throw new Exception("数据库连接关闭出错!", e);
+				throw new RuntimeException("数据库连接关闭出错!", e);
 			}
 		}
 
@@ -55,7 +55,7 @@ public class ConnC3p0Impl implements Conn {
 				conn.close();
 			} catch (SQLException e) {
 				logger.error("Exception in C3p0Utils! Connection", e);
-				throw new Exception("数据库连接关闭出错!", e);
+				throw new RuntimeException("数据库连接关闭出错!", e);
 			}
 		}
 	}

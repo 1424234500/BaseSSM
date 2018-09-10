@@ -18,7 +18,6 @@ import java.util.concurrent.TimeoutException;
 import org.hibernate.engine.ExecuteUpdateResultCheckStyle;
 
 import util.Tools;
-import util.database.SqlFactory;
 import util.setting.Setting;
 
 /**

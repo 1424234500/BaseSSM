@@ -9,9 +9,9 @@ import java.sql.ResultSet;
  * @author walker
  *
  */
-public interface Conn {
-	Connection getConn() throws Exception;
-	public void close(Connection conn, PreparedStatement pst, ResultSet rs) throws Exception;
+interface Pool {
+	Connection getConn();
+	public void close(Connection conn, PreparedStatement pst, ResultSet rs);
 	
 	
 }

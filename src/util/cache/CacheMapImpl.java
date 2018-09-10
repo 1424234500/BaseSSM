@@ -32,6 +32,7 @@ public class CacheMapImpl implements Cache<String> {
 		long expire;	//过期时间
 		long mtime;	//修改时间
 		public boolean isExpire(){ //是否过期
+			if(mtime <= 0) return false;
 			return System.currentTimeMillis() > mtime + expire;
 		}
 	}

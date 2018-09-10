@@ -35,7 +35,7 @@ public interface Cache<K> {
 	/**
 	 * 默认的缓存周期
 	 */
-	long TIME_DEFAULT_EXPIRE = 600 * 1000L;
+	long TIME_DEFAULT_EXPIRE = 0 * 600 * 1000L;
 	
 	
 //具体缓存实现
