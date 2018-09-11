@@ -13,7 +13,7 @@ import com.service.impl.FileServiceImpl;
 
 import util.Bean;
 import util.cache.Cache;
-import util.cache.CacheMapImpl;
+import util.cache.CacheFactory;
 
 @Component
 public class OnLoaded implements ApplicationListener<ContextRefreshedEvent> {
@@ -40,7 +40,7 @@ public class OnLoaded implements ApplicationListener<ContextRefreshedEvent> {
 			list.add(bean2);
 			list.add(map);
 			
-			Cache<String> cache = new CacheMapImpl();
+			Cache<String> cache = CacheFactory.getInstance();
 			cache.put("int", 1);
 			cache.put("long", 998);
 			cache.put("string", "the is a string");

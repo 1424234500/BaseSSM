@@ -21,7 +21,7 @@ import util.Tools;
  * 缓存池支持 ?
  * 缓存时间支持
  */
-public class CacheMapImpl implements Cache<String> {
+class CacheMapImpl implements Cache<String> {
 	static int ALL_COUNT = 0; //所有缓存访问get次数
 
 	/**
@@ -32,7 +32,7 @@ public class CacheMapImpl implements Cache<String> {
 		long expire;	//过期时间
 		long mtime;	//修改时间
 		public boolean isExpire(){ //是否过期
-			if(mtime <= 0) return false;
+			if(expire <= 0) return false;
 			return System.currentTimeMillis() > mtime + expire;
 		}
 	}
@@ -484,7 +484,7 @@ public class CacheMapImpl implements Cache<String> {
 	}
 	
 	private void out(Object...objects){
-		Tools.out(objects);
+		Tools.out(this.getClass().getName(), objects);
 	}
 
 }

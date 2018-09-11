@@ -95,13 +95,13 @@ public class SqlHelp{
 	/**
 	 * ?, ?, ?
 	 */
-	public static String makeMapPosis(Map map){
+	public static String makeMapPosis(Map<?, ?> map){
 		return makePosition("?", map.size());
 	}
 	/**
 	 * id, value, name
 	 */
-	public static String makeMapKeys(Map map){
+	public static String makeMapKeys(Map<?, ?> map){
 		String res = "";
 		for(Object key : map.keySet()){
 			res = res + key + ", ";
@@ -112,7 +112,7 @@ public class SqlHelp{
 	/**
 	 * id=?, value=?, name=?
 	 */
-	public static String makeMapKeyPosis(Map map){
+	public static String makeMapKeyPosis(Map<?, ?> map){
 		String res = "";
 		for(Object key : map.keySet()){
 			res = res + key + "=?, ";
@@ -123,7 +123,7 @@ public class SqlHelp{
 	/**
 	 * id1, value2, name3
 	 */
-	public static String makeMapValues(Map map){
+	public static String makeMapValues(Map<?, ?> map){
 		String res = "";
 		for(Object key : map.keySet()){
 			res = res + (map.get(key)).toString() + ", ";
@@ -131,7 +131,7 @@ public class SqlHelp{
 		res = res.substring(0, res.length() - 2);
 		return res;
 	}
-	public static int getMapSize(Map map){
+	public static int getMapSize(Map<?, ?> map){
 		return map.size();
 	}
 	/**

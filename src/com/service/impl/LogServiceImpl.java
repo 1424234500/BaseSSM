@@ -19,7 +19,7 @@ import util.Bean;
 import util.MapListUtil;
 import util.Tools;
 import util.cache.Cache;
-import util.cache.CacheMapImpl;
+import util.cache.CacheFactory;
 
 @Service("logService")
 @Scope("prototype") 
@@ -28,9 +28,9 @@ public class LogServiceImpl implements LogService,Serializable {
 	static public Logger logger = LoggerFactory.getLogger(LogServiceImpl.class); 
 	final static String CACHE_KEY = "cache-url-request";
     @Autowired
-    protected BaseDao baseDao;    
+    private BaseDao baseDao;    
 
-	protected Cache<String> cache = new CacheMapImpl();
+	private Cache<String> cache = CacheFactory.getInstance();
     
     
     //info:

@@ -26,7 +26,7 @@ import util.Tools;
  * 缓存服务实现类
  * redis实现
  */
-public class CacheRedisImpl implements Cache<String> {
+class CacheRedisImpl implements Cache<String> {
 	public interface Fun<T>{
 		public T make(Jedis jedis) ;
 	} 

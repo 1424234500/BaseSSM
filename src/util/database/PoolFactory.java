@@ -4,20 +4,24 @@ import java.util.EnumMap;
 
 import util.cache.CacheFactory;
 
+/**
+ * 连接池 管理器
+ * 管理多种连接池
+ *
+ */
 class PoolFactory{
 
 	private PoolFactory() {
 	}
-	private static EnumMap<Type, Pool> connMap;
+	private static EnumMap<TypePool, Pool> connMap;
 	static {
-		connMap = new EnumMap<>(Type.class);
-		CacheFactory.getInstance().put("static.ConnFactory", "connMap", connMap);
+		connMap = new EnumMap<>(TypePool.class);
 	}
 	public static Pool getInstance() {
-		return getInstance(Type.C3P0);
+		return getInstance(TypePool.C3P0);
 	}
 
-	public static Pool getInstance(Type type) {
+	public static Pool getInstance(TypePool type) {
 		Pool conn = connMap.get(type);
 		if(conn == null){
 			switch(type){
@@ -38,7 +42,7 @@ class PoolFactory{
 
 }
 
-enum Type{
+enum TypePool{
 	C3P0,JDBC
 }
 

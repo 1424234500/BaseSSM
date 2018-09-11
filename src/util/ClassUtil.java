@@ -20,7 +20,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import util.cache.Cache;
-import util.cache.CacheMapImpl;
+import util.cache.CacheFactory;
 
 /**
  * 
@@ -28,7 +28,7 @@ import util.cache.CacheMapImpl;
  *
  */
 public class ClassUtil {
-	public static Cache<String> cache = new CacheMapImpl();
+	public static Cache<String> cache = CacheFactory.getInstance();
 	final static String CACHE_KEY = "class-load-cache";
 	/**
 	 * 加载类

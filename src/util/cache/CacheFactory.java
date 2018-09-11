@@ -3,7 +3,6 @@ package util.cache;
 import java.io.File;
 
 import util.FileUtil;
-import util.Tools;
 import util.setting.SettingUtil;
 
 /**

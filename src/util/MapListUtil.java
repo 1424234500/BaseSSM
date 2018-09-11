@@ -32,11 +32,11 @@ public class MapListUtil {
 
 		ArrayList<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
-		Map map = getMap().put("key1", "value1").put(null, "value null").put("value null", null).build();
-		Map map2 = getMap().put("key2", "value2").build();
+		Map<String, Object> map = getMap().put("key1", "value1").put(null, "value null").put("value null", null).build();
+		Map<String, Object> map2 = getMap().put("key2", "value2").build();
 
-		Map map22 = getMap().put("key2", "value2").build();
-		Map map3 = map;
+		Map<String, Object> map22 = getMap().put("key2", "value2").build();
+		Map<String, Object> map3 = map;
 		Tools.out("map.keySet null键唯一 键集合",map.keySet());
 		Tools.out("map.entrySet 键值集合",map.entrySet());
 		//for (Map.Entry<String, Object> entry : map.entrySet())
@@ -81,7 +81,7 @@ public class MapListUtil {
 
 		List<Map<String, Object>> li = new ArrayList<Map<String, Object>>();
 		for(int i = 0; i < 2; i++){
-			Map mm = getMap()
+			Map<String, Object> mm = getMap()
 					.put("id", "id-" + i)
 					.put("name", "name-" + i)
 					.build();
@@ -95,13 +95,16 @@ public class MapListUtil {
 
 
 	}
-
-	public static int getMapSize(Map map){
-		return map.size();
+	public static Map copy(Map<Object, Object> map){
+		return copy(map, map.keySet().toArray());
 	}
-
-
-
+	public static Map copy(Map map, Object...keys){
+		Map res = new HashMap<>();
+		for(Object key : keys){
+			res.put(key, map.get(key));
+		}
+		return res;
+	}
 	/**
 	 * 获取Map工厂build模式
 	 * @return
@@ -345,7 +348,7 @@ public class MapListUtil {
 			int cc = 0;
 			for (Object key : set) {
 //				Tools.out(key);
-				Map col = getLinkMap().build();
+				Map<String, Object> col = getLinkMap().build();
 				for(int i = 0; i < rowSize; i++){
 					col.put("col"+i, getList(list, i, ""+key));
 				}
@@ -429,7 +432,7 @@ public class MapListUtil {
 	 * put map1.map11.cc test
 	 * @return 
 	 */
-	public static String putMapUrl(Map map, String urls, Object value){
+	public static String putMapUrl(Map<String, Object> map, String urls, Object value){
 		if(urls.length() == 0) return null;
 		String key = "";
 		String[] keys = urls.split("\\."); //map1,   map1 map11
@@ -445,7 +448,10 @@ public class MapListUtil {
 				if(temp == null){
 					make = new Bean().put(keys[i], make); //map{map11:value}
 				}else{ //必须为map
-					((Map)temp).put(keys[i], make);
+					if(temp instanceof Map)
+						((Map<String, Object>)temp).put(keys[i], make);
+					else//找到上层url 替换为新map
+						putMapUrl(map, urls, value);
 					break;
 				}
 			}

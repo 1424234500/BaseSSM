@@ -33,7 +33,7 @@ public class ThreadUtil {
 	//存储三种池 统一
 	private static Map<Integer, ExecutorService>          mapExec = new HashMap<>();
 	static{
-		CacheFactory.getInstance().put("static.ThreadUtil", "mapExec", mapExec);
+		
 	}
 //	private static ScheduledExecutorService 			  scheduleExec;
 
@@ -43,7 +43,7 @@ public class ThreadUtil {
 	 * @param corePoolSize 只对Fixed和Scheduled线程池起效
 	 */
 	private static ExecutorService getExecutorServiceInstance(int type) {
-		return getExecutorServiceInstance(type, Tools.parseInt(Setting.getProperty("corePoolSize", "5")));
+		return getExecutorServiceInstance(type, CacheFactory.getInstance().get("corePoolSize", 5));
 	}
 	private static ExecutorService getExecutorServiceInstance(int type, final int corePoolSize) {
 	    type = type % 4;

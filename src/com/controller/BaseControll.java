@@ -22,6 +22,8 @@ import util.Bean;
 import util.JsonUtil;
 import util.MapListUtil;
 import util.Tools;
+import util.cache.Cache;
+import util.cache.CacheFactory;
 import util.database.SqlHelp;
 
 
@@ -40,6 +42,11 @@ public abstract class BaseControll {
 	@Qualifier("baseService") 
 	protected BaseService baseService;
  
+	/**
+	 * 内存缓存map
+	 */
+	Cache<String> cache = CacheFactory.getInstance();
+	
 	/**
 	 * 普通跳转模式，request获取参数，map写入参数<request.setAttrbute()>，或者request.getSession().setAttrbute()写入session
 	 */
@@ -173,7 +180,6 @@ public abstract class BaseControll {
 			throw new Exception("该表 " + tableName + " 没有列 ");
 		return (String)res.get(0);
 	}
-	@SuppressWarnings("rawtypes")
 	@RequestMapping("/list.do")
 	public void list(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		this.beforeDo(request, response);

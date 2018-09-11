@@ -24,8 +24,6 @@ import util.MapListUtil;
 import util.Tools;
 import util.cache.Cache;
 import util.cache.CacheFactory;
-import util.cache.CacheMapImpl;
-import util.cache.CacheRedisImpl;
 
 /** 
  * Tomcat监控后台
@@ -40,7 +38,7 @@ public class TomcatControll extends BaseControll{
 		super(TomcatControll.class, "");
 	}
 	
-	Cache cache =  CacheFactory.getInstance();
+	Cache<String> cache =  CacheFactory.getInstance();
 	
 	/**
 	 * 缓存监控 map实现

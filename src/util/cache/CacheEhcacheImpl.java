@@ -23,7 +23,7 @@ import util.Tools;
  * 缓存服务实现类
  * ehcache实现
  */
-public class CacheEhcacheImpl implements Cache<String> {
+class CacheEhcacheImpl implements Cache<String> {
 	static int ALL_COUNT = 0; //所有缓存访问get次数
 	private CacheManager cacheMgr = null;
 	private net.sf.ehcache.Cache cache = null;

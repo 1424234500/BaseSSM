@@ -7,19 +7,19 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.map.TransformedMap;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import util.Bean;
 import util.ClassUtil;
 import util.cache.Cache;
-import util.cache.CacheMapImpl; 
+import util.cache.CacheFactory;
 
 
 @Controller
 @RequestMapping("/class")
 public class ClassControll extends BaseControll{
+	
 	public ClassControll() {
 		super(ClassControll.class, "");
 	}
@@ -30,7 +30,6 @@ public class ClassControll extends BaseControll{
 		String packageName = getValue(request, "package");
 		String keyName = "/class/list/" + packageName;
 		List<?> list = null;
-		Cache<String> cache = new CacheMapImpl();
 		if(cache.containsKey(keyName)){
 			list = (List<?>) cache.get(keyName);
 		}else{
@@ -47,7 +46,6 @@ public class ClassControll extends BaseControll{
 		String className = getValue(request, "PACKAGE");
 		List<?> list = null;
 		
-		Cache<String> cache = new CacheMapImpl();
 		Bean bean = cache.get("/class/detail", new Bean());
 
 		String toName = className.replace('.', '-');
