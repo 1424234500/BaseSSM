@@ -3,6 +3,7 @@ package com.event.intercept;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.NDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,11 @@ public class LogInterceptors implements HandlerInterceptor{
         
         logService.exeStatis(url, params, time);
 
+        
+        NDC.pop();
+
         Context.clear();
+        
     }  
     /** 
      * 该方法在目标方法调用之后，渲染视图之前被调用； 
@@ -85,9 +90,15 @@ public class LogInterceptors implements HandlerInterceptor{
     	
         // 设置开始时间  线程绑定变量（该数据只有当前请求的线程可见）
         startTimeThreadLocal.set(System.currentTimeMillis());
+        
+        //log4j 日志栈控制
+        NDC.push(request.getRemoteAddr() + ":" + request.getRemotePort());
+
         Context.setRequest(request);
         Context.setResponse(response);
         Context.setTimeStart();
+        
+        
  
         String requestUri = request.getRequestURI();  
         String contextPath = request.getContextPath();  
@@ -100,7 +111,9 @@ public class LogInterceptors implements HandlerInterceptor{
 	        	name = handlerMethod.getMethod().getName();
 	            cla = handlerMethod.getBean().toString();
 	            cla = cla.substring(0, cla.indexOf("@"));
-        	}catch(Exception e){ }
+        	}catch(Exception e){
+        		e.printStackTrace();
+        	}
         }
         //日志 记录 输出       
 //        logger.info("++++++++ ");

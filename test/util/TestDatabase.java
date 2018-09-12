@@ -87,7 +87,7 @@ public class TestDatabase {
 
 		}
 		
-		ThreadUtil.sleep(10 * 60 * 1000 * 1000);
+		ThreadUtil.sleep(3600 * 1000);
 	}
 	
 	
