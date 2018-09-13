@@ -17,8 +17,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -44,7 +44,7 @@ public class FileControll extends BaseControll{
 		super(FileControll.class, "");
 	}
 
-	static public Logger logger = LoggerFactory.getLogger(FileControll.class); 
+	static public Logger logger = Logger.getLogger(FileControll.class); 
 	@Autowired
 	@Qualifier("fileService") 
 	protected FileService fileService;

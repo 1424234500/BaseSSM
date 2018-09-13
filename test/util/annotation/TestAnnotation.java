@@ -59,5 +59,4 @@ public class TestAnnotation {
 		throw new Exception("");
 	}
 	
-	
 }

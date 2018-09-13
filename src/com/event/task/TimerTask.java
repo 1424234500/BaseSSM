@@ -1,7 +1,6 @@
 package com.event.task;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,7 +14,7 @@ import com.service.LogService;
  */
 @Component
 public class TimerTask {
-	static public Logger logger = LoggerFactory.getLogger("TimerTask"); 
+	static public Logger logger = Logger.getLogger("TimerTask"); 
 	
 	@Scheduled(cron = "0 59 23 ? * *") //每天
 	public void EveryDay() {

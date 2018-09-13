@@ -20,7 +20,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import util.cache.Cache;
-import util.cache.CacheFactory;
+import util.cache.CacheMgr;
 
 /**
  * 
@@ -28,7 +28,7 @@ import util.cache.CacheFactory;
  *
  */
 public class ClassUtil {
-	public static Cache<String> cache = CacheFactory.getInstance();
+	public static Cache<String> cache = CacheMgr.getInstance();
 	final static String CACHE_KEY = "class-load-cache";
 	/**
 	 * 加载类
@@ -67,7 +67,7 @@ public class ClassUtil {
 			constructor.setAccessible(true);
 			res = constructor.newInstance(constructorArgs);
 		} catch (Exception e){
-			out("反射[" + cls.getName() + ".构造]" + Arrays.toString(constructorArgs) + e.toString());
+			out("反射[" + cls + ".构造]" + Arrays.toString(constructorArgs) + e.toString());
 		}
 		return res;
 	}
@@ -90,7 +90,7 @@ public class ClassUtil {
 				//查询自己private函数
 				method = cls.getDeclaredMethod(methodName, args);
 			} catch (Exception e) {
-				out("加载类" + cls.getName() + " 方法" + methodName + " 异常" + e.toString());
+				out("加载类" + cls + " 方法" + methodName + " 异常" + e.toString());
 			}
 		}
 		return method;

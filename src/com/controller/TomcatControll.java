@@ -1,7 +1,6 @@
 package com.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,21 +8,15 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.service.StudentService;
 
 import util.Bean;
 import util.JsonUtil;
 import util.MapListUtil;
 import util.Tools;
 import util.cache.Cache;
-import util.cache.CacheFactory;
+import util.cache.CacheMgr;
 
 /** 
  * Tomcat监控后台
@@ -38,7 +31,7 @@ public class TomcatControll extends BaseControll{
 		super(TomcatControll.class, "");
 	}
 	
-	Cache<String> cache =  CacheFactory.getInstance();
+	Cache<String> cache =  CacheMgr.getInstance();
 	
 	/**
 	 * 缓存监控 map实现

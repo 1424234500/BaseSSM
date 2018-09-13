@@ -28,10 +28,10 @@ public class Dao {
 	
 	private Boolean boolAutoClose = true;
 	public Dao(){
-		this.pool = PoolFactory.getInstance();
+		this.pool = PoolMgr.getInstance();
 	}
 	public Dao(TypePool type){
-		this.pool = PoolFactory.getInstance(type);
+		this.pool = PoolMgr.getInstance(type);
 	}
 	public void setDs(String dsName){
 		this.dsName = dsName;

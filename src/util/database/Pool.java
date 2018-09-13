@@ -8,7 +8,7 @@ import java.util.Map;
 
 import util.ClassUtil;
 import util.cache.Cache;
-import util.cache.CacheFactory;
+import util.cache.CacheMgr;
 
 /**
  * 连接接口
@@ -45,7 +45,7 @@ abstract class Pool {
 	 */
 	protected static String defaultDsName;
 	static {
-		Cache<String> cache = CacheFactory.getInstance();
+		Cache<String> cache = CacheMgr.getInstance();
 		Map<String, Object> jdbc = cache.get("jdbc");
 		if(jdbc == null || jdbc.size() == 0){
 			throw new RuntimeException("jdbc数据源配置异常 未配置?");

@@ -2,9 +2,8 @@ package com.event.intercept;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -20,7 +19,7 @@ import com.service.LogService;
  *
  */
 public class LoginInterceptors implements HandlerInterceptor{  
-	static public Logger logger = LoggerFactory.getLogger("Aop"); 
+	static public Logger logger = Logger.getLogger("Aop"); 
 
 	
     /** 

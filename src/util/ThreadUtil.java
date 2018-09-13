@@ -14,7 +14,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import util.cache.CacheFactory;
+import util.cache.CacheMgr;
 import util.setting.Setting;
 
 /**
@@ -43,7 +43,7 @@ public class ThreadUtil {
 	 * @param corePoolSize 只对Fixed和Scheduled线程池起效
 	 */
 	private static ExecutorService getExecutorServiceInstance(int type) {
-		return getExecutorServiceInstance(type, CacheFactory.getInstance().get("corePoolSize", 5));
+		return getExecutorServiceInstance(type, CacheMgr.getInstance().get("corePoolSize", 5));
 	}
 	private static ExecutorService getExecutorServiceInstance(int type, final int corePoolSize) {
 	    type = type % 4;

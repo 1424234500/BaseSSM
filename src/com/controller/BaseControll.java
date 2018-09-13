@@ -9,8 +9,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +23,7 @@ import util.JsonUtil;
 import util.MapListUtil;
 import util.Tools;
 import util.cache.Cache;
-import util.cache.CacheFactory;
+import util.cache.CacheMgr;
 import util.database.SqlHelp;
 
 
@@ -45,7 +45,7 @@ public abstract class BaseControll {
 	/**
 	 * 内存缓存map
 	 */
-	Cache<String> cache = CacheFactory.getInstance();
+	Cache<String> cache = CacheMgr.getInstance();
 	
 	/**
 	 * 普通跳转模式，request获取参数，map写入参数<request.setAttrbute()>，或者request.getSession().setAttrbute()写入session
@@ -131,11 +131,11 @@ public abstract class BaseControll {
 	 */ 
 	public BaseControll(Class<?> clazz, String tableName){
 		this.tableName = tableName;
-		this.logger = LoggerFactory.getLogger(clazz);
+		this.logger = Logger.getLogger(clazz);
 	}
 	
 	private String tableName = ""; //成员变量 单例 公用 于 每个并发线程
-	private Logger logger = LoggerFactory.getLogger(BaseControll.class); //成员变量 单例 公用 于 每个并发线程
+	private Logger logger = Logger.getLogger(BaseControll.class); //成员变量 单例 公用 于 每个并发线程
 
 	/**
 	 * 实现日志打印工具

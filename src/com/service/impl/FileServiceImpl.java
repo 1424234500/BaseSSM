@@ -6,8 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +24,9 @@ import util.database.SqlHelp;
 @Service("fileService")
 public class FileServiceImpl implements FileService,Serializable {
 	private static final long serialVersionUID = 8304941820771045214L;
-	static public Logger logger = LoggerFactory.getLogger("File"); 
-
+	private static Logger logger = Logger.getLogger("File");
+	
+	
     @Autowired
     protected BaseDao baseDao;
     //info:

@@ -4,8 +4,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -19,18 +18,18 @@ import util.Bean;
 import util.MapListUtil;
 import util.Tools;
 import util.cache.Cache;
-import util.cache.CacheFactory;
+import util.cache.CacheMgr;
 
 @Service("logService")
 @Scope("prototype") 
 public class LogServiceImpl implements LogService,Serializable {
 	private static final long serialVersionUID = 8304941820771045214L;
-	static public Logger logger = LoggerFactory.getLogger(LogServiceImpl.class); 
+	static public Logger logger = Logger.getLogger(LogServiceImpl.class); 
 	final static String CACHE_KEY = "cache-url-request";
     @Autowired
     private BaseDao baseDao;    
 
-	private Cache<String> cache = CacheFactory.getInstance();
+	private Cache<String> cache = CacheMgr.getInstance();
     
     
     //info:

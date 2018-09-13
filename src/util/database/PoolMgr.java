@@ -2,16 +2,16 @@ package util.database;
 
 import java.util.EnumMap;
 
-import util.cache.CacheFactory;
+import util.cache.CacheMgr;
 
 /**
  * 连接池 管理器
  * 管理多种连接池
  *
  */
-class PoolFactory{
+class PoolMgr{
 
-	private PoolFactory() {
+	private PoolMgr() {
 	}
 	private static EnumMap<TypePool, Pool> connMap;
 	static {

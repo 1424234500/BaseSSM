@@ -2,13 +2,18 @@ package util.annotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import util.ClassUtil;
-import util.Tools;
 
 /**
  * 注解扫描处理器工具 抽离出目标注解(Class, Method, Field)的处理实现 支持处理链? 一次扫描 所有注解全部处理 只处理本项目下的注解
@@ -29,18 +34,69 @@ public class TrackerUtil {
 				new Tracker(UseCase.class, ElementType.METHOD,  new UseCaseTracker()),
 				new Tracker(Test.class, ElementType.METHOD,  new TestTracker()),
 		};
-		TrackerUtil.make("", trackerClass, trackerField, trackerMethod);
+
+		Tracker[][] trackerAll = { trackerClass, trackerField, trackerMethod }; //分层
+		TrackerUtil.make("", trackerAll);
 	}
 	
 	
+	/**
+	 * 默认扫描util.annotation包 找出所有的 注解定义 和 注解处理器  快捷初始化tracker
+	 */
+	public static Tracker[][] scan(String clsPackage){
+		EnumMap<ElementType, Set<Tracker>> map = new EnumMap<>(ElementType.class);
+		map.put(ElementType.TYPE, new HashSet<Tracker>());
+		map.put(ElementType.METHOD, new HashSet<Tracker>());
+		map.put(ElementType.FIELD, new HashSet<Tracker>());
+		
+		clsPackage = clsPackage == null || clsPackage.length() == 0 ? "util.annotation" : clsPackage;
+		List<String> classs = ClassUtil.getPackageClass(clsPackage, false);
+		for (String item : classs) { // 按照 包名 类 深度(class->field->method)优先 处理
+//			Tools.out(item);
+			Class<?> cls = ClassUtil.loadClass(item);
+			if (cls == null)
+				continue;
+			//取出这两个注解修饰  判定是否是一个 注解定义
+			//@Target(ElementType.TYPE)
+			//@Retention(RetentionPolicy.RUNTIME)
+			Annotation targetAnno = cls.getAnnotation(Target.class); 
+			if (targetAnno != null){
+				Target target = (Target)targetAnno;
+				ElementType[] et = target.value(); //Field Method Type
+				String clsName = cls.getName(); 				//util.annotation.DBTable
+				String trackerClsName = clsName + "Tracker";	//util.annotation.DBTableTracker
+				Object makerObj = ClassUtil.newInstance(trackerClsName);
+				//new Tracker(UseCase.class, ElementType.METHOD,  new UseCaseTracker()),
+				if(makerObj != null){
+					OnAnnotation maker = (OnAnnotation) makerObj;
+					for(ElementType type : et){
+						map.get(type).add(new Tracker((Class<? extends Annotation>) cls, type, maker));
+					}
+					
+				}
+				
+			}
+			
+			
+		}
+		
+		return new Tracker[][]{
+			map.get(ElementType.TYPE).toArray(new Tracker[0]), 
+			map.get(ElementType.METHOD).toArray(new Tracker[0]),
+			map.get(ElementType.FIELD).toArray(new Tracker[0]), 
+		};
+	}
 	
-	
-	public static void make(String clsPackage, Tracker[] trackerClass, Tracker[] trackerField, Tracker[] trackerMethod) {
+	/**
+	 * 把注解对应的处理器调用处理 分为三级层次 
+	 * @param clsPackage
+	 * @param trackerClass
+	 * @param trackerField
+	 * @param trackerMethod
+	 */
+	public static void make(String clsPackage, Tracker[][] trackerAll) {
 		// 获取所有class文件列表 可配置包名 来限定扫描控制
 		List<String> classs = ClassUtil.getPackageClass("", true);
-		
-		// 注解 定义-处理器
-		Tracker[][] trackerAll = { trackerClass, trackerField, trackerMethod }; //分层
 		
 		
 		// 判断class包含注解列表 匹配 待处理列表

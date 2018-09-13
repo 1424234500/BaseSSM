@@ -16,16 +16,6 @@ import util.Tools;
 
 public class TestTracker implements OnAnnotation{
 	
-	public static void main(String[] argv){
-		Tracker[] trackerClass = {
-		};
-		Tracker[] trackerField = {
-		};
-		Tracker[] trackerMethod = {
-				new Tracker(Test.class, ElementType.METHOD,  new TestTracker()),
-		};
-		TrackerUtil.make("util.annotation.TestAnnotation", trackerClass, trackerField, trackerMethod);
-	}
 	@Override
 	public Status make(Annotation annotation, ElementType type, Object object, Class<?> cls) {
 //		Tools.out(this, annotation, type, object);

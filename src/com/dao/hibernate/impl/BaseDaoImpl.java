@@ -14,8 +14,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.jdbc.Work;
 import org.hibernate.transform.Transformers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -26,7 +26,7 @@ import com.dao.hibernate.BaseDao;
  
 @Repository("baseDao")
 public class BaseDaoImpl implements BaseDao  {
-	static public Logger logger = LoggerFactory.getLogger("Hibernate"); 
+	static public Logger logger = Logger.getLogger("Hibernate"); 
 	public void out(String str){
 		logger.info(str);
 	}

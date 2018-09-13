@@ -8,9 +8,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -156,7 +155,7 @@ public class AngularControll extends BaseControll{
 		echo(list);
 	} 
 	
-	static public Logger logger = LoggerFactory.getLogger(AngularControll.class); 
+	static public Logger logger = Logger.getLogger(AngularControll.class); 
 
 	@Override
 	public void log(Object... objs) {

@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import util.annotation.TrackerMgr;
+
 public class TestTools {
 
 	public TestTools(){}
@@ -34,12 +36,15 @@ public class TestTools {
 //			System.out.println(str);
 		}
 	}
-	
+	@Test
 	public void testSeria(){
-java.util.HashMap map = new java.util.HashMap();
-util.SerializeUtil.serialize(map);
+		java.util.HashMap map = new java.util.HashMap();
+		util.SerializeUtil.serialize(map);
 	}
-	
+	@Test
+	public void testAnnoStart(){
+		TrackerMgr.start();
+	}
 	
 	
 	

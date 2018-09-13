@@ -6,7 +6,7 @@ public class TestCacheFactory{
 
 	@Test
 	public void test(){
-		CacheFactory.getInstance();
+		CacheMgr.getInstance();
 	}
 	
 	
