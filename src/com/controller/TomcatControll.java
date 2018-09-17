@@ -74,10 +74,6 @@ public class TomcatControll extends BaseControll{
 		Bean res = cache.findCacheList(map);
 		page.setNUM(res.get("size", 0));
 		res.put("page", page);
-		res.put("33", "ddd" + String.valueOf('\33') + "fff");
-		res.put("34", "ddd" + String.valueOf('\34') + "fff");
-		res.put("35", "ddd" + String.valueOf('\35') + "fff");
-		res.put("36", "ddd" + String.valueOf('\36') + "fff");
 		echo(res);
 	}
 

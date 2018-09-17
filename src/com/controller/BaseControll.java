@@ -98,6 +98,13 @@ public abstract class BaseControll {
 	public void echo(boolean flag, String info) throws IOException{
 		echo(flag, info, "");
 	}
+	public static char[] asciiNo = null;
+	static {
+		asciiNo = new char[32];
+		for(int i = 0; i < 32; i++){
+			asciiNo[i] = (char)i;
+		}
+	}
 	public void echo(boolean flag, String info, Object data) throws IOException{
 		HttpServletResponse response = Context.getResponse();
 		long timestart = Context.getTimeStart();
@@ -111,6 +118,7 @@ public abstract class BaseControll {
 				.put("time", time)
 				.put("data", data);
 		String jsonStr = (JsonUtil.makeJson(bean));
+		jsonStr = jsonStr.replace("[\\x00-\\x1f]+", "");
 		response.getWriter().write( jsonStr );
 	}
 	
