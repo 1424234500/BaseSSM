@@ -23,28 +23,28 @@ public class RestfulControll extends BaseControll{
 	}
 
 	@RequestMapping(value="/make.do/{id}",method=RequestMethod.GET)
-	public void get(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException{
+	public void get(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException{
 	    echo(baseService.findOne("select * from student where id=? ", id));
 	}
 
 	@RequestMapping(value="/make.do",method=RequestMethod.POST) //, produces = "application/json")
-	public void get(HttpServletRequest request, HttpServletResponse response) throws IOException{
-		String id = getValue(request, "id");
-		String name = getValue(request, "name");
-		String time = getValue(request, "time");
-		echo(baseService.executeSql("insert into student values(?,?,?)", id, name, time));
+	public void post(HttpServletRequest request, HttpServletResponse response) throws IOException{
+		String id = getValue(request, "ID");
+		String name = getValue(request, "NAME");
+		String time = getValue(request, "TIME");
+		echo(baseService.executeSql("insert into student(id,name) values(?,?)", id, name));
 	}
 	
 	@RequestMapping(value="/make.do",method=RequestMethod.PUT)
 	public void put(HttpServletRequest request, HttpServletResponse response) throws IOException{
-		String id = getValue(request, "id");
-		String name = getValue(request, "name");
-		String time = getValue(request, "time");
-		echo(baseService.executeSql("update student set id=?,name=?,time=? where id=? ", id, name, time, id));
+		String id = getValue(request, "ID");
+		String name = getValue(request, "NAME");
+		String time = getValue(request, "TIME");
+		echo(baseService.executeSql("update student set id=?,name=? where id=? ", id, name, id));
 	}
 
 	@RequestMapping(value="/make.do/{id}",method=RequestMethod.DELETE)
-	public void delete(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException{
+	public void delete(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException{
 	    echo(baseService.findOne("delete from student where id=? ", id));
 	}
 

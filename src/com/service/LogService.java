@@ -1,15 +1,15 @@
 package com.service;
 
-import java.util.List;
-import java.util.Map;
-
-import com.controller.Page;
-
+import org.apache.log4j.Logger;
 
 /**
  * 日志管理
  */
 public interface LogService  {
+	Logger logger = Logger.getLogger(LogService.class); 
+	String CACHE_KEY = "cache-url-request";
+	
+	
 	//登陆用户操作 记录
 	public void userMake(String userid, String url, String ip, String host, int port, String params);
 	//所有请求时间花费 统计 redis

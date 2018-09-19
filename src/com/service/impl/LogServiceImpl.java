@@ -24,8 +24,6 @@ import util.cache.CacheMgr;
 @Scope("prototype") 
 public class LogServiceImpl implements LogService,Serializable {
 	private static final long serialVersionUID = 8304941820771045214L;
-	static public Logger logger = Logger.getLogger(LogServiceImpl.class); 
-	final static String CACHE_KEY = "cache-url-request";
     @Autowired
     private BaseDao baseDao;    
 
