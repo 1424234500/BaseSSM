@@ -22,7 +22,7 @@ public class RestfulControll extends BaseControll{
 
 	}
 
-	@RequestMapping(value="/make.do/{id}",method=RequestMethod.GET)
+	@RequestMapping(value="/{id}/make.do",method=RequestMethod.GET)
 	public void get(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException{
 	    echo(baseService.findOne("select * from student where id=? ", id));
 	}
@@ -43,9 +43,9 @@ public class RestfulControll extends BaseControll{
 		echo(baseService.executeSql("update student set id=?,name=? where id=? ", id, name, id));
 	}
 
-	@RequestMapping(value="/make.do/{id}",method=RequestMethod.DELETE)
+	@RequestMapping(value="/{id}/make.do",method=RequestMethod.DELETE)
 	public void delete(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException{
-	    echo(baseService.findOne("delete from student where id=? ", id));
+	    echo(baseService.executeSql("delete from student where id=? ", id));
 	}
 
     
