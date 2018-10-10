@@ -1,8 +1,6 @@
 package util.cache;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,12 +47,12 @@ public interface Cache<K> {
      * 全量添加map作为缓存key-value
      */
 //    <K,V> void putAll(Map<?,?> m); 
-	void putAll(Map map);
+	void putAll(Map<?, ?> map);
 
     /**
      * 全量获取缓存key-value
      */
-    Map getAll();
+    Map<?, ?> getAll();
     
     void clear();
     /**
@@ -68,11 +66,11 @@ public interface Cache<K> {
    
     <V> V get(K key);
     <V> V get(K key, V defaultValue);
-    <V> Cache put(K key, V value);
+    <V> Cache<?> put(K key, V value);
     /**
      * 缓存时间
      */
-    <V> Cache put(K key, V value, long expiry);
+    <V> Cache<?> put(K key, V value, long expiry);
 
     /**
      *  map1.list1[01].map2 

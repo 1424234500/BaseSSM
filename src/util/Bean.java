@@ -1,8 +1,5 @@
 package util;
-//import java.util.a
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,6 +8,9 @@ import java.util.Map;
  * 2018年7月13日
  */
 public class Bean extends HashMap{ 
+	private static final long serialVersionUID = 1L;
+
+
 	public static Bean getBean(){
 		return new Bean();
 	}
@@ -25,7 +25,7 @@ public class Bean extends HashMap{
      * 构造体方法，直接初始化Bean
      * @param values    带数据信息
      */
-    public Bean(Map values) {
+    public Bean(Map<?, ?> values) {
         super(values);
     }
 
@@ -63,36 +63,15 @@ public class Bean extends HashMap{
      * @param def 缺省对象
      * @return 对象值
      */ 
+	@SuppressWarnings("unchecked")
 	public <T> T get(Object key, T defaultValue){
 		Object obj = get(key);
-		T res = null;
 //		匹配大小写命名
 //		if(obj == null)obj = get(key.toString().toLowerCase());
 //		if(obj == null)obj = get(key.toString().toUpperCase());
 
-		if(obj == null) {
-			res = defaultValue;
-		}else{
-			if(key.getClass().isInstance(defaultValue)){
-				
-			}
-			if (defaultValue instanceof String) {
-				res = (T)(obj.toString());
-			} else if (obj instanceof String) { 
-				if (defaultValue instanceof Integer) {
-					res = (T)(new Integer(Tools.parseInt(obj.toString(), (Integer)defaultValue)));
-				} else if (defaultValue instanceof Double) {
-					res = (T)(new Double(Tools.parseDouble(obj.toString(), (Double)defaultValue)));
-				} else if (defaultValue instanceof Long) {
-					res = (T)(new Long(Tools.parseLong(obj.toString(), (Long)defaultValue)));
-				}else{
-					res = (T)obj;
-				}
-			}else{
-				res = (T)obj;
-			}
-		}
-
+		T res = LangUtil.turn(obj, defaultValue);
+		
 		return res;
 	}
     
@@ -149,28 +128,6 @@ public class Bean extends HashMap{
        } else {
            putAll(bean);
        }
-   }
-
-
-   public static void main(String[] argc){
-	   Bean bean = Bean.getBean().put("key1", "v1").put("key2", "v2");
-	   List<String> list = new ArrayList<>();
-	   list.add("aaa");
-	   list.add("bbb");
-	   Bean bean1 = Bean.getBean().put("key1", "v1").put("key2", "v2")
-			   .put("bean", bean)
-			   .put("list", list)
-			   ;
-	   
-	   Tools.out(bean);
-	   Tools.out(bean.get("key1",""));
-	   Tools.out(bean.get("key3",new HashMap()));
-	   Tools.out(bean1);
-	   Tools.out(bean1.get("bean",new HashMap()));
-	   Tools.out(bean1.get("list"));
-	   Tools.out(bean1.get("list2"));
-	   
-	   
    }
 
 

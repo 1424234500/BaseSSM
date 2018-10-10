@@ -61,7 +61,7 @@ public class Dao {
 	}
 
 	private void out(Object...objects) {
-		if (false) {
+		if (true) {
 			Tools.out(this, objects);
 		}
 	}

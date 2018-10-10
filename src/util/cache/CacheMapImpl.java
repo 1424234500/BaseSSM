@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.controller.Page;
 
 import util.Bean;
+import util.LangUtil;
 import util.MapListUtil;
 import util.SortUtil;
 import util.Tools;
@@ -119,7 +120,7 @@ class CacheMapImpl implements Cache<String> {
 		if(containsKey(key)){
 			Index index = mapIndex.get(key);
 			index.count += 1;
-			return (V)map.get(key);
+			return (V)(LangUtil.turn(map.get(key), defaultValue));
 		}
 		return defaultValue;
 	}

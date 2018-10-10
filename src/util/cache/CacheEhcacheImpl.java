@@ -2,7 +2,6 @@ package util.cache;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +14,7 @@ import com.controller.Page;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import util.Bean;
+import util.LangUtil;
 import util.SortUtil;
 import util.Tools;
 
@@ -109,7 +109,7 @@ class CacheEhcacheImpl implements Cache<String> {
 		V res = defaultValue;
 		Element ele = cache.get(key);
 		if(ele != null){
-			res = (V) ele.getObjectKey();
+			res = (V) (LangUtil.turn(ele.getObjectKey(), defaultValue));
 		}
 		return res;
 	}

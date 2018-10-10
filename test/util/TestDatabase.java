@@ -1,8 +1,5 @@
 package util;
 
-import java.sql.Connection;
-import java.util.*;
-
 import org.junit.Test;
 
 import util.database.Dao;
@@ -75,7 +72,7 @@ public class TestDatabase {
 		}
 		
 		
-		for(int i = 0; i < 40; i++){
+		for(int i = 0; i < 1; i++){
 			ThreadUtil.execute(
 				new Runnable(){
 					public void run(){
