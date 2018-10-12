@@ -13,7 +13,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.controller.LoginControll;
-import com.controller.WebHelp;
 import com.mode.LoginUser;
 import com.service.LogService;
 import com.service.LoginService;
@@ -21,6 +20,7 @@ import com.service.impl.LoginServiceImpl;
 
 import util.Bean;
 import util.MD5;
+import util.WebHelp;
 import util.cache.Cache;
 
 /**

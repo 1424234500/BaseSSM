@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,6 +24,7 @@ import util.Bean;
 import util.JsonUtil;
 import util.MapListUtil;
 import util.Tools;
+import util.WebHelp;
 import util.cache.Cache;
 import util.cache.CacheMgr;
 import util.database.SqlHelp;
@@ -169,14 +172,28 @@ public abstract class BaseControll {
 		List<Object> res = baseService.getColumns(tableName); 
 		return WebHelp.getParam(request, res);
 	}
+	/**
+	 * 获取request key 兼容大小写
+	 */
 	public String getValue(HttpServletRequest request, String key) {
 		return WebHelp.getKey(request, key);
 	}
+	
+	/**
+	 * 站内跳转 jsp || servlet
+	 */
+	public void sendDispatcher(HttpServletRequest request, HttpServletResponse response, String url) {
+		WebHelp.sendDispatcher(request, response, url);
+	}
+	/**
+	 * 重定向
+	 * @throws IOException 
+	 */
+	public void sendRedirect(HttpServletRequest request, HttpServletResponse response, String url) throws IOException {
+		WebHelp.sendRedirect(response, url);
+	}
 	/**
 	 * 获取表键名
-	 * @param request
-	 * @return
-	 * @throws Exception
 	 */
 	public String getTableKeyName(HttpServletRequest request) throws Exception{
 		String tableName = getTableName();
@@ -229,7 +246,7 @@ public abstract class BaseControll {
 	public void add(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		this.beforeDo(request, response);
 
-		Map map = this.getTableParam(request);
+		Map<?, ?> map = this.getTableParam(request);
 		int count = baseService.executeSql("insert into " + getTableName() + "(" + SqlHelp.makeMapKeys(map) + ") values(" + SqlHelp.makeMapPosis(map) + ")  ", map.values().toArray());
 		echo(count);
 	}
@@ -257,7 +274,7 @@ public abstract class BaseControll {
 		String key = this.getTableKeyName(request);
 		String value = this.getValue(request, key);
 		
-		Map map = baseService.findOne("select * from " + getTableName() + " where " + key + "=?", value);
+		Map<?, ?> map = baseService.findOne("select * from " + getTableName() + " where " + key + "=?", value);
 		echo(map);
 	}
 	
@@ -282,7 +299,6 @@ public abstract class BaseControll {
 	}
 	void beforeDo(HttpServletRequest request, HttpServletResponse response) {
 		String tableName = this.getValue(request, "TABLE_NAME");
-
 	}
 	
 

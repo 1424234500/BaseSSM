@@ -17,6 +17,7 @@ import com.service.FileService;
 
 import util.FileUtil;
 import util.Fun;
+import util.LangUtil;
 import util.MapListUtil;
 import util.Tools;
 import util.database.SqlHelp;
@@ -87,7 +88,8 @@ public class FileServiceImpl implements FileService,Serializable {
 		String type = FileUtil.getFileType(name);
 		String changetime = Tools.formatL(new Date(file.lastModified()));
 		about = Tools.cutString(about, 500);
-		String key = baseDao.getString("select SEQ_fileinfo.Nextval from dual");
+//		String key = baseDao.getString("select SEQ_fileinfo.Nextval from dual");
+		String key = LangUtil.getUUID();
 		int res = baseDao.executeSql("insert into fileinfo"
 				+ "(id,                   uptime, name,filesize,  type,path,changetime               ,about,upuserid ) values "
 				+ "(?, sysdate,?    ,?      ,  ?   ,?    ,"+ SqlHelp.to_dateL() +",?, ?   ) "

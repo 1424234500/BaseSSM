@@ -49,7 +49,7 @@ public class FileControll extends BaseControll{
 	@Qualifier("fileService") 
 	protected FileService fileService;
 	
-	static int cacheSize = 512;
+	static int cacheSize = 4096;
 	
 	@RequestMapping("/fileCols.do")
 	public void fileCols(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -72,7 +72,7 @@ public class FileControll extends BaseControll{
 		if(type == 1){ //若是文件夹
 			echo( FileUtil.ls(dir));
 		}else if(type == 0){ //文件
-			this.down(request, response);
+			this.download(request, response);
 		}
 	} 
 	
@@ -169,26 +169,44 @@ public class FileControll extends BaseControll{
 		echo( map);	
 	}
 	 /**  
-     * 文件下载功能  
-     * @param request  
-     * @param response  
-     * @throws Exception  
+     * 文件下载
+     * path 若有则按照path下载
+     * key  则按照key 映射path下载
+     * 
      */  
     @RequestMapping("/download.do")  
-    public void down(HttpServletRequest request,HttpServletResponse response) throws Exception{  
+    public void download(HttpServletRequest request,HttpServletResponse response) throws Exception{  
     	long starttime = System.currentTimeMillis();
 
-		String path = request.getParameter("path");
+    	String path = getValue(request, "path");
+    	String key = getValue(request, "key");
+    	
 //		String path1 = new String(path.getBytes("iso-8859-1"), "gbk");
 //		String path3 = URLDecoder.decode(path, "utf-8");
 //		String path4 = URLDecoder.decode(path);
 		path = new String(path.getBytes("iso-8859-1"), "utf-8");
-		
-		
-		if(path == null || FileUtil.check(path) != 0){
+		Boolean res = false;
+		String info = "";
+		if(key.length() > 0){ //key 映射 path 方式
+			Map<String, Object> map = baseService.findOne("select * from fileinfo where id=?", key);
+			path = MapListUtil.getMap(map, "ID", "");
+		}
+		if(path.length() > 0){ //处理path分析文件
+			int type = FileUtil.check(path);
+			if(type == 1){
+				info = path + " 是文件夹";
+			}else if(type == 0){
+				info = path + " 存在";
+				res = true;
+			}else{
+				info = path + " 不存在";
+			}
+		}
+		if(!res){
+			echo(res, info);
 			return;
 		}
-			
+		
 		String name = FileUtil.getFileName(path);
         name = URLEncoder.encode(name,"UTF-8");      //转码，免得文件名中文乱码  
         //设置文件下载头  
@@ -231,6 +249,15 @@ public class FileControll extends BaseControll{
         
        
     }  
+    
+    /**
+     * 上传文件
+     * 存入文件系统 path路径
+     * 
+     * 生产key 存入数据库映射路径和key
+     * 序列 返回key
+     * 
+     */
 	@RequestMapping(value="/upload.do",method=RequestMethod.POST)
     public void upload(HttpServletRequest request,  PrintWriter pw) throws IOException{
 		long starttime = System.currentTimeMillis();
@@ -249,7 +276,8 @@ public class FileControll extends BaseControll{
         String dir = Tools.notNull(uppath) ? uppath : UtilTools.getUploadDir();
         String path = dir + File.separator + newName;
         FileOutputStream out = new FileOutputStream(path);
-        int res = 0; 
+        boolean res = false; 
+        String key = "";
 //      fos.write(file.getBytes());
         InputStream in = null;
         try {    
@@ -268,10 +296,10 @@ public class FileControll extends BaseControll{
             long deta = endtime - starttime;//下载写入耗时deta 大小size 名字name 路径path
             //记录文件上传下载情况 并打印
             // id,fileid,type(up/down),costtime(ms),time
-            String key = fileService.upload(getUser().getId(), name, path, ""); 
-            res = key.equals("0")?0:1;
-            log("up file", name, path, Tools.calcTime(deta) , Tools.calcSize(size));
+            key = fileService.upload(getUser().getId(), name, path, ""); 
+            res = key.equals("0");
 
+            log("up file", name, path, Tools.calcTime(deta) , Tools.calcSize(size));
             fileService.fileUpDown(key, "up", deta+""); 
         } catch (Exception e1) {  
             e1.printStackTrace();  
@@ -286,7 +314,7 @@ public class FileControll extends BaseControll{
             }  
         }  
         
-        echo(res);
+        echo(res, key, path);
     }
 	
 	

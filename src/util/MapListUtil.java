@@ -186,6 +186,8 @@ public class MapListUtil {
 	}
 
 	public static <T> T getMap(Map map, Object key, T defaultValue){
+		if(map == null) return defaultValue;
+		
 		Object obj = map.get(key);
 		T res = null;
 		if(obj == null)obj = map.get(key.toString().toLowerCase());
