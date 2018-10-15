@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import util.Bean;
 import util.ClassUtil;
-import util.cache.Cache;
-import util.cache.CacheMgr;
 
 
 @Controller

@@ -330,70 +330,11 @@ class CacheEhcacheImpl implements Cache<String> {
 		return res;
 	}
 	
-	public static void main(String[] argv){
-		Cache<String> cache = new CacheEhcacheImpl();
-		Bean bean1 = Bean.getBean().put("b1", "bk1").put("b2", "bk2");
-		cache.clear();
-		Tools.out(cache.keySet(), cache.getAll());
-		cache.put("str01", "000", 3600 * 1000);
-		cache.put("map", bean1);
-		Tools.out(cache.keySet(), cache.getAll());
-		List<Object> list = new ArrayList<>();
-		list.add("str02");
-		list.add(22);
-		list.add(bean1);
-		
-//		cache.put("map1", bean1, 3600 * 1000);
-		cache.put("list", list, 3600 * 1000);
-		Tools.out(cache.keySet(), cache.getAll());
-
-		Tools.out(cache.findCacheList(new Bean()));
-//		cache.put("str01", "001", 60 * 1000);
-//		cache.put("str02", "000", 100);
-//		cache.put("str03", "000", 10);
-//		cache.put("str04", "000", 1);
-//		cache.put("mmm.bbb", "000", 1);
-//		cache.put("map", Bean.getBean().put("b1", "bk1").put("b2", "bk2"), 186 * 1000);
-//		List<Object> list = new ArrayList<>();
-//		list.add("list str1");
-//		list.add("list str2");
-//		list.add(Bean.getBean().put("b1", "bk1").put("b2", "bk2"));
-//		list.add(Bean.getBean().put("listStr", "bk1").put("listMap", Bean.getBean().put("listMapStr", "bk1").put("b2", "bk2")));
-//		cache.put("list", list, 186 * 1000);
-//		
-//		for(int i = 0; i < 100; i ++){
-//			cache.get(cache.keySet().toArray()[(int) (Math.random() * cache.keySet().size())]);
-//		}
-//		
-		
-//		Tools.out("--------------全");
-//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "")).get(key));
-//		Tools.out("--------------基本数据");
-//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "str01")));
-//		Tools.out("--------------map");
-//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "map")));
-//		Tools.out("--------------list");
-//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "list")));
-//		Tools.out("--------------list[099]不存在");
-//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "list[099]")));
-//		Tools.out("--------------list[03]存在");
-//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "list[03]")));
-//
-//		Tools.out("--------------list[03].listMap");
-//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "list[03].listMap")));
-
-//		Tools.out("--------------list[03].listMap.listMapStr");
-//		Tools.formatOut(cache.findCacheList(new Bean().put("URL", "list[03].listMap.listMapStr")));
-//		String str = "..aaa.bbb.ccc.";
-//		Tools.out(str.split("\\."));
-//		
-//		Tools.out(MapListUtil.getMapUrl(cache.getAll(), "list[03].listMap"));
-//		Tools.out(MapListUtil.getMapUrl(cache.getAll(), "list[03].listMap.listMapStr"));
-//		
-	}
-	
 	private void out(Object...objects){
 		Tools.out(objects);
 	}
-
+	@Override
+	public CacheType getType() {
+		return CacheType.EHCACHE;
+	}
 }

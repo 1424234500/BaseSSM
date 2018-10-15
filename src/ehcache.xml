@@ -15,22 +15,22 @@
 		diskPersistent="false" statistics="true"
 		diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU">
 		<terracotta clustered="false" />
-	<cacheEventListenerFactory
-	class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
-	properties="replicateAsynchronously=true, replicatePuts=false, replicateUpdates=false,
-	replicateUpdatesViaCopy=false, replicateRemovals=true "/>
+		<cacheEventListenerFactory
+			class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+			properties="replicateAsynchronously=true, replicatePuts=false, replicateUpdates=false,
+			replicateUpdatesViaCopy=false, replicateRemovals=true "/>
 	</defaultCache>
 
 	<!-- OAUTH2单点登录access_token缓存
-	<cache name="OAUTH2_CACHE" maxElementsInMemory="2000000"
-		eternal="false" overflowToDisk="false" timeToIdleSeconds="60"
-		timeToLiveSeconds="600" memoryStoreEvictionPolicy="LFU">
-		<cacheEventListenerFactory
-		class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
-		properties="replicateAsynchronously=false, replicatePuts=true, replicateUpdates=true,
-		replicateUpdatesViaCopy=true, replicateRemovals=true "/>
-	</cache>
-	-->
+		<cache name="OAUTH2_CACHE" maxElementsInMemory="2000000"
+			eternal="false" overflowToDisk="false" timeToIdleSeconds="60"
+			timeToLiveSeconds="600" memoryStoreEvictionPolicy="LFU">
+			<cacheEventListenerFactory
+			class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+			properties="replicateAsynchronously=false, replicatePuts=true, replicateUpdates=true,
+			replicateUpdatesViaCopy=true, replicateRemovals=true "/>
+		</cache>
+		-->
 	<!-- 集群环境 RMI同步设置 --> 
 	<cacheManagerPeerProviderFactory
 		class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"

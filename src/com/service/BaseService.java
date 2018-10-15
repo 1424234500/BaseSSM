@@ -18,7 +18,7 @@ public interface BaseService {
 	/**
 	 * 查询列名字集合List<String>
 	 */
-	public List findColumns(String sql);
+	public List<Object> findColumns(String sql);
 
 	/**
 	 * 查询结果集合

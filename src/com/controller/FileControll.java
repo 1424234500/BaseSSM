@@ -63,7 +63,7 @@ public class FileControll extends BaseControll{
 		
 
 		if( ! Tools.notNull(dir)){
-			dir = UtilTools.getUploadDir();
+			dir = Context.getUploadDir();
 		}
 		if( Tools.notNull(newdir, name)){
 			FileUtil.mkdir(dir + File.separator + name);
@@ -117,7 +117,7 @@ public class FileControll extends BaseControll{
 		int count = 0;
 		String info = "";
 		if(Tools.notNull(path)){
-			if(path.startsWith(UtilTools.getUploadDir())){
+			if(path.startsWith(Context.getUploadDir())){
 //				count = baseService.executeSql("delete from fileinfo where path=?", path);
 				FileUtil.delete(path);
 			}else{
@@ -139,8 +139,8 @@ public class FileControll extends BaseControll{
 		int count = 0;
 		String info = "";
 		if(Tools.notNull(path)){
-			if((path+File.separator).startsWith(UtilTools.getUploadDir()) 
-					&& (oldPath).startsWith(UtilTools.getUploadDir())
+			if((path+File.separator).startsWith(Context.getUploadDir()) 
+					&& (oldPath).startsWith(Context.getUploadDir())
 					&& Tools.notNull(oldPath, path)){
 				FileUtil.mv(oldPath, path + File.separator + name);
 			}else{
@@ -266,14 +266,14 @@ public class FileControll extends BaseControll{
         MultipartFile file = mreq.getFile("file");
         String uppath = request.getParameter("path");
 
-		if(uppath.indexOf(UtilTools.getUploadDir()) != 0){
+		if(uppath.indexOf(Context.getUploadDir()) != 0){
 			echo(false, "无修改权限" + uppath);
 			return;
 		}
         
         String name = file.getOriginalFilename();
         String newName = name; // Tools.getTimeSequence() + "-" + 
-        String dir = Tools.notNull(uppath) ? uppath : UtilTools.getUploadDir();
+        String dir = Tools.notNull(uppath) ? uppath : Context.getUploadDir();
         String path = dir + File.separator + newName;
         FileOutputStream out = new FileOutputStream(path);
         boolean res = false; 

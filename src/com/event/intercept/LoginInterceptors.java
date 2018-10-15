@@ -1,25 +1,21 @@
 package com.event.intercept;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.Logger;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.controller.LoginControll;
-import com.mode.LoginUser;
 import com.service.LogService;
 import com.service.LoginService;
-import com.service.impl.LoginServiceImpl;
 
 import util.Bean;
-import util.MD5;
 import util.WebHelp;
 import util.cache.Cache;
 
@@ -69,7 +65,7 @@ public class LoginInterceptors implements HandlerInterceptor{
 	    
 		Object tokenObj = request.getSession().getAttribute("token");
 //		cache.put("USER_ONLINE", map);
-	    Map map =  cache.get(LoginService.CACHE_KEY);
+	    Map<String, Object> map =  cache.get(LoginService.CACHE_KEY, new HashMap<String, Object>());
 	    if(tokenObj != null && map != null && map.containsKey(tokenObj) ){
 	    	Bean user = (Bean) map.get(tokenObj);
 	    	

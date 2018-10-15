@@ -13,7 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.controller.Context;
-import com.controller.UtilTools;
+import com.controller.Page;
+import com.controller.Context;
 import com.dao.hibernate.BaseDao;
 import com.service.FileService;
 
@@ -38,7 +39,7 @@ public class FileServiceImpl implements FileService,Serializable {
     
 	@Override
 	public void initDirs() {
-		FileUtil.mkdir( UtilTools.getUploadDir());
+		FileUtil.mkdir( Context.getUploadDir());
 	}
     
 	@Override
@@ -48,7 +49,8 @@ public class FileServiceImpl implements FileService,Serializable {
 		
 		Long count = baseDao.count("select * from fileinfo");
 		int once = Context.getDbOnce();
-		int page = (int) Math.ceil(1.0 * count / once);
+		Page pageBean = new Page(once, count);
+		int page = pageBean.getPAGENUM();
 		while(page > 0){
 			List<Map<String, Object>> list = baseDao.findPage("select * from fileinfo", page--, once);
 			
@@ -63,12 +65,12 @@ public class FileServiceImpl implements FileService,Serializable {
 			if(sb.length() > 0){
 				sb.setLength(sb.length() - 1);
 			}
-			baseDao.executeSql("delete from fileinfo where PATH in (?) ", sb.toString());
+			baseDao.executeSql("delete from fileinfo where PATH in (" + sb.toString() + ") ");
 
 		}
 		//添加其它文件到表中 策略变更 不再扫描文件加入数据库
 		/*
-		 	List<File> lf = FileUtil.showDirAsync(UtilTools.getScanDirs(), new Fun<File>() {
+		 	List<File> lf = FileUtil.showDirAsync(Context.getScanDirs(), new Fun<File>() {
 			@Override
 			public Object make(File obj) {
 				if(obj.isFile()){

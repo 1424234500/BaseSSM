@@ -100,4 +100,6 @@ public interface Cache<K> {
      * 开启缓存
      */
     void startup();
+    
+    CacheType getType();
 }

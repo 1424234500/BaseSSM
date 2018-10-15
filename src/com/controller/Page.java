@@ -5,19 +5,25 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
 import util.Bean;
+import util.LangUtil;
 import util.Tools;
 
 @Component
 public class Page {
-	static int defaultEachPageNum = 5;
+//	static int defaultEachPageNum = 5;
 	long NUM = 0;	//总数据条数
-	int SHOWNUM = defaultEachPageNum;//每页数量
+	int SHOWNUM = Context.getShowNum();//每页数量
 	int NOWPAGE = 1;	//当前页码
 	int PAGENUM = 0;	//总页数
 	String ORDER;	//排序
 	String DESC;	//倒序 有值则倒序
+	
 	public Page(){}
 	
+	public Page(int showNum, long allNum){
+		this.SHOWNUM = showNum;
+		this.setNUM(allNum);
+	}
 	/**
 	 * 通过request获取 查询第几页 每页多少条
 	 */
@@ -63,10 +69,11 @@ public class Page {
 		return SHOWNUM;
 	}
 
-	public void setSHOWNUM(String eachPageNum) {
-		this.SHOWNUM = Tools.parseInt(eachPageNum, defaultEachPageNum);
+	public void setSHOWNUM(Object eachPageNum) {
+		int defaultShowNum = Context.getShowNum();
+		this.SHOWNUM = LangUtil.turn(eachPageNum, defaultShowNum);
 		if(this.SHOWNUM <= 0){
-			this.SHOWNUM = defaultEachPageNum;
+			this.SHOWNUM = defaultShowNum;
 		}
 	}
 
@@ -85,8 +92,8 @@ public class Page {
 		return PAGENUM;
 	}
 
-	public void setPAGENUM(String pageNum) {
-		this.PAGENUM = Tools.parseInt(pageNum);
+	public void setPAGENUM(Object pageNum) {
+		this.PAGENUM = LangUtil.turn(pageNum, 0);
 	}
 
 	public String getORDER() {

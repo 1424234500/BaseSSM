@@ -6,17 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.MapUtils;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-import util.Fun;
-import util.MapListUtil;
 import util.SerializeUtil;
 import util.Tools;
  
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class Redis   { 
 
 	public interface Fun<T>{

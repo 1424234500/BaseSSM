@@ -65,29 +65,33 @@ public class BaseDaoImpl implements BaseDao  {
 		return list;
 	}
 	  
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Map<String, Object>> find(String sql, Object... params) {
 		SQLQuery q = getCurrentSession().createSQLQuery(sql);
 		setParams(q, params);
 		return q.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
 	}
+	@SuppressWarnings("unchecked")
 	@Override
-	public Map findOne(String sql, Object... params) {
+	public Map<String, Object> findOne(String sql, Object... params) {
 		SQLQuery q = getCurrentSession().createSQLQuery("select * from (" + sql + ") where rownum <= 1 ");
 		setParams(q, params);
-		List<Map> list = q.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
-		Map res = null;
+		List<Map<String, Object>> list = q.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
+		Map<String, Object> res = null;
 		if(list != null && list.size() > 0){
 			res = list.get(0);
 		}else{
-			res = new HashMap();
+			res = new HashMap<String, Object>();
 		}
 		return res;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Map<String, Object>> findPage(String sql, int page, int rows, Object... params) {
+		page = page <= 0 ? 1 : page;
+		rows = rows <= 0 ? 2 : rows;
 		SQLQuery q = getCurrentSession().createSQLQuery(sql);
 		setParams(q, params);
 		return q.setFirstResult((page - 1) * rows).setMaxResults(rows).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
@@ -116,6 +120,7 @@ public class BaseDaoImpl implements BaseDao  {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	public List<Object> getColumns(String tableName){
 		String sql = "";
 		//oracle
@@ -127,11 +132,11 @@ public class BaseDaoImpl implements BaseDao  {
 		
 		SQLQuery q = getCurrentSession().createSQLQuery(sql);
 		setParams(q);
-		List<Map> list = q.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
+		List<Map<String, Object>> list = q.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
 		List<Object> res = new ArrayList<Object>();
 		
 		if(list != null){
-			for(Map map : list){
+			for(Map<String, Object> map : list){
 				res.add(map.get("COLUMN_NAME").toString());
 			}
 		}
