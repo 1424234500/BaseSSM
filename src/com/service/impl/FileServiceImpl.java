@@ -2,6 +2,7 @@ package com.service.impl;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.controller.Context;
 import com.controller.UtilTools;
 import com.dao.hibernate.BaseDao;
 import com.service.FileService;
@@ -41,16 +43,32 @@ public class FileServiceImpl implements FileService,Serializable {
     
 	@Override
 	public void scan() {
-		//删除表中中不存在文件的记录
-		final List<Map<String, Object>> list = baseDao.find("select * from fileinfo");
-		for(int i = 0; i < list.size(); i++){
-			File file = new File(MapListUtil.getList(list, i, "PATH"));
-			if(!file.exists()){ // || file.isDirectory()
-				baseDao.executeSql("delete from fileinfo where PATH=?", MapListUtil.getList(list, i, "PATH"));
+		//删除表中中不存在文件的记录 删除失效文件
+		//添加分页循环处理
+		
+		Long count = baseDao.count("select * from fileinfo");
+		int once = Context.getDbOnce();
+		int page = (int) Math.ceil(1.0 * count / once);
+		while(page > 0){
+			List<Map<String, Object>> list = baseDao.findPage("select * from fileinfo", page--, once);
+			
+			StringBuilder sb = new StringBuilder();
+			for(int i = 0; i < list.size(); i++){
+				String path = MapListUtil.getList(list, i, "PATH");
+				File file = new File(path);
+				if(!file.exists() || file.isDirectory() ){ //删除不存在的 或者文件夹
+					sb.append("'").append(path).append("'").append(",");
+				}
+			} 
+			if(sb.length() > 0){
+				sb.setLength(sb.length() - 1);
 			}
-		} 
-		//添加其它文件到表中
-		List<File> lf = FileUtil.showDirAsync(UtilTools.getScanDirs(), new Fun<File>() {
+			baseDao.executeSql("delete from fileinfo where PATH in (?) ", sb.toString());
+
+		}
+		//添加其它文件到表中 策略变更 不再扫描文件加入数据库
+		/*
+		 	List<File> lf = FileUtil.showDirAsync(UtilTools.getScanDirs(), new Fun<File>() {
 			@Override
 			public Object make(File obj) {
 				if(obj.isFile()){
@@ -78,6 +96,7 @@ public class FileServiceImpl implements FileService,Serializable {
 				return obj;
 			}
 		});  
+		*/
 
 	}
 

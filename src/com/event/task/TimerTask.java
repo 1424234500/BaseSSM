@@ -1,5 +1,6 @@
 package com.event.task;
 
+import org.apache.commons.logging.Log;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,11 +15,12 @@ import com.service.LogService;
  */
 @Component
 public class TimerTask {
-	static public Logger logger = Logger.getLogger("TimerTask"); 
+	static private Logger log = Logger.getLogger("TimerTask"); 
+	static private long count = 0;
 	
 	@Scheduled(cron = "0 59 23 ? * *") //每天
 	public void EveryDay() {
-	    logger.info("[eachDay 23:59][每天任务]");
+	    log.info("[eachDay 23:59][每天任务]");
 	}
 
 	
@@ -33,9 +35,9 @@ public class TimerTask {
 	
 	@Scheduled(cron = "0 0/60 * * * ?") //每小时
 	public void EveryHour() {
-	    logger.info("[eachHour 59m][每小时任务]");
+	    log.info("[eachHour 59m][每小时任务]");
 	    
-	    logger.info("扫描同步上传文件"); 
+	    log.info("扫描同步上传文件"); 
 	    //刷新上传文件集合的 文件数据到 内存数据库？ 文件管理系统 展示文件 介绍（图片），
 	    fileService.scan();
 	}
@@ -43,14 +45,18 @@ public class TimerTask {
 	
 	@Scheduled(cron = "0/60 * * * * ?") //每分钟
 	public void eachMinute() {
-//	    logger.info("[eachMinute 0/60 * * * * ?][每分钟任务]");
-//		logger.info("Redis操作记录持久化"); 
+//	    log.info("[eachMinute 0/60 * * * * ?][每分钟任务]");
+//		log.info("Redis操作记录持久化"); 
 	    //刷新redis到oracle
 	    logService.saveStatis();
-	    
+	    fileService.scan();
+
 	}
 
-
+	@Scheduled(cron = "0/10 * * * * ?") //每10s
+	public void eachMake() {
+	    log.info(count++);
+	}
 	
 	/*
 	cronExpression的配置说明，具体使用以及参数请百度google

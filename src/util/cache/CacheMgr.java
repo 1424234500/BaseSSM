@@ -3,10 +3,14 @@ package util.cache;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import util.Bean;
 import util.Call;
 import util.FileUtil;
+import util.MapListUtil;
+import util.Tools;
+import util.database.Dao;
 import util.setting.SettingUtil;
 
 /**
@@ -48,21 +52,36 @@ public class CacheMgr implements Call{
 
 	/**
 	 * 初始化cache 系统级数据 环境设置读取 词典加载 额外配置项
+	 * 1.加载配置文件
+	 * 2.加载数据库
 	 */
-
-	private static void init(Cache<?> cache) {
+	private static void init(Cache<String> cache) {
 		String classRoot = CacheMgr.class.getResource("/").getPath();
 		File dir = new File(classRoot);
-		// Tools.out(dir.getPath(), dir.getAbsolutePath(), dir.getName(),
-		// dir.getPath(),dir.list());
+		Tools.out(dir.getPath(), dir.getAbsolutePath(), dir.getName(), dir.getPath(),dir.list());
 		for (String item : dir.list()) {
 			String path = classRoot + item;
 			if (FileUtil.check(path) == 0 && path.endsWith(".properties")) {
 				cache.putAll(SettingUtil.getSetting(path));
 			}
 		}
+		
+		Dao dao = new Dao();
+		//key value info time
+		for(Map<String, Object> keyValue : dao.queryList("select * from sys_config")){
+			String key = (String) keyValue.get("KEY");
+			Object value = keyValue.get("VALUE");
+			cache.put(key, value);
+		}
 	}
-
+	
+	/**
+	 * 重装载cache
+	 */
+	public static void reload(Cache<String> cache){
+		init(cache);
+	}
+	
 	public void call(){
 		Cache<String> cache = getInstance();
 		if(cache == null) return ;

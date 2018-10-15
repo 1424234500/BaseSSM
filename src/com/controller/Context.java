@@ -6,13 +6,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
 import util.Bean;
+import util.cache.CacheMgr;
+import util.setting.SettingUtil;
 
 /**
  * 环境上下文
  *
  */
 @Component
-public class Context {
+public class Context extends ContextSystem {
+	
 	
 	private final static String STR_REQUEST = "_REQUEST_";
 	private final static String STR_RESPONSE = "_RESPONSE_";
