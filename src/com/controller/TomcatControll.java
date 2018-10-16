@@ -15,7 +15,7 @@ import util.Bean;
 import util.JsonUtil;
 import util.MapListUtil;
 import util.Tools;
-import util.WebHelp;
+import util.RequestUtil;
 import util.cache.Cache;
 import util.cache.CacheMgr;
 
@@ -39,7 +39,7 @@ public class TomcatControll extends BaseControll{
 	 */
 	@RequestMapping("/addCacheMap.do") 
 	public void addCacheMap(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Bean args = WebHelp.getParam(request, new String[]{"URL", "KEY", "VALUE", "EXPIRE", "TYPE"});
+		Bean args = RequestUtil.getParam(request, new String[]{"URL", "KEY", "VALUE", "EXPIRE", "TYPE"});
 		String url = args.get("URL", "");
 		String key = args.get("KEY", "");
 		Object value = args.get("VALUE", new Bean());
@@ -58,8 +58,8 @@ public class TomcatControll extends BaseControll{
 	}
 	@RequestMapping("/deleteCacheMap.do") 
 	public void deleteCacheMap(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String url = WebHelp.getKey(request, "URL");
-		String key = WebHelp.getKey(request, "KEY");
+		String url = RequestUtil.getKey(request, "URL");
+		String key = RequestUtil.getKey(request, "KEY");
 		
 		String res = cache.remove(url, key);
 		if(res.equals("true")){
@@ -70,7 +70,7 @@ public class TomcatControll extends BaseControll{
 	}
 	@RequestMapping("/listCacheMap.do") 
 	public void listCacheMap(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Bean map = WebHelp.getParam(request); //, new String[]{"URL", "KEY", "VALUE", "EXPIRE", "TYPE"}
+		Bean map = RequestUtil.getParam(request); //, new String[]{"URL", "KEY", "VALUE", "EXPIRE", "TYPE"}
 		Page page = Page.getPage(request);
 		Bean res = cache.findCacheList(map);
 		page.setNUM(res.get("size", 0));
@@ -122,7 +122,7 @@ public class TomcatControll extends BaseControll{
 		Map res = MapListUtil.getMap()
 				.put("res", "true")
 				.put("option", option) 
-				.put("info", WebHelp.getRequestBean(request)).build(); 
+				.put("info", RequestUtil.getRequestBean(request)).build(); 
 		log(res);
 		echo(res);
 	}	
@@ -169,7 +169,7 @@ public class TomcatControll extends BaseControll{
 		Map res = MapListUtil.getMap()
 				.put("res", "true")
 				.put("option", option) 
-				.put("info", WebHelp.getRequestBean(request)).build(); 
+				.put("info", RequestUtil.getRequestBean(request)).build(); 
 		log(res);
 		echo(res);
 	}	

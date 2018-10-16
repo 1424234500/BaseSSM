@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import util.MapListUtil;
 import util.Tools;
-import util.WebHelp;
+import util.RequestUtil;
 
 @Controller
 @RequestMapping("/lunch")
@@ -93,7 +93,7 @@ public class LunchControl extends BaseControll {
 		Map res = MapListUtil.getMap()
 				.put("res", "true")
 				.put("option", option) 
-				.put("info", WebHelp.getRequestBean(request)).build(); 
+				.put("info", RequestUtil.getRequestBean(request)).build(); 
 		log(res);
 		echo(res);
 	}	

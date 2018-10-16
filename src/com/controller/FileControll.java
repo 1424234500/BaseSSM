@@ -8,8 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -29,10 +26,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.service.FileService;
 
-import util.Bean;
 import util.FileUtil;
 import util.MapListUtil;
-import util.JsonUtil;
+import util.RequestUtil;
 import util.Tools;
 import util.database.SqlHelp; 
 
@@ -44,7 +40,7 @@ public class FileControll extends BaseControll{
 		super(FileControll.class, "");
 	}
 
-	static public Logger logger = Logger.getLogger(FileControll.class); 
+	private static Logger logger = Logger.getLogger(FileControll.class); 
 	@Autowired
 	@Qualifier("fileService") 
 	protected FileService fileService;
@@ -208,11 +204,8 @@ public class FileControll extends BaseControll{
 		}
 		
 		String name = FileUtil.getFileName(path);
-        name = URLEncoder.encode(name,"UTF-8");      //转码，免得文件名中文乱码  
-        //设置文件下载头  
-        response.addHeader("Content-Disposition", "attachment;filename=" + name);    
-        //设置文件ContentType类型，这样设置，会自动判断下载文件类型    
-        response.setContentType("multipart/form-data");   
+        RequestUtil.setDownFileName(request, response, name);
+        
         BufferedOutputStream out = new BufferedOutputStream(response.getOutputStream());  
         InputStream in = null;
         try {    

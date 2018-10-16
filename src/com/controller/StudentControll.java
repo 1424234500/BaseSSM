@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.service.StudentService;
 
 import util.JsonUtil;
-import util.WebHelp;
+import util.RequestUtil;
 
 
 /**
@@ -46,7 +46,7 @@ public class StudentControll {
 		String timefrom = request.getParameter("timefrom");
 		String timeto = request.getParameter("timeto");
 		Page page = Page.getPage(request);
-		map.putAll(WebHelp.getRequestBean(request));
+		map.putAll(RequestUtil.getRequestBean(request));
 		
 	    List<Map<String, Object>> res = studentServiceHibernate.list(id, name, timefrom, timeto, page);
 	   // logger.info(MapListHelp.list2string(res));
@@ -110,7 +110,7 @@ public class StudentControll {
 		String timeto = request.getParameter("timeto");
 	     
 		Page page = Page.getPage(request);
-		map.putAll(WebHelp.getRequestBean(request));
+		map.putAll(RequestUtil.getRequestBean(request));
 
 	    List<Map<String, Object>> res = studentServiceMybatis.list(id, name, timefrom, timeto, page);
 		map.put("PAGE", page);

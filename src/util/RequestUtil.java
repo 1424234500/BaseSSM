@@ -22,9 +22,9 @@ import com.controller.BaseControll;
  * @author Walker
  *
  */
-public class WebHelp {
-	private Logger logger = Logger.getLogger(WebHelp.class); // 成员变量 单例 公用 于
-																// 每个并发线程
+public class RequestUtil {
+	private Logger logger = Logger.getLogger(RequestUtil.class); // 成员变量 单例 公用 于
+																	// 每个并发线程
 
 	/**
 	 * 对应解开客户端进行简单加密的字符串，进一步提高系统的安全性
@@ -199,18 +199,18 @@ public class WebHelp {
 	}
 
 	/**
-	 * 设置下载文件显示名称
-	 * 
-	 * @param request
-	 *            请求头
-	 * @param response
-	 *            响应头
-	 * @param fileName
-	 *            文件名称
-	 * @throws UnsupportedEncodingException
+	 * 设置下载 文件 头
 	 */
 	public static void setDownFileName(HttpServletRequest request, HttpServletResponse response, String fileName)
 			throws UnsupportedEncodingException {
+		
+//		name = URLEncoder.encode(name,"UTF-8");      //转码，免得文件名中文乱码  
+//        //设置文件下载头  
+//        response.addHeader("Content-Disposition", "attachment;filename=" + name);    
+//        //设置文件ContentType类型，这样设置，会自动判断下载文件类型    
+//        response.setContentType("multipart/form-data");   
+        
+        
 		String userbrowser = "unknow";
 		userbrowser = request.getHeader("User-Agent");
 		if (userbrowser == null) {
@@ -295,7 +295,7 @@ public class WebHelp {
 		Enumeration<?> enu = request.getParameterNames();
 		while (enu.hasMoreElements()) {
 			String name = (String) enu.nextElement();
-			String value = WebHelp.getKey(request, name);
+			String value = RequestUtil.getKey(request, name);
 			res.put(name, value);
 		}
 		return res;
@@ -307,7 +307,7 @@ public class WebHelp {
 	public static Bean getParam(HttpServletRequest request, List<Object> colNames) {
 		Bean res = new Bean();
 		for (Object key : colNames) {
-			res.put(key, WebHelp.getKey(request, key));
+			res.put(key, RequestUtil.getKey(request, key));
 		}
 		return res;
 	}
@@ -321,7 +321,7 @@ public class WebHelp {
 			res = getRequestBean(request);
 		} else {
 			for (Object key : colNames) {
-				res.put(key, WebHelp.getKey(request, key));
+				res.put(key, RequestUtil.getKey(request, key));
 			}
 		}
 		return res;

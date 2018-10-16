@@ -20,7 +20,7 @@ import com.service.StudentService;
 import util.Bean;
 import util.MapListUtil;
 import util.Tools;
-import util.WebHelp;
+import util.RequestUtil;
 
 /** 
  * 测试AngularJs的后台
@@ -94,7 +94,7 @@ public class AngularControll extends BaseControll{
 		Map res = MapListUtil.getMap()
 				.put("res", "true")
 				.put("option", option) 
-				.put("info", WebHelp.getRequestBean(request)).build(); 
+				.put("info", RequestUtil.getRequestBean(request)).build(); 
 		log(res);
 		echo(res);
 	}	
@@ -102,7 +102,7 @@ public class AngularControll extends BaseControll{
 	
 	@RequestMapping("/login.do") 
 	public void login(HttpServletRequest request, HttpServletResponse response) throws IOException { 
-		Map res = MapListUtil.getMap().put("res", "true").put("info",WebHelp.getRequestBean(request)).build(); 
+		Map res = MapListUtil.getMap().put("res", "true").put("info",RequestUtil.getRequestBean(request)).build(); 
 		log(res);
 		echo(res);
 	}	

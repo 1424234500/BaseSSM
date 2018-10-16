@@ -29,6 +29,12 @@ public class OnLoaded implements ApplicationListener<ContextRefreshedEvent> {
 			
 			
 			logger.info("######################启动完毕#######################");
+			
+			
+			logger.info("######################开启测试初始化springMvc#######################");
+			
+			
+			
 		}
 	}
 }

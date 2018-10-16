@@ -21,7 +21,7 @@ import util.Bean;
 import util.JsonUtil;
 import util.MapListUtil;
 import util.Tools;
-import util.WebHelp;
+import util.RequestUtil;
 import util.cache.Cache;
 import util.cache.CacheMgr;
 import util.database.SqlHelp;
@@ -167,27 +167,27 @@ public abstract class BaseControll {
 		if(!Tools.notNull(tableName))
 			throw new Exception("没有配置表");
 		List<Object> res = baseService.getColumns(tableName); 
-		return WebHelp.getParam(request, res);
+		return RequestUtil.getParam(request, res);
 	}
 	/**
 	 * 获取request key 兼容大小写
 	 */
 	public String getValue(HttpServletRequest request, String key) {
-		return WebHelp.getKey(request, key);
+		return RequestUtil.getKey(request, key);
 	}
 	
 	/**
 	 * 站内跳转 jsp || servlet
 	 */
 	public void sendDispatcher(HttpServletRequest request, HttpServletResponse response, String url) {
-		WebHelp.sendDispatcher(request, response, url);
+		RequestUtil.sendDispatcher(request, response, url);
 	}
 	/**
 	 * 重定向
 	 * @throws IOException 
 	 */
 	public void sendRedirect(HttpServletRequest request, HttpServletResponse response, String url) throws IOException {
-		WebHelp.sendRedirect(response, url);
+		RequestUtil.sendRedirect(response, url);
 	}
 	/**
 	 * 获取表键名
