@@ -20,19 +20,19 @@ public class TestCache{
 	@Test
 	public void test1(){
 		Cache<String> cache = null;
-		cache = CacheMgr.getInstance(CacheType.MAP);
+		cache = CacheMgr.getInstance(Type.MAP);
 		testThread(cache);
 	}
 	@Test
 	public void test2(){
 		Cache<String> cache = null;
-		cache = CacheMgr.getInstance(CacheType.EHCACHE);
+		cache = CacheMgr.getInstance(Type.EHCACHE);
 		testThread(cache);
 	}
 	@Test
 	public void test3(){
 		Cache<String> cache = null;
-		cache = CacheMgr.getInstance(CacheType.REDIS);
+		cache = CacheMgr.getInstance(Type.REDIS);
 		testThread(cache);
 	}
 	public void testThread(final Cache<String> cache){

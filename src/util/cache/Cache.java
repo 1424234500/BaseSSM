@@ -14,8 +14,8 @@ import util.Bean;
  * by Walker
  */
 public interface Cache<K> {
-//  缓存监控接口
 	/**
+	 * 缓存监控接口
 	 * 每一个缓存的键作为一条sql记录  hash, 键, 值, 修改时间, 过期时间, 命中次数, 值类型 map 1/list 2/base 0
 	 */
 	String[] table = {"HASHCODE", "KEY", "VALUE", "MTIME", "EXPIRE", "COUNT", "TYPE"};
@@ -101,5 +101,5 @@ public interface Cache<K> {
      */
     void startup();
     
-    CacheType getType();
+    Type getType();
 }

@@ -86,6 +86,7 @@ public class Dao {
 			res = rs2list(resultSet);
 		} catch (Exception e) {
 			except(sql, objects, e.toString());
+			res = new ArrayList<>();
 		} finally {
 			close(resultSet, preparedStatement, conn);
 		}

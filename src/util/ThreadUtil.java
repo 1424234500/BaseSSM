@@ -403,20 +403,27 @@ public class ThreadUtil {
 	 */
 	@Test
 	public void ttt( ){
+		final Lock lock = new ReentrantLock();
+		final Condition condition = lock.newCondition(); //依赖于锁lock的信号标识量  需要持有锁的状态才能用 否则异常
+		System.out.println("---------------------------tttttttt-------------");
+
 		ThreadUtil.execute(new Runnable() {
 			@Override
 			public void run() {
-				int i = 0;
 				while(! Thread.interrupted()){
-					System.out.println("execute:" + i);
-					i+=2;
-					Thread.yield();
-					sleep(1000);
+					lock.lock();
+					try{
+						System.out.println("execute 0:" + iSignal);
+						iSignal++;
+//						Thread.yield();
+						sleep(3000);
+						condition.notifyAll();
+					}finally{
+						lock.unlock();
+					}
 				}
 			}
 		});
-		final Lock lock = new ReentrantLock();
-		final Condition condition = lock.newCondition(); //依赖于锁lock的信号标识量
 		ThreadUtil.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -465,7 +472,7 @@ public class ThreadUtil {
 				}
 			}
 		});
-		f.cancel(true);
+//		f.cancel(true);
 		
 //		try {
 //			wait(); //非同步控制方法里调用  0.可以由notify恢复 1.释放锁  所以异常 调用时必须要获得锁才能?    sleep不释放锁  不可恢复 只是暂时让出cpu
@@ -479,8 +486,7 @@ public class ThreadUtil {
 		}
 		
 		
-		
-		
+		ThreadUtil.awaitTermination(DefaultThread, 60 * 1000 * 30, TimeUnit.MILLISECONDS);
 		
 		
 		

@@ -428,7 +428,7 @@ class CacheRedisImpl implements Cache<String> {
 		Tools.out(objects);
 	}
 	@Override
-	public CacheType getType() {
-		return CacheType.REDIS;
+	public Type getType() {
+		return Type.REDIS;
 	}
 }

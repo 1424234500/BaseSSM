@@ -334,7 +334,7 @@ class CacheEhcacheImpl implements Cache<String> {
 		Tools.out(objects);
 	}
 	@Override
-	public CacheType getType() {
-		return CacheType.EHCACHE;
+	public Type getType() {
+		return Type.EHCACHE;
 	}
 }
