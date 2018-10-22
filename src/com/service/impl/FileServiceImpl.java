@@ -2,24 +2,20 @@ package com.service.impl;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.controller.Context;
 import com.controller.Page;
-import com.controller.Context;
 import com.dao.hibernate.BaseDao;
 import com.service.FileService;
 
 import util.FileUtil;
-import util.Fun;
 import util.LangUtil;
 import util.MapListUtil;
 import util.Tools;
@@ -28,7 +24,7 @@ import util.database.SqlHelp;
 @Service("fileService")
 public class FileServiceImpl implements FileService,Serializable {
 	private static final long serialVersionUID = 8304941820771045214L;
-	private static Logger logger = Logger.getLogger("File");
+	private static Logger log = Logger.getLogger("File");
 	
 	
     @Autowired
@@ -39,7 +35,9 @@ public class FileServiceImpl implements FileService,Serializable {
     
 	@Override
 	public void initDirs() {
+		log.info("** 初始化项目相关文件夹");
 		FileUtil.mkdir( Context.getUploadDir());
+		log.info("**! 初始化项目相关文件夹");
 	}
     
 	@Override
@@ -64,8 +62,8 @@ public class FileServiceImpl implements FileService,Serializable {
 			} 
 			if(sb.length() > 0){
 				sb.setLength(sb.length() - 1);
+				baseDao.executeSql("delete from fileinfo where PATH in (" + sb.toString() + ") ");
 			}
-			baseDao.executeSql("delete from fileinfo where PATH in (" + sb.toString() + ") ");
 
 		}
 		//添加其它文件到表中 策略变更 不再扫描文件加入数据库

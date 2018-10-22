@@ -29,8 +29,8 @@ import com.controller.FileControll;
  * 
  *
  */
-public class HttpUtils {
-	private static Logger log = Logger.getLogger(FileControll.class);
+public class HttpUtil {
+	private static Logger log = Logger.getLogger("Http");
 	private final static String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36";
 	private final static String DEFAULT_ENCODE = "utf-8";
 
@@ -99,7 +99,7 @@ public class HttpUtils {
 	private static HttpClient makeHttpClient(){
 		//创造HttpClient浏览器端
 		BasicHttpParams httpParameters = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpParameters, 3000);// 连接超时
+		HttpConnectionParams.setConnectionTimeout(httpParameters, 10000);// 连接超时
 		HttpConnectionParams.setSoTimeout(httpParameters, 300000);//
 		HttpClient client = new DefaultHttpClient(httpParameters);
 		client.getParams().setIntParameter("http.socket.timeout", 15000);

@@ -3,14 +3,13 @@ package util.cache;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 import util.Bean;
 import util.Call;
 import util.FileUtil;
-import util.MapListUtil;
 import util.Tools;
-import util.database.Dao;
 import util.setting.SettingUtil;
 
 /**
@@ -20,6 +19,7 @@ import util.setting.SettingUtil;
  *
  */
 public class CacheMgr implements Call{
+	static public Logger log = Logger.getLogger("Cache"); 
 
 	/**
 	 * 用以保证默认的cache只初始化一次
@@ -81,6 +81,7 @@ public class CacheMgr implements Call{
 	}
 	
 	public void call(){
+		log.info("** 初始化缓存");
 		Cache<String> cache = getInstance();
 		if(cache == null) return ;
 		
@@ -109,6 +110,8 @@ public class CacheMgr implements Call{
 				);
 		cache.put("list", list);
 		
+
+		log.info("**! 初始化缓存");
 	}
 
 }

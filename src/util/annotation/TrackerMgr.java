@@ -1,4 +1,6 @@
 package util.annotation;
+import org.apache.log4j.Logger;
+
 import util.Call;
 
 /**
@@ -8,7 +10,8 @@ import util.Call;
  */
 
 public class TrackerMgr implements Call{
-	
+	static public Logger log = Logger.getLogger("Annotation"); 
+
 	@Override
 	public void call() {
 		start();
@@ -19,7 +22,9 @@ public class TrackerMgr implements Call{
 	 * @return
 	 */
 	public static Boolean start(){
+		log.info("**扫描所有注解 以及对应的处理器 并调用执行处理器 初始化注解系统");
 		TrackerUtil.make("", TrackerUtil.scan(""));
+		log.info("**!扫描所有注解 以及对应的处理器 并调用执行处理器 初始化注解系统");
 		return true;
 	}
 	

@@ -12,18 +12,25 @@ import util.Tools;
 public class Page {
 //	static int defaultEachPageNum = 5;
 	long NUM = 0;	//总数据条数
-	int SHOWNUM = Context.getShowNum();//每页数量
+	int SHOWNUM = 5;//每页数量
 	int NOWPAGE = 1;	//当前页码
 	int PAGENUM = 0;	//总页数
 	String ORDER;	//排序
 	String DESC;	//倒序 有值则倒序
 	
-	public Page(){}
+	public Page(){
+		SHOWNUM = Context.getShowNum();//每页数量
+	}
 	
 	public Page(int showNum, long allNum){
 		this.SHOWNUM = showNum;
 		this.setNUM(allNum);
 	}
+	
+	public Bean toBean(){
+		return new Bean().put("NUM", NUM).put("SHOWNUM", SHOWNUM).put("NOWPAGE", NOWPAGE).put("ORDER", ORDER).put("DESC", DESC);
+	}
+	
 	/**
 	 * 通过request获取 查询第几页 每页多少条
 	 */
