@@ -13,7 +13,7 @@ public class Consumer {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] {"dubbo-consumer.xml"});
         context.start();
         // Obtaining a remote service proxy
-        ServiceProvider demoService = (ServiceProvider)context.getBean("serviceProvider");
+        ServiceHello demoService = (ServiceHello)context.getBean("serviceProvider");
         // Executing remote methods
         String hello = demoService.sayHello("world");
         // Display the call result
