@@ -638,9 +638,9 @@ public class ClassUtil {
 		out(i);
 		return "testInt";
 	}
-	public String testInt(Integer i){
+	public String testInteger(Integer i){
 		out(i);
-		return "testIntger";
+		return "testInteger";
 	}
 	public String testStr(String i){
 		out(i);
@@ -701,8 +701,8 @@ public class ClassUtil {
 	}
 	public static void main(String argc[]){
 		out(ClassUtil.doClassMethod("util.ClassUtil", "testNoArgs"));
-		out(ClassUtil.doClassMethod("util.ClassUtil", new Object[]{}, "testInt", 1));
-		out(ClassUtil.doClassMethod("util.ClassUtil", new Object[]{}, "testIntger", 1));
+		out(ClassUtil.doClassMethod("util.ClassUtil", "testInt", (int)1));
+		out(ClassUtil.doClassMethod("util.ClassUtil", "testInteger", 1));
 		out(ClassUtil.doClassMethod("util.ClassUtil", new Object[]{"str"}, "testStr", "str"));
 		out(ClassUtil.doClassMethod("util.ClassUtil", new Object[]{"str", 111}, "testBean", new Bean().put("key", "vvv")));
 //		out(ClassUtil.doClassMethod("util.ClassUtil", "testObjects", new String[]{"str", "str2"}));

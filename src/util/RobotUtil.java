@@ -15,48 +15,79 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
 /**
- * win32工具窗口 鼠标 
+ * win32工具窗口 鼠标
+ * 
  * @author Walker
  *
  */
 public class RobotUtil {
-	private static volatile RobotUtil robotHelp = null;
-	public  Robot robot = null;
-    private RobotUtil(){
-    	try { 
-    		robot = new Robot(); 
-    	} 
-    	catch (AWTException e) {
-    		e.printStackTrace(); 
-		} 
-    }
-    public static RobotUtil getSingleton(){
-        if(robotHelp == null){
-            synchronized (RobotUtil.class){
-                if(robotHelp == null){
-                	robotHelp = new RobotUtil();
-                }
-            }
-        }
-        return robotHelp;
-    }   
+	public static volatile Robot robot = null;
 	
-    public static Point getMousePoint(){
-    	return MouseInfo.getPointerInfo().getLocation();
-    }
-    
-    
-    public static Color getColor(){
-    	return getColor(getMousePoint()); 
-    } 
-    public static Color getColor(Point point){
-    	return getColor(point.x, point.y); 
-    } 
-    public static Color getColor(int x, int y){
-    	return getSingleton().robot.getPixelColor(x, y); 
-    } 
-    
-    /**
+	private RobotUtil() {
+
+	}
+
+	public static Robot getInstance() {
+		if (robot == null) {
+			synchronized (RobotUtil.class) {
+				if (robot == null) {
+					try {
+						robot = new Robot();
+					} catch (AWTException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return robot;
+	}
+
+	/**
+	 * 按键按下
+	 */
+	public static void keyPress(int keyCode) {
+		getInstance().keyPress(keyCode);
+	}
+	/**
+	 * 按键松开
+	 */
+	public static void keyRelease(int keyCode) {
+		getInstance().keyRelease(keyCode);
+	}
+	/**
+	 * 获取鼠标点
+	 */
+	public static Point getMouse() {
+		return MouseInfo.getPointerInfo().getLocation();
+	}
+	/**
+	 * 设置鼠标点
+	 */
+	public static void setMouse(int x, int y) {
+		getInstance().mouseMove(x, y);
+	}
+	/**
+	 * 移动鼠标点
+	 */
+	public static void moveMouse(int dx, int dy) {
+		Point p = getMouse();
+		getInstance().mouseMove((int)p.getX() + dx, (int)p.getY() + dy);
+	}
+	/**
+	 * 获取鼠标点颜色
+	 */
+	public static Color getColor() {
+		Point p = getMouse();
+		return getColor(p.x, p.y);
+	}
+	/**
+	 * 获取指定点颜色
+	 */
+	public static Color getColor(int x, int y) {
+		return getInstance().getPixelColor(x, y);
+	}
+
+	/**
 	 * 从剪切板获得文字。
 	 */
 	public static String getSysClipboardText() {
@@ -69,8 +100,7 @@ public class RobotUtil {
 			// 检查内容是否是文本类型
 			if (clipTf.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 				try {
-					ret = (String) clipTf
-							.getTransferData(DataFlavor.stringFlavor);
+					ret = (String) clipTf.getTransferData(DataFlavor.stringFlavor);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -83,9 +113,9 @@ public class RobotUtil {
 	/**
 	 * 将字符串复制到剪切板。
 	 */
-	public static void setSysClipboardText(String writeMe) {
+	public static void setSysClipboardText(String str) {
 		Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-		Transferable tText = new StringSelection(writeMe);
+		Transferable tText = new StringSelection(str);
 		clip.setContents(tText, null);
 	}
 
@@ -115,17 +145,14 @@ public class RobotUtil {
 				return DataFlavor.imageFlavor.equals(flavor);
 			}
 
-			public Object getTransferData(DataFlavor flavor)
-					throws UnsupportedFlavorException, IOException {
+			public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
 				if (isDataFlavorSupported(flavor))
 					return image;
 				throw new UnsupportedFlavorException(flavor);
 			}
 
 		};
-		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(trans,
-				null);
+		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(trans, null);
 	}
 
-    
 }
