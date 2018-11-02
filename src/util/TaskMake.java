@@ -5,7 +5,7 @@ import util.socket.ThreadUtilServer;
 
 public class TaskMake{
 	TaskInterface taskResult = null;
-	int threadType = ThreadUtil.DefaultThread;
+	int threadType = ThreadUtilServer.DefaultThread;
 	long time = 1000;
 	int maxRetryCount = 5;	//最大重试次数
 	String doName = "操作";

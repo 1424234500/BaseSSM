@@ -1,9 +1,8 @@
 package util;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -13,14 +12,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.junit.Test;
 
 import util.cache.CacheMgr;
-import util.setting.Setting;
+
 
 /**
  * 线程工具
@@ -28,17 +22,35 @@ import util.setting.Setting;
  *
  */
 public class ThreadUtil {
-	public static final int DefaultThread  = 0;
+	public enum Type{
 
-	public static final int FixedThread  = 0;	//固定数量的线程池
-	public static final int CachedThread = 1;	//缓存?
-	public static final int SingleThread = 2;	//单线程池 队列
-	public static final int ScheduledThread = 3;//定时任务线程池
+		/**
+		 * 固定数量的线程池 构造一个固定线程数目的线程池
+		 */
+		DefaultThread,
+
+		/**
+		 * 固定数量的线程池 构造一个固定线程数目的线程池
+		 */
+		FixedThread,
+		/**
+		 * 缓存? 构造一个缓冲功能的线程池
+		 */
+		CachedThread,
+		/**
+		 * 单线程池 队列 只支持一个线程的线程池 
+		 */
+		SingleThread,
+		/**
+		 * 定时任务线程池
+		 */
+		ScheduledThread,
+	}
 
 	//存储三种池 统一
-	private static final Map<Integer, ExecutorService>          mapExec;
+	private static final EnumMap<Type, ExecutorService>          mapExec;
 	static{
-		mapExec = new HashMap<>();
+		mapExec = new EnumMap<>(Type.class);
 	}
 //	private static ScheduledExecutorService 			  scheduleExec;
 
@@ -47,20 +59,15 @@ public class ThreadUtil {
 	 * @param type         线程池类型
 	 * @param corePoolSize 只对Fixed和Scheduled线程池起效
 	 */
-	private static ExecutorService getExecutorServiceInstance(int type) {
+	private static ExecutorService getExecutorServiceInstance(Type type) {
 		return getExecutorServiceInstance(type, CacheMgr.getInstance().get("corePoolSize", 5));
 	}
-	private static ExecutorService getExecutorServiceInstance(int type, final int corePoolSize) {
-	    type = type % 4;
+	private static ExecutorService getExecutorServiceInstance(Type type, final int corePoolSize) {
+//	    type = type % 4;
 		// 构造有定时功能的线程池
 	    // ThreadPoolExecutor(corePoolSize, Integer.MAX_VALUE, 10L, TimeUnit.MILLISECONDS, new BlockingQueue<Runnable>)
 	    if(mapExec.get(type) == null){
 		    switch (type) {
-		        case FixedThread:
-		            // 构造一个固定线程数目的线程池
-		            // ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
-		            mapExec.put(type, Executors.newFixedThreadPool(corePoolSize));
-		            break;
 		        case SingleThread:
 		            // 构造一个只支持一个线程的线程池,相当于newFixedThreadPool(1)
 		            // ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>())
@@ -76,6 +83,11 @@ public class ThreadUtil {
 		            // ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
 		        	mapExec.put(type, Executors.newScheduledThreadPool(corePoolSize));
 		            break;
+//		        case FixedThread:
+	            default:
+		            // 构造一个固定线程数目的线程池
+		            // ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+		            mapExec.put(type, Executors.newFixedThreadPool(corePoolSize));
 		    }
 	    }
 	    return mapExec.get(type);
@@ -86,19 +98,19 @@ public class ThreadUtil {
 	 * @param type ThreadHelp.
 	 * @param runnable 命令
 	 */
-	public static void execute(int type, Runnable runnable) {
+	public static void execute(Type type, Runnable runnable) {
 		ExecutorService exec = getExecutorServiceInstance(type);
 		exec.execute(runnable);
 	}
 	public static void execute(Runnable runnable) {
-		execute(ThreadUtil.DefaultThread, runnable);
+		execute(Type.DefaultThread, runnable);
 	}
 	/**
 	 * 添加多个线程任务 type三种线程池
 	 * @param type ThreadHelp.
 	 * @param runnable 命令
 	 */
-	public static void execute(int type, List<Runnable> runables) {
+	public static void execute(Type type, List<Runnable> runables) {
 		ExecutorService exec = getExecutorServiceInstance(type);
 	    for (Runnable runable : runables) {
 	        exec.execute(runable);
@@ -111,7 +123,7 @@ public class ThreadUtil {
 	 * 如果已经关闭，则调用没有作用。</p>
 	 * @param type ThreadHelp.
 	 */
-	public static void shutDown(int type) {
+	public static void shutDown(Type type) {
 		ExecutorService exec = getExecutorServiceInstance(type);
 	    exec.shutdown();
 	}
@@ -123,7 +135,7 @@ public class ThreadUtil {
 	 * @param type ThreadHelp.
 	 * @return 等待执行的任务的列表
 	 */
-	public static List<Runnable> shutDownNow(int type) {
+	public static List<Runnable> shutDownNow(Type type) {
 		ExecutorService exec = getExecutorServiceInstance(type);
 	    return exec.shutdownNow();
 	}
@@ -133,7 +145,7 @@ public class ThreadUtil {
 	 * @param type ThreadHelp.
 	 * @return {@code true}: 是<br>{@code false}: 否
 	 */
-	public static boolean isShutDown(int type) {
+	public static boolean isShutDown(Type type) {
 		ExecutorService exec = getExecutorServiceInstance(type);
 		return exec.isShutdown();
 	}
@@ -143,7 +155,7 @@ public class ThreadUtil {
 	 * <p>注意，除非首先调用 shutdown 或 shutdownNow，否则 isTerminated 永不为 true。</p>
 	 * @return {@code true}: 是<br>{@code false}: 否
 	 */
-	public static boolean isTerminated(int type) {
+	public static boolean isTerminated(Type type) {
 		ExecutorService exec = getExecutorServiceInstance(type);
 	    return exec.isTerminated();
 	}
@@ -158,7 +170,7 @@ public class ThreadUtil {
 	 * @return {@code true}: 请求成功<br>{@code false}: 请求超时
 	 * @throws InterruptedException 终端异常
 	 */
-	public static boolean awaitTermination(int type, long timeout, TimeUnit unit){
+	public static boolean awaitTermination(Type type, long timeout, TimeUnit unit){
 		ExecutorService exec = getExecutorServiceInstance(type);
 		boolean res = false;
 		try {
@@ -177,7 +189,7 @@ public class ThreadUtil {
 	 * @param <T>  泛型
 	 * @return 表示任务等待完成的Future, 该Future的{@code get}方法在成功完成时将会返回该任务的结果。
 	 */
-	public static <T> Future<T> submit(int type, Callable<T> task) {
+	public static <T> Future<T> submit(Type type, Callable<T> task) {
 		ExecutorService exec = getExecutorServiceInstance(type);
 	    return exec.submit(task);
 	}
@@ -190,7 +202,7 @@ public class ThreadUtil {
 	 * @param <T>    泛型
 	 * @return 表示任务等待完成的Future, 该Future的{@code get}方法在成功完成时将会返回该任务的结果。
 	 */
-	public static <T> Future<T> submit(int type, Runnable task, final T result) {
+	public static <T> Future<T> submit(Type type, Runnable task, final T result) {
 		ExecutorService exec = getExecutorServiceInstance(type);
 	    return exec.submit(task, result);
 	}
@@ -201,7 +213,7 @@ public class ThreadUtil {
 	 * @param task 任务
 	 * @return 表示任务等待完成的Future, 该Future的{@code get}方法在成功完成时将会返回null结果。
 	 */
-	public static Future<?> submit(int type, Runnable task) {
+	public static Future<?> submit(Type type, Runnable task) {
 		ExecutorService exec = getExecutorServiceInstance(type);
 	    return exec.submit(task);
 	}
@@ -218,7 +230,7 @@ public class ThreadUtil {
 	 * @return 表示任务的 Future 列表，列表顺序与给定任务列表的迭代器所生成的顺序相同，每个任务都已完成。
 	 * @throws InterruptedException 如果等待时发生中断，在这种情况下取消尚未完成的任务。
 	 */
-	public static <T> List<Future<T>> invokeAll(int type, Collection<? extends Callable<T>> tasks) {
+	public static <T> List<Future<T>> invokeAll(Type type, Collection<? extends Callable<T>> tasks) {
 		ExecutorService exec = getExecutorServiceInstance(type);
 		try {
 			return exec.invokeAll(tasks);
@@ -243,7 +255,7 @@ public class ThreadUtil {
 	 * @return 表示任务的 Future 列表，列表顺序与给定任务列表的迭代器所生成的顺序相同。如果操作未超时，则已完成所有任务。如果确实超时了，则某些任务尚未完成。
 	 * @throws InterruptedException 如果等待时发生中断，在这种情况下取消尚未完成的任务
 	 */
-	public static <T> List<Future<T>> invokeAll(int type, Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) {
+	public static <T> List<Future<T>> invokeAll(Type type, Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) {
 		ExecutorService exec = getExecutorServiceInstance(type);
 		try {
 			return exec.invokeAll(tasks, timeout, unit);
@@ -265,7 +277,7 @@ public class ThreadUtil {
 	 * @throws InterruptedException 如果等待时发生中断
 	 * @throws ExecutionException   如果没有任务成功完成
 	 */
-	public static <T> T invokeAny(int type, Collection<? extends Callable<T>> tasks) {
+	public static <T> T invokeAny(Type type, Collection<? extends Callable<T>> tasks) {
 		ExecutorService exec = getExecutorServiceInstance(type);
 		try {
 			return exec.invokeAny(tasks);
@@ -292,7 +304,7 @@ public class ThreadUtil {
 	 * @throws ExecutionException   如果没有任务成功完成
 	 * @throws TimeoutException     如果在所有任务成功完成之前给定的超时期满
 	 */
-	public static <T> T invokeAny(int type, Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit){
+	public static <T> T invokeAny(Type type, Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit){
 		ExecutorService exec = getExecutorServiceInstance(type);
 		try {
 			return exec.invokeAny(tasks, timeout, unit);
@@ -315,7 +327,7 @@ public class ThreadUtil {
 	 * @return 表示挂起任务完成的ScheduledFuture，并且其{@code get()}方法在完成后将返回{@code null}
 	 */
 	public static ScheduledFuture<?> schedule(final Runnable runnable, final long delay, final TimeUnit unit) {
-		ExecutorService scheduleExec = getExecutorServiceInstance(ThreadUtil.ScheduledThread);
+		ExecutorService scheduleExec = getExecutorServiceInstance(Type.ScheduledThread);
 	    return ((ScheduledExecutorService) scheduleExec).schedule(runnable, delay, unit);
 	}
 
@@ -329,7 +341,7 @@ public class ThreadUtil {
 	 * @return 可用于提取结果或取消的ScheduledFuture
 	 */
 	public static <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
-		ExecutorService scheduleExec = getExecutorServiceInstance(ThreadUtil.ScheduledThread);
+		ExecutorService scheduleExec = getExecutorServiceInstance(Type.ScheduledThread);
 		return ((ScheduledExecutorService) scheduleExec).schedule(callable, delay, unit);
 	}
 
@@ -343,7 +355,7 @@ public class ThreadUtil {
 	 * @return 表示挂起任务完成的ScheduledFuture，并且其{@code get()}方法在取消后将抛出异常
 	 */
 	public static ScheduledFuture<?> scheduleWithFixedRate(Runnable runnable, long initialDelay, long period, TimeUnit unit) {
-		ExecutorService scheduleExec = getExecutorServiceInstance(ThreadUtil.ScheduledThread);
+		ExecutorService scheduleExec = getExecutorServiceInstance(Type.ScheduledThread);
 	    return ((ScheduledExecutorService) scheduleExec).scheduleAtFixedRate(runnable, initialDelay, period, unit);
 	}
 
@@ -357,7 +369,7 @@ public class ThreadUtil {
 	 * @return 表示挂起任务完成的ScheduledFuture，并且其{@code get()}方法在取消后将抛出异常
 	 */
 	public static ScheduledFuture<?> scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay, TimeUnit unit) {
-		ExecutorService scheduleExec = getExecutorServiceInstance(ThreadUtil.ScheduledThread);
+		ExecutorService scheduleExec = getExecutorServiceInstance(Type.ScheduledThread);
 	    return ((ScheduledExecutorService) scheduleExec).scheduleWithFixedDelay(runnable, initialDelay, delay, unit);
 	}
 	
@@ -395,105 +407,6 @@ public class ThreadUtil {
 			System.out.println("Thread.sleep error " + time);
 		}
 	}
-	
-	static int iSignal = 0;
-
-	/**
-	 * 测试线程相关
-	 */
-	@Test
-	public void ttt( ){
-		final Lock lock = new ReentrantLock();
-		final Condition condition = lock.newCondition(); //依赖于锁lock的信号标识量  需要持有锁的状态才能用 否则异常
-		System.out.println("---------------------------tttttttt-------------");
-
-		ThreadUtil.execute(new Runnable() {
-			@Override
-			public void run() {
-				while(! Thread.interrupted()){
-					lock.lock();
-					try{
-						System.out.println("execute 0:" + iSignal);
-						iSignal++;
-//						Thread.yield();
-						sleep(3000);
-						condition.notifyAll();
-					}finally{
-						lock.unlock();
-					}
-				}
-			}
-		});
-		ThreadUtil.execute(new Runnable() {
-			@Override
-			public void run() {
-				while(! Thread.interrupted()){
-					if(iSignal % 3 == 1){
-						lock.lock();
-						try{
-							System.out.println("execute 1:" + iSignal);
-							iSignal++;
-							sleep(1000);
-							condition.notifyAll();
-						}finally{
-							lock.unlock();
-						}
-					}else{
-						try {
-							condition.await();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		});
-		Future<?> f = ThreadUtil.submit(DefaultThread, new Runnable() {
-			@Override
-			public void run() {
-				while(! Thread.interrupted()){
-					if(iSignal % 3 == 2){
-						lock.lock();
-						try{
-							System.out.println("execute 2:" + iSignal);
-							iSignal++;
-							sleep(1000);
-							condition.notifyAll();
-						}finally{
-							lock.unlock();
-						}
-					}else{
-						try {
-							condition.await(); //等待condition条件信号
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		});
-//		f.cancel(true);
-		
-//		try {
-//			wait(); //非同步控制方法里调用  0.可以由notify恢复 1.释放锁  所以异常 调用时必须要获得锁才能?    sleep不释放锁  不可恢复 只是暂时让出cpu
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-		
-		Object lockObj = new Object();
-		synchronized (lockObj) {
-			lockObj.notifyAll();//唤醒所有持有该锁?
-		}
-		
-		
-		ThreadUtil.awaitTermination(DefaultThread, 60 * 1000 * 30, TimeUnit.MILLISECONDS);
-		
-		
-		
-	}
-	
-	
-	
 	
 	
 }

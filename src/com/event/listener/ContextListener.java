@@ -26,7 +26,7 @@ import util.cache.CacheMgr;
  * 
  */
 public class ContextListener implements ServletContextListener {
-	static public Logger log = Logger.getLogger("ContextListener"); 
+	private static Logger log = Logger.getLogger("ContextListener"); 
 
     /**
      * 初始化系统

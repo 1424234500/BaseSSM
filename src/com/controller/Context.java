@@ -35,7 +35,7 @@ public class Context extends ContextSystem {
 	 * 获取线程 专用 键值对map 
 	 * @return
 	 */
-	public static Bean getContext(){
+	private static Bean getContext(){
 		return Context.threadLocal.get();
 	} 
 	/**

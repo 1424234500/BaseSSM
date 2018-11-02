@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import util.ThreadUtil.Type;
+
 /**
  * 如何写出无法维护的代码
  *
@@ -104,7 +106,7 @@ public class SomethingTest {
 	}
 	public void testThread(){
 		final String name = "T-master";
-		ThreadUtil.execute(ThreadUtil.DefaultThread, new Runnable() {
+		ThreadUtil.execute(Type.DefaultThread, new Runnable() {
 			public void run() {
 				int tt = 0;
 				while(true){
@@ -120,7 +122,7 @@ public class SomethingTest {
 		
 		for(int i = 0; i < 1; i++){
 			final int name1 = i;
-			ThreadUtil.execute(ThreadUtil.DefaultThread, new Runnable() {
+			ThreadUtil.execute(Type.DefaultThread, new Runnable() {
 				public void run() {
 					int tt = 0;
 					while(true){
@@ -135,7 +137,7 @@ public class SomethingTest {
 		final LinkedBlockingDeque<Object> lbq = new LinkedBlockingDeque<>();
 
 		final String name2 = "T-master-2";
-		ThreadUtil.execute(ThreadUtil.SingleThread, new Runnable() {
+		ThreadUtil.execute(Type.SingleThread, new Runnable() {
 			public void run() {
 				int tt = 0;
 				while(true){
@@ -165,7 +167,7 @@ public class SomethingTest {
 					Tools.out("----无任务-----");
 			}
 		}, 3, 2, TimeUnit.SECONDS);
-		ThreadUtil.execute(ThreadUtil.SingleThread, new Runnable() {
+		ThreadUtil.execute(Type.SingleThread, new Runnable() {
 			public void run() {
 				int tt = 0;
 				while(true){

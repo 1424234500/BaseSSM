@@ -18,7 +18,7 @@ import com.controller.BaseControll;
 
 /**
  * servlet request response printwriter 帮助工具
- * 
+ * 处理request相关设置
  * @author Walker
  *
  */

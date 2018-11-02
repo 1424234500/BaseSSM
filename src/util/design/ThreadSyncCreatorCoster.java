@@ -4,6 +4,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import util.ThreadUtil;
+import util.ThreadUtil.Type;
 import util.Tools;
 
 /**
@@ -38,7 +39,7 @@ public class ThreadSyncCreatorCoster {
 	} 
 	// 开启生产者
 	public void startCreator() {
-		ThreadUtil.execute(ThreadUtil.DefaultThread, new Runnable() {
+		ThreadUtil.execute(Type.DefaultThread, new Runnable() {
 			public void run() {
 				int tt = 0;
 				while (true) {
@@ -62,7 +63,7 @@ public class ThreadSyncCreatorCoster {
 
 	// 开启消费者
 	public void startCoster() {
-		ThreadUtil.execute(ThreadUtil.DefaultThread, new Runnable() {
+		ThreadUtil.execute(Type.DefaultThread, new Runnable() {
 			public void run() {
 				int tt = 0;
 				while (true) {
@@ -88,9 +89,5 @@ public class ThreadSyncCreatorCoster {
 		});
 	}
 
-	public static void main(String[] argv) {
-		new ThreadSyncCreatorCoster();
-
-	}
 
 }

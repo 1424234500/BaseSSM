@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,7 +41,7 @@ public class FileControll extends BaseControll{
 		super(FileControll.class, "");
 	}
 
-	private static Logger logger = Logger.getLogger(FileControll.class); 
+	private static Logger log = Logger.getLogger(FileControll.class); 
 	@Autowired
 	@Qualifier("fileService") 
 	protected FileService fileService;
@@ -172,8 +173,9 @@ public class FileControll extends BaseControll{
      */  
     @RequestMapping("/download.do")  
     public void download(HttpServletRequest request,HttpServletResponse response) throws Exception{  
-    	long starttime = System.currentTimeMillis();
-
+    	StopWatch sw = new StopWatch(); 	//耗时监控分析工具
+    	sw.start();
+    	long starttime = sw.getStartTime();//System.currentTimeMillis();
     	String path = getValue(request, "path");
     	String key = getValue(request, "key");
     	
@@ -200,6 +202,7 @@ public class FileControll extends BaseControll{
 		}
 		if(!res){
 			echo(res, info);
+			sw.stop();
 			return;
 		}
 		
@@ -220,6 +223,8 @@ public class FileControll extends BaseControll{
             	size += len;
             	out.flush();
             }  
+            sw.stop();
+            log.warn(sw.toString());
             long endtime = System.currentTimeMillis();
             long deta = endtime - starttime;//下载写入耗时deta 大小size 名字name 路径path
             //记录文件上传下载情况 并打印
@@ -232,14 +237,13 @@ public class FileControll extends BaseControll{
         } finally {  
             if (in != null) { 
             	try {  in.close(); }
-            	catch (Exception e1) {  } 
+            	catch (Exception e1) { e1.printStackTrace();  } 
             }  
             if (out != null) { 
             	try {  out.close();   }
-            	catch (Exception e1) {  } 
+            	catch (Exception e1) { e1.printStackTrace(); } 
             }  
         }  
-        
        
     }  
     
@@ -313,7 +317,7 @@ public class FileControll extends BaseControll{
 	
 	@Override
 	public void log(Object... objs) {
-		 logger.info(Tools.objects2string(objs));
+		 log.info(Tools.objects2string(objs));
 	}
     
 }
