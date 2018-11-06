@@ -3,8 +3,13 @@ package util;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.lang.StringUtils;
+
+import util.setting.Setting;
 
 //MD5加密工具类  
 public class MD5 {
@@ -17,38 +22,91 @@ public class MD5 {
 	 * 最小长度
 	 * 最大长度
 	 */
-	public static String parse(String key, Integer minLen, Integer maxLen, Fun<String> call){
-		String res = "";
-		final char start = '0';
-		final char stop = 'z';
-
-		BigInteger base = BigInteger.valueOf(stop - start + 1);
-		BigInteger maxValue = BigInteger.ONE;
-		for(int i = 0; i < minLen; i++){
-			maxValue.multiply(base);
-		}
-		BigInteger value;
-		String pkey = "";
-		for(int nowLen = minLen; nowLen <= maxLen; nowLen ++){
-			
-			value = BigInteger.ZERO; //0->max
-			while(value.compareTo(maxValue) < 0){
-				//把需要处理的值放入缓存队列
-				//核心耗时 线程分流处理  编码 加密
-				pkey = encode(value, nowLen, start, stop);
-				pkey = call.make(pkey); //加密规则暴露
-				if(pkey.equals(key)){
-					Tools.out(value, "res", pkey);
-				}
-				
-				value.add(BigInteger.ONE);
-			}
-		}
+	public static void parse(String key, Integer minLen, Integer maxLen, Fun<String> call){
 		
-
 		
-		return res;
+		startCosumer();
+		startCreator(key, minLen, maxLen, call);
 	}
+	private static Queue<Bean> quene = new LinkedBlockingQueue<>();
+	private static void startCosumer(){
+		int i = 0;
+		while(i++ < 10){
+			final int ii = i;
+			new Thread(new Runnable(){
+				@SuppressWarnings("unchecked")
+				public void run(){
+					Tools.out("线程启动 " + ii);
+					//把需要处理的值放入缓存队列
+					//核心耗时 线程分流处理  编码 加密
+					while(!Thread.interrupted()){
+						Bean bean = quene.poll();
+						if(bean != null){
+							BigInteger value = (BigInteger) bean.get("value");
+							if(value != null){
+								int nowLen = bean.get("nowlen", 0);
+								char start = bean.get("start", '0');
+								char stop  = bean.get("stop", 'z');
+								String key  = bean.get("key", "");
+								Fun<String> call  = (Fun<String>) bean.get("call");
+								
+								String pkey = encode(value, nowLen, start, stop);
+								String tkey = call.make(pkey); //加密规则暴露
+								Tools.out(pkey.equals(key), value, pkey, tkey, key);
+								if(pkey.equals(key)){
+									Tools.out(value, "res", pkey);
+									Setting.saveProperty("rrrrrrrrrrrrrrr", pkey);
+								}
+							}
+						}else{
+							ThreadUtil.sleep(10);
+						}
+					}
+					
+				}
+			}).start();
+		}
+		
+	}
+	private static void startCreator(final String key, final Integer minLen, final Integer maxLen, final Fun<String> call){
+		ThreadUtil.execute(new Runnable(){
+			public void run(){
+				Tools.out("生产者启动");
+				final char start = '0';
+				final char stop = 'z';
+
+				BigInteger base = BigInteger.valueOf(stop - start + 1);
+				BigInteger maxValue = BigInteger.ONE;
+				for(int i = 0; i < minLen; i++){
+					maxValue = maxValue.multiply(base);
+				}
+				BigInteger value;
+				for(int nowLen = minLen; nowLen <= maxLen; nowLen ++){
+					
+					value = BigInteger.ZERO; //0->max
+					while(value.compareTo(maxValue) < 0){
+						//把需要处理的值放入缓存队列
+						//核心耗时 线程分流处理  编码 加密
+
+						quene.add(new Bean().put("value", value)
+								.put("nowlen", nowLen)
+								.put("start", start)
+								.put("stop", stop)
+								.put("key", key)
+								.put("call", call)
+								);
+						while(Thread.interrupted() && quene.size() > 32767)
+							ThreadUtil.sleep(10);
+						
+						value = value.add(BigInteger.ONE);
+					}
+				}
+			}
+		});
+		
+	}
+	
+	
 	/**
 	 * 编码 把value编码成N进制 进制基数编码为start->stop 并填充位数len
 	 * @param value
@@ -62,12 +120,12 @@ public class MD5 {
 		StringBuilder sb = new StringBuilder();
 		
 		while(value.compareTo(BigInteger.ZERO) > 0){
-			Tools.out(value, sb.toString());
+//			Tools.out(value, sb.toString());
 			sb.append((char)(start +  value.mod(cLen).intValue())) ;//22 -> '0'+22
 			value = value.divide(cLen);
 		}
 		sb.reverse();
-		return sb.toString();
+		return Tools.fillStringBy(sb.toString(), ""+start, len, 0);
 	}
 //	1、新建一个值为123的大整数对象
 //	BigInteger a=new BigInteger(“123”); //第一种，参数是字符串
