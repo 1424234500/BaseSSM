@@ -17,7 +17,8 @@ public class TestMd5 {
 			}
 			
 		});
-		ThreadUtil.sleep(1000 * 60 * 20);
+		
+		ThreadUtil.sleep(1000 * 60 * 60 * 2222);
 
 	}
 	
