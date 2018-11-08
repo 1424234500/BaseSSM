@@ -39,7 +39,7 @@ class CacheRedisImpl implements Cache<String> {
         // 设置最大连接数
 		config.setMaxTotal(100);
 		config.setMaxWaitMillis(1000); 
-        // 设置空闲连接
+        // 设置空闲连接 
         config.setMaxIdle(10); 
         
 		pool = new JedisPool(config, "localhost");

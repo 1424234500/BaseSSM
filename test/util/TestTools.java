@@ -43,9 +43,28 @@ public class TestTools {
 	}
 	@Test
 	public void testAnnoStart(){
-		TrackerMgr.start();
+//		TrackerMgr.start();
 	}
 	
+	@Test
+	public void testSplit(){
+		String s = "";
+		String ss[];
+		ss = "".split(",");
+		Tools.out(ss.length,ss);
+
+		ss = " ".split(" ");
+		Tools.out(ss.length,ss);
+		ss = " ".split(" ", -1);
+		Tools.out(ss.length,ss);
+
+		ss = ",".split(",");
+		Tools.out(ss.length,ss);
+
+		ss = ",".split(",", -1);
+		Tools.out(ss.length,ss);
+		
+	}
 	
 	
 	
