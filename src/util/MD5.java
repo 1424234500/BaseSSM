@@ -41,7 +41,7 @@ public class MD5 {
 					//核心耗时 线程分流处理  编码 加密
 					while(!Thread.interrupted()){
 						Bean bean = quene.poll();
-						if(bean != null){
+						if(bean != null){ 
 							BigInteger value = (BigInteger) bean.get("value");
 							if(value != null){
 								int nowLen = bean.get("nowlen", 0);
