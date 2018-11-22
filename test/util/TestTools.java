@@ -12,6 +12,21 @@ public class TestTools {
 
 	public TestTools(){}
 	
+	
+	@Test
+	public void testRegex(){
+		//编译正则
+		java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\[.*?\\]");
+		//使用正则匹配
+		java.util.regex.Matcher matcher = pattern.matcher("[aaa][bbb]ccc[ddd]");
+		
+		//matcher.reset(); //重置匹配位置
+		while(matcher.find()){
+			Tools.out(matcher.start(), matcher.end(), matcher.regionStart(), matcher.regionEnd(), matcher.group());
+			
+		}
+			
+	}	
 	@Test
 	public void makeDay(){
 		Bean map = new Bean();
