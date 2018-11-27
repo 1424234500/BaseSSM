@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -20,7 +21,7 @@ import org.dom4j.io.SAXReader;
  * @version $Id$
  */
 public class XmlUtil {
-    private static Log log = LogFactory.getLog(XmlUtil.class);
+	private static Logger log = Logger.getLogger("Xml"); 
     /** 节点名称：根节点 */
     public static final String NODE_NAME_ROOT = "root";
     /** 节点名称：列表节点 */
@@ -39,9 +40,8 @@ public class XmlUtil {
      * @param str xml字符串 
      * @return Map实体
      **/
-    @SuppressWarnings("unchecked")
     public static Map toMap(String str) {
-        Map bean = new HashMap();
+        Map<String, Object> bean = new HashMap<>();
         if (str != null && str.length() > 0) {
             Document doc;
             try {

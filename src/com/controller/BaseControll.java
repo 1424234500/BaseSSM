@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ import util.Bean;
 import util.JsonUtil;
 import util.MapListUtil;
 import util.Tools;
+import util.XmlUtil;
 import util.RequestUtil;
 import util.cache.Cache;
 import util.cache.CacheMgr;
@@ -33,7 +35,9 @@ import util.database.SqlHelp;
  *
  */  
 public abstract class BaseControll {
-
+	private static final String RES_TYPE = "_KEY";
+	private static final String TYPE_XML = "XML";
+	private static final String TYPE_JSON = "JSON";
 
 	/**
 	 * 基本的通用型 hibernate查询service
@@ -45,7 +49,7 @@ public abstract class BaseControll {
 	/**
 	 * 内存缓存map
 	 */
-	Cache<String> cache = CacheMgr.getInstance();
+	protected Cache<String> cache = CacheMgr.getInstance();
 	
 	/**
 	 * 普通跳转模式，request获取参数，map写入参数<request.setAttrbute()>，或者request.getSession().setAttrbute()写入session
@@ -106,7 +110,9 @@ public abstract class BaseControll {
 		}
 	}
 	public void echo(boolean flag, String info, Object data) throws IOException{
+		HttpServletRequest request = Context.getRequest();
 		HttpServletResponse response = Context.getResponse();
+		
 		long timestart = Context.getTimeStart();
 		long timestop = System.currentTimeMillis();
 		long time = timestop - timestart;
@@ -117,9 +123,18 @@ public abstract class BaseControll {
 				.put("timestop", timestop)
 				.put("time", time)
 				.put("data", data);
-		String jsonStr = (JsonUtil.makeJson(bean));
-		jsonStr = jsonStr.replace("[\\x00-\\x1f]+", "");
-		response.getWriter().write( jsonStr );
+		
+		String res = "";
+		String resType = getValue(request, RES_TYPE).toUpperCase();
+		if(resType.equals(TYPE_XML)){
+			res = XmlUtil.toFullXml(bean);
+		}else{
+			res = (JsonUtil.makeJson(bean));
+			//过滤特殊字符避免ie解析json异常
+			res = res.replace("[\\x00-\\x1f]+", "");
+		}
+		
+		response.getWriter().write( res );
 	}
 	
 	/**

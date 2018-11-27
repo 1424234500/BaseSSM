@@ -23,8 +23,6 @@ import com.controller.BaseControll;
  *
  */
 public class RequestUtil {
-	private Logger logger = Logger.getLogger(RequestUtil.class); // 成员变量 单例 公用 于
-																	// 每个并发线程
 
 	/**
 	 * 对应解开客户端进行简单加密的字符串，进一步提高系统的安全性
@@ -307,7 +305,7 @@ public class RequestUtil {
 	public static Bean getParam(HttpServletRequest request, List<Object> colNames) {
 		Bean res = new Bean();
 		for (Object key : colNames) {
-			res.put(key, RequestUtil.getKey(request, key));
+			res.put(key, RequestUtil.getKey(request, (String)key));
 		}
 		return res;
 	}
@@ -321,7 +319,7 @@ public class RequestUtil {
 			res = getRequestBean(request);
 		} else {
 			for (Object key : colNames) {
-				res.put(key, RequestUtil.getKey(request, key));
+				res.put(key, RequestUtil.getKey(request, (String)key));
 			}
 		}
 		return res;
@@ -339,7 +337,7 @@ public class RequestUtil {
 	/**
 	 * 获取某个key的参数值 兼容大小写
 	 */
-	public static String getKey(HttpServletRequest request, Object name) {
+	public static String getKey(HttpServletRequest request, String name) {
 		String value = request.getParameter((String) name);
 		if (!Tools.notNull(value)) { // 兼容全小写
 			value = request.getParameter(((String) name).toLowerCase());

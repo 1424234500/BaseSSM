@@ -13,6 +13,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.log4j.Logger;
+
 import util.cache.CacheMgr;
 
 
@@ -22,6 +24,8 @@ import util.cache.CacheMgr;
  *
  */
 public class ThreadUtil {
+	private static Logger log = Logger.getLogger("Thread"); 
+
 	public enum Type{
 
 		/**
@@ -51,6 +55,19 @@ public class ThreadUtil {
 	private static final EnumMap<Type, ExecutorService>          mapExec;
 	static{
 		mapExec = new EnumMap<>(Type.class);
+		
+		//定时监控线程池日志 同时支持 在线监控
+		scheduleAtFixedRate(new Runnable(){
+			public void run(){
+				log.warn("** 定时线程池日志");
+				for(Type type : mapExec.keySet()){
+					ExecutorService es = mapExec.get(type);
+					log.warn(es.toString());
+				}
+				log.warn("**! 定时线程池日志");
+			}
+		}, 30, 30, TimeUnit.SECONDS);
+		
 	}
 //	private static ScheduledExecutorService 			  scheduleExec;
 
@@ -83,7 +100,7 @@ public class ThreadUtil {
 		            // ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
 		        	mapExec.put(type, Executors.newScheduledThreadPool(corePoolSize));
 		            break;
-//		        case FixedThread:
+		        case FixedThread:
 	            default:
 		            // 构造一个固定线程数目的线程池
 		            // ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
@@ -354,7 +371,7 @@ public class ThreadUtil {
 	 * @param unit         时间单位
 	 * @return 表示挂起任务完成的ScheduledFuture，并且其{@code get()}方法在取消后将抛出异常
 	 */
-	public static ScheduledFuture<?> scheduleWithFixedRate(Runnable runnable, long initialDelay, long period, TimeUnit unit) {
+	public static ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long initialDelay, long period, TimeUnit unit) {
 		ExecutorService scheduleExec = getExecutorServiceInstance(Type.ScheduledThread);
 	    return ((ScheduledExecutorService) scheduleExec).scheduleAtFixedRate(runnable, initialDelay, period, unit);
 	}
