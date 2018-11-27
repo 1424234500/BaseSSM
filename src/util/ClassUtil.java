@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -68,6 +69,7 @@ public class ClassUtil {
 			res = constructor.newInstance(constructorArgs);
 		} catch (Exception e){
 			out("反射[" + cls + ".构造]" + Arrays.toString(constructorArgs) + e.toString());
+			throw new RuntimeException(e);
 		}
 		return res;
 	}
@@ -91,6 +93,7 @@ public class ClassUtil {
 				method = cls.getDeclaredMethod(methodName, args);
 			} catch (Exception e) {
 				out("加载类" + cls + " 方法" + methodName + " 异常" + e.toString());
+				throw new RuntimeException(e);
 			}
 		}
 		return method;
@@ -153,8 +156,10 @@ public class ClassUtil {
 		try {
 			method.setAccessible(true);
 			res = method.invoke(instance, methodArgs);
-		} catch (Exception e){
+		} catch (Exception e) {
 			out("反射[" + instance.getClass().getName() + "." + method + "]" + Arrays.toString(methodArgs) + " 异常 " + e.toString());
+			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		return res;
 	}
@@ -326,7 +331,11 @@ public class ClassUtil {
 					res = new Float(value);
 				}else if(type.equals("boolean") || type.equals("bool")){
 					res = new Boolean(value);
-				}
+				}else if(type.equals("short")){
+					res = new Short(value);
+				}else if(type.equals("byte")){
+					res = new Byte(value);
+				} 
 				//常用对象类型
 				else if(type.equals("hashmap")){ //无法实例化原生Map 
 					res = new HashMap<Object, Object>(JsonUtil.getMap(value));
@@ -338,6 +347,10 @@ public class ClassUtil {
 				//序列化传输 必须使用序列化 完整的str byte[]的数据  注意!!此处序列化会执行构造函数
 				else if(type.equals("seria") || type.equals("serializeUtil")){
 					res = SerializeUtil.deserialize(util.encode.Base64.decode(value));
+				}
+				//反射 生成构造类对象 全路径 com.controller.Page-arg1,arg2 默认构造
+				else {
+					res = newInstance(type);
 				}
 			
 			}catch(Exception e){

@@ -1,6 +1,8 @@
 package com.event.listener;
 
 import java.io.File;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
@@ -15,6 +17,7 @@ import com.service.impl.FileServiceImpl;
 import util.ClassUtil;
 import util.HttpUtil;
 import util.ThreadUtil;
+import util.ThreadUtil.Type;
 import util.Tools;
 import util.cache.Cache;
 import util.cache.CacheMgr;
@@ -60,23 +63,43 @@ public class ContextListener implements ServletContextListener {
         log.info("系统工作目录: " + systemPath);
         log.info("系统服务路径: " + contextPath);
 
-        
-        log.info("&& 开始初始化call调用");
-		new FileServiceImpl().initDirs();
-		
-		
-		ClassUtil.doClassMethod("util.cache.CacheMgr", "call");
-		ClassUtil.doClassMethod("util.annotation.TrackerMgr", "call");
-		
-		log.info("&&! 开始初始化call调用");
-
+        startComp();
         startTestSelf();
 
         log.info("系统初始化完毕，开始接收请求！");
-        log.info("...... ...................................................");
+        log.info("........................................................");
 
         
     }
+    /**
+     * 挂载组件 初始化模块
+     */
+    private void startComp(){
+        log.info("&&&&&&&&&&&&&&&&&&&&& 开始初始化call调用 &&&&&&&&&&&&&&&&&&&&");
+
+        //初始化文件目录
+		new FileServiceImpl().initDirs();
+		
+		//初始化缓存配置
+		Cache<String> cache = CacheMgr.getInstance();
+		String str = cache.get("onstart", ""); //来源于*.properties
+//		onstart=util.cache.CacheMgr,util.annotation.TrackerMgr
+		String[] arr = str.split(",");
+		int i = 1;
+		for(final String clz : arr){
+			//使用缓冲队列任务的形式来 隔离 避免runtimeException 相干
+			log.info("********** step." + i++ + " ****************");
+			ThreadUtil.execute(Type.CachedThread, new Runnable(){
+				public void run(){
+					ClassUtil.doClassMethod(clz, "call");
+				}
+			});
+		}
+		
+		log.info("&&&&&&&&&&&&&&&&&&&&&&& &&! 开始初始化call调用 &&&&&&&&&&&&&&&&&&&&&&");
+    }
+    
+    
     /**
      * 用以触发springmvc的代理 初始化
      */
@@ -93,7 +116,7 @@ public class ContextListener implements ServletContextListener {
 					startTestSelf();
 				}
 			}
-		}, 10, TimeUnit.MILLISECONDS);
+		}, 10, TimeUnit.SECONDS);
 
 		
 	}

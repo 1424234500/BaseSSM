@@ -1,4 +1,4 @@
-package util;
+package util.web;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -15,6 +15,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 
 import com.controller.BaseControll;
+
+import util.Bean;
+import util.Tools;
 
 /**
  * servlet request response printwriter 帮助工具

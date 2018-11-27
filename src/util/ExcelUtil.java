@@ -20,13 +20,19 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+
+/**
+ * excel 文档存取
+ *
+ */
 public class ExcelUtil {
 	//默认单元格内容为数字时格式
-	private static DecimalFormat df = new DecimalFormat("0");
+	public static DecimalFormat df = new DecimalFormat("0");
 	// 默认单元格格式化日期字符串 
-	private static SimpleDateFormat sdf = new SimpleDateFormat(  "yyyy-MM-dd HH:mm:ss"); 
+	public static SimpleDateFormat sdf = new SimpleDateFormat(  "yyyy-MM-dd HH:mm:ss"); 
 	// 格式化数字
-	private static DecimalFormat nf = new DecimalFormat("0.00");  
+	public static DecimalFormat nf = new DecimalFormat("0.00");  
+	
 	public static ArrayList<ArrayList<Object>> readExcel(File file){
 		if(file == null){
 			return null;
@@ -39,11 +45,11 @@ public class ExcelUtil {
 			return readExcel2003(file);
 		}
 	}
-	/*
+	/**
 	 * @return 将返回结果存储在ArrayList内，存储结构与二位数组类似
 	 * lists.get(0).get(0)表示过去Excel中0行0列单元格
 	 */
-	public static ArrayList<ArrayList<Object>> readExcel2003(File file){
+	private static ArrayList<ArrayList<Object>> readExcel2003(File file){
 		try{
 			ArrayList<ArrayList<Object>> rowList = new ArrayList<ArrayList<Object>>();
 			ArrayList<Object> colList;
@@ -115,7 +121,7 @@ public class ExcelUtil {
 		}
 	}
 	
-	public static ArrayList<ArrayList<Object>> readExcel2007(File file){
+	private static ArrayList<ArrayList<Object>> readExcel2007(File file){
 		try{
 			ArrayList<ArrayList<Object>> rowList = new ArrayList<ArrayList<Object>>();
 			ArrayList<Object> colList;
@@ -188,7 +194,7 @@ public class ExcelUtil {
 		}
 	}
 	public static void out(String str){
-		
+		Tools.out(str);
 	}
 	public static void writeExcel(ArrayList<ArrayList<Object>> result,String path){
 		if(result == null){
@@ -225,27 +231,6 @@ public class ExcelUtil {
             e.printStackTrace();
         }           
 	}
-	
-	public static DecimalFormat getDf() {
-		return df;
-	}
-	public static void setDf(DecimalFormat df) {
-		ExcelUtil.df = df;
-	}
-	public static SimpleDateFormat getSdf() {
-		return sdf;
-	}
-	public static void setSdf(SimpleDateFormat sdf) {
-		ExcelUtil.sdf = sdf;
-	}
-	public static DecimalFormat getNf() {
-		return nf;
-	}
-	public static void setNf(DecimalFormat nf) {
-		ExcelUtil.nf = nf;
-	}
-	
-	
 	
 	
 }

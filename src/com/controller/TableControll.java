@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import util.MapListUtil;
 import util.Tools;
-import util.RequestUtil;
+import util.web.RequestUtil;
 
 @Controller
 @RequestMapping("/table")

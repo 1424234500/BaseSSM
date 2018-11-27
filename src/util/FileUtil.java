@@ -4,29 +4,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
-import java.nio.file.WatchEvent.Kind;
-import java.nio.file.WatchEvent.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -112,21 +100,6 @@ public class FileUtil {
 	}
 
 	/**
-	 * 遍历处理目录下的文件
-	 * 
-	 * @param dir
-	 * @param cfun
-	 * @return 文件的总数
-	 */
-	public static int controlDirs(String dir, Fun<File> cfun) {
-		List<File> files = getAllFiles(dir);
-		for (File f : files) {
-			cfun.make(f);
-		}
-		return files.size();
-	}
-
-	/**
 	 * 同步 树形展示目录及其文件 获取文件夹下所有的文件
 	 * 
 	 * @param dir
@@ -136,18 +109,6 @@ public class FileUtil {
 	 */
 	public static List<File> getAllFilesAsync(String dir) {
 		return showDirAsync(dir, null);
-	}
-
-	/**
-	 * 树形展示目录及其文件 获取文件夹下所有的文件
-	 * 
-	 * @param dir
-	 * @param funFileOrDir
-	 *            遍历时处理回调可为空
-	 * @return 文件list 及目录都有
-	 */
-	public static List<File> getAllFiles(String dir) {
-		return showDir(dir, null);
 	}
 
 	/**
@@ -438,43 +399,6 @@ public class FileUtil {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		// FileUtil.mkfile(newPath);
-		// out((ifMove?"移动":"复制") + "文件" + oldPath + "->" + newPath);
-		// FileInputStream input = null;
-		// FileOutputStream output = null;
-		// try {
-		// input = new FileInputStream(oldPath);
-		// output = new FileOutputStream(newPath);
-		// byte[] b = new byte[1024 * 5];
-		// int len;
-		// while ((len = input.read(b)) != -1) {
-		// output.write(b, 0, len);
-		// }
-		// output.flush();
-		// output.close();
-		// input.close();
-		// if(ifMove){
-		// new File(oldPath).delete();
-		// }
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// } finally{
-		// if(input != null){
-		// try {
-		// input.close();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-		// }
-		// if(output != null){
-		// try {
-		// output.close();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-		// }
-		// }
 	}
 
 	/**
@@ -523,14 +447,6 @@ public class FileUtil {
 					newPath = newPath + File.separator + getFileName(oldPath);
 				}
 				cpDir(oldPath, newPath, ifMove);
-				// mkdir(newPath);
-				// File dir = new File(oldPath);
-				// String[] file = dir.list();
-				// for (int i = 0; i < file.length; i++) { //c:/dir1 -> c:/dir2
-				// cpIfMove(oldPath + File.separator + file[i], newPath +
-				// File.separator + file[i], ifMove);
-				// }
-				// if(ifMove) dir.delete();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -633,7 +549,7 @@ public class FileUtil {
 				return fileToMap(rootfile);
 			}
 		}
-		return new HashMap();
+		return new HashMap<>();
 	}
 
 	/**
@@ -830,32 +746,6 @@ public class FileUtil {
 			}
 		}
 		return res;
-
-	}
-
-	public static void main(String[] argv) throws IOException {
-		String dirpath = "C:\\tomcat\\download";
-		String path = "C:\\tomcat\\download\\20180717150340-compareTo2.c";
-
-		List<Map> res = (FileUtil.ls(dirpath));
-
-		Tools.formatOut(res);
-
-		// cp("C:\\tomcat\\download\\dd.txt", "C:\\tomcat\\download\\cc.txt");
-		// cp("C:\\tomcat\\download\\dd.txt", "C:\\tomcat\\download\\eef");
-		// cp("C:\\tomcat\\download\\dd.txt", "C:\\tomcat\\download\\eee\\");
-		// cp("C:\\tomcat\\download\\fff", "C:\\tomcat\\download\\ggg");
-		// cp("C:\\tomcat\\download\\fff", "C:\\tomcat\\download\\ggg\\");
-		//
-		// mv("C:\\tomcat\\download\\fff", "C:\\tomcat\\download\\ff2");
-		// mv("C:\\tomcat\\download\\ggg", "C:\\tomcat\\download\\ff2\\");
-		// mv("C:\\tomcat\\download\\ff2",
-		// "C:\\tomcat\\download\\ff21\\ff22\\ff33");
-
-		// FileUtils.moveFile(new File("C:\\tomcat\\download\\meet.c"), new
-		// File("C:\\tomcat\\download\\cc\\mm.c"));
-		FileUtils.copyFile(new File("C:\\tomcat\\download\\meet.c"), new File("C:\\tomcat\\download\\dd\\mm.c"));
-		FileUtils.copyDirectory(new File("C:\\tomcat\\download\\b"), new File("C:\\tomcat\\download\\dfdf\\dd"));
 
 	}
 

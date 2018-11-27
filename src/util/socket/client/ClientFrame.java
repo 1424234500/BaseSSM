@@ -1,6 +1,6 @@
 package util.socket.client;
 
-import util.TaskInterface;
+import util.TaskMake.TaskInterface;
 import util.TaskMake;
 import util.Tools;
 import util.setting.Setting;

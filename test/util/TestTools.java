@@ -6,11 +6,39 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.controller.Page;
+import com.sun.org.apache.xml.internal.security.utils.XMLUtils;
+
 import util.annotation.TrackerMgr;
 
 public class TestTools {
 
 	public TestTools(){}
+	
+	
+	@Test
+	public void testXml(){
+		Bean test = new Bean().put("ke1", "value1").put("ke2", "value2");
+		Bean bean = new Bean();
+		bean.put("aaaa", "addadfadsf");
+		bean.put("map", test);
+		List list = new ArrayList<>();
+		list.add("bbb");
+		list.add("ccc");
+		list.add(4);
+		list.add(test);
+		list.add(test);
+		bean.put("list", list);
+		bean.put("page", new Page());
+		
+		Tools.out(XmlUtil.toFullXml(bean));
+		int i = 4;
+
+		fun(i);
+	}
+	public void fun(Object obj){
+		Tools.out(obj.getClass());
+	}
 	
 	
 	@Test

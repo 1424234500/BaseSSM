@@ -61,6 +61,8 @@ public class CacheMgr implements Call{
 	 * 2.加载数据库 
 	 */
 	public static void reload(Cache<String> cache){
+		Tools.out("** init load cache ");
+		
 		String classRoot = CacheMgr.class.getResource("/").getPath();
 		File dir = new File(classRoot);
 		Tools.out(dir.getPath(), dir.getAbsolutePath(), dir.getName(), dir.getPath(),dir.list());
@@ -78,13 +80,16 @@ public class CacheMgr implements Call{
 //			Object value = keyValue.get("VALUE");
 //			cache.put(key, value);
 //		}
+		Tools.out("**! init load cache ");
+
 	}
 	
 	public void call(){
-		log.info("** 初始化缓存");
 		Cache<String> cache = getInstance();
 		if(cache == null) return ;
 		
+		log.info("** 附加缓存");
+
 		List<Object> list = new ArrayList<>();
 		list.add("string item");
 		list.add(1111111);
@@ -109,9 +114,8 @@ public class CacheMgr implements Call{
 				.put("map3", bean2)
 				);
 		cache.put("list", list);
-		
 
-		log.info("**! 初始化缓存");
+		log.info("**! 附加缓存");
 	}
 
 }

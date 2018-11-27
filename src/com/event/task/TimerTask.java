@@ -14,7 +14,7 @@ import com.service.LogService;
  */
 @Component
 public class TimerTask {
-	static private Logger log = Logger.getLogger("TimerTask"); 
+	static private Logger log = Logger.getLogger("spring.TimerTask"); 
 	static private long count = 0;
 	
 	@Scheduled(cron = "0 59 23 ? * *") //每天
@@ -54,7 +54,7 @@ public class TimerTask {
 
 	@Scheduled(cron = "0/10 * * * * ?") //每10s
 	public void eachMake() {
-	    log.info(count++);
+//	    log.info(count++);
 	}
 	
 	/*

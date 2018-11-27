@@ -16,8 +16,9 @@ import com.service.LogService;
 import com.service.LoginService;
 
 import util.Bean;
-import util.RequestUtil;
 import util.cache.Cache;
+import util.cache.CacheMgr;
+import util.web.RequestUtil;
 
 /**
  * 拦截器 日志 登录/访问权限 事务   监控所有用户操作和登录并记录日志数据库
@@ -27,7 +28,7 @@ import util.cache.Cache;
 public class LoginInterceptors implements HandlerInterceptor{  
 	static public Logger logger = Logger.getLogger("Aop"); 
 
-	Cache<String> cache = util.cache.CacheMgr.getInstance();
+	Cache<String> cache = CacheMgr.getInstance();
     @Autowired
 	LoginService loginService;
 	

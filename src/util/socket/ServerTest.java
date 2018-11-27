@@ -2,6 +2,7 @@ package util.socket;
 
 public class ServerTest {
 
+	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
 		
 //		new ServerHashmapImpl(new SocketIO()).start();

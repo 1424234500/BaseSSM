@@ -230,7 +230,7 @@ public class SortUtil {
 	public static void test(int len){
 		Bean[] list = new Bean[len];
 		Bean[] res;
-		int[] sequence = RandomUtil.getSequence(len, 0);
+		int[] sequence = ArraysUtil.getSequence(len, 0);
 		for(int i = 0; i < len; i++){
 			list[i] = (Bean.getBean().put("k", sequence[i]));//Tools.getRandomNum(0, len, 0)));
 		}

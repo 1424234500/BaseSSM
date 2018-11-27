@@ -1,14 +1,101 @@
 package util;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import org.apache.log4j.Logger;
 
 /**
  * 对象类型转换工具
  *
  */
 public class LangUtil {
+	private static Logger log = Logger.getLogger("Lang");
 
+	public interface Call{
+		void onMap(Map<?,?> map);
+		void onList(List<?> list);
+		void onString(String str);
+	}
+	
+	/**
+	 * 
+	 * 解析判断Object类型 回调处理 适用于递归处理的 JSON XML 格式化
+	 * 
+	 * Map
+	 * 		key1-value
+	 * 		key2-value
+	 * 
+	 * List
+	 * 		arr[0]
+	 * 		arr[1]
+	 * 
+	 * Java simple Object
+	 * 		id-value
+	 * 		name-value
+	 * 
+	 * String
+	 * 		Int 
+	 * 		Long
+	 * 		String
+	 */
+	public static void onObject(Object obj, Call call){
+		if(call == null)return;
+			
+		 if (obj instanceof Map) {
+             call.onMap((Map<?,?>)obj);
+         } else if (obj instanceof List) {
+             call.onList((List<?>)obj);
+         } else if (
+        		    obj instanceof String
+        		 || obj instanceof Integer
+        		 || obj instanceof Double
+        		 || obj instanceof Long
+        		 || obj instanceof Float
+        		 || obj instanceof Character
+        		 || obj instanceof Short
+        		 || obj instanceof Boolean
+        		 ) {
+             call.onString(String.valueOf(obj));
+         } else{//按照基本类型 key-value转化
+        	 if(obj != null){
+            	 Map<String, Object> map = new HashMap<>();
+	        	 Field[] fields = obj.getClass().getDeclaredFields();
+	        	 for(Field item : fields){
+	        		 String key = item.getName();
+	        		 Object value = null;
+	        		 item.setAccessible(true);
+	        		 try {
+						value = item.get(obj);
+						map.put(key, value);
+					} catch (IllegalArgumentException | IllegalAccessException e) { //私有不计算策略
+						e.printStackTrace();
+					}
+	        	 }
+	        	 log.info("turn obj to " + map.keySet() + " from " + obj);
+	        	 call.onMap(map);
+        	 }else{
+        		 call.onString("null");
+        	 }
+         }
+		
+	}
+	
+	/**
+	 * 目标类型转换
+	 * 
+	 * @param obj
+	 * @param defaultValue
+	 * @return
+	 */
+	public static <T> T turn(Object obj) {
+		return turn(obj, null);
+	}
 	/**
 	 * 目标类型转换
 	 * 
@@ -101,7 +188,7 @@ public class LangUtil {
 	 * 
 	 * @return 整型
 	 */
-	public static Integer to(Object obj, int def) {
+	public static Integer to(Object obj, Integer def) {
 		if (obj != null) {
 			if (obj instanceof Integer) {
 				return (Integer) obj;
@@ -137,7 +224,7 @@ public class LangUtil {
 	 * 
 	 * @return 长整型
 	 */
-	public static Long to(Object obj, long def) {
+	public static Long to(Object obj, Long def) {
 		if (obj != null) {
 			if (obj instanceof Long) {
 				return (Long) obj;

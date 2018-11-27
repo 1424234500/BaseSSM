@@ -69,11 +69,17 @@ public class ClassControll extends BaseControll{
 		splitArg = splitArg.length()==0 ? "-" : splitArg;
 		splitArr = splitArr.length()==0 ? "@" : splitArr;
 		
-		if(args.length() > 0){
-			echo(ClassUtil.doClassMethod(className, methodName, ClassUtil.parseObject(args, splitArr, splitArg)));
-		}else{
-			echo(ClassUtil.doClassMethod(className, methodName));
+		Object res = null;
+		try{
+			if(args.length() > 0){
+				res = ClassUtil.doClassMethod(className, methodName, ClassUtil.parseObject(args, splitArr, splitArg));
+			}else{
+				res = ClassUtil.doClassMethod(className, methodName);
+			}
+		}catch(Exception e){
+			res = e.toString();
 		}
+		echo(res);
 	}
 	/**
 	 * 连续 反射 多注入 执行链 builder模式  代码注入？

@@ -1,8 +1,10 @@
-package util;
+package util.graphic;
 import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+
+import util.Tools;
  
 /**
  * This class demonstrates the DirectoryDialog class
@@ -19,9 +21,9 @@ public class FileDialog {
 		      
 		      File file=jfc.getSelectedFile();  
 		      if(file.isDirectory()){  
-		          System.out.println("文件夹:"+file.getAbsolutePath());  
+		          Tools.out("文件夹:"+file.getAbsolutePath());  
 	          }else if(file.isFile()){  
-	              System.out.println("文件:"+file.getAbsolutePath());  
+	              Tools.out("文件:"+file.getAbsolutePath());  
 	          }  
 		      return file.getAbsolutePath();
 		}catch(Exception e){
@@ -37,9 +39,9 @@ public class FileDialog {
 	      jfc.showDialog(new JLabel(), "选择文件夹或者文件");  
 	      File file=jfc.getSelectedFile();  
 	      if(file.isDirectory()){  
-	          System.out.println("文件夹:"+file.getAbsolutePath());  
+	          Tools.out("文件夹:"+file.getAbsolutePath());  
         }else if(file.isFile()){  
-            System.out.println("文件:"+file.getAbsolutePath());  
+            Tools.out("文件:"+file.getAbsolutePath());  
         }  
 	      return file.getAbsolutePath();
 	}catch(Exception e){
@@ -55,9 +57,9 @@ public class FileDialog {
 	        jfc.showDialog(new JLabel(), "选择文件");  
 	        File file=jfc.getSelectedFile();  
 	        if(file.isDirectory()){  
-	            System.out.println("文件夹:"+file.getAbsolutePath());  
+	            Tools.out("文件夹:"+file.getAbsolutePath());  
 	        }else if(file.isFile()){  
-	            System.out.println("文件:"+file.getAbsolutePath());  
+	            Tools.out("文件:"+file.getAbsolutePath());  
 	        }  
 			return file.getAbsolutePath();  
 		}catch(Exception e){

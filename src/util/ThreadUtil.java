@@ -59,14 +59,12 @@ public class ThreadUtil {
 		//定时监控线程池日志 同时支持 在线监控
 		scheduleAtFixedRate(new Runnable(){
 			public void run(){
-				log.warn("** 定时线程池日志");
 				for(Type type : mapExec.keySet()){
 					ExecutorService es = mapExec.get(type);
-					log.warn(es.toString());
+					log.warn("Thread show " + es.toString());
 				}
-				log.warn("**! 定时线程池日志");
 			}
-		}, 30, 30, TimeUnit.SECONDS);
+		}, 60, 60, TimeUnit.SECONDS);
 		
 	}
 //	private static ScheduledExecutorService 			  scheduleExec;

@@ -3,7 +3,7 @@ package util;
 import java.util.HashMap;
 
 /**
- * 元组 模式 构建 多元素
+ * 元组 模式 构建 多元素返回
  * @author walker
  *
  * @param <T>

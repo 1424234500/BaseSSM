@@ -23,10 +23,10 @@ import util.JsonUtil;
 import util.MapListUtil;
 import util.Tools;
 import util.XmlUtil;
-import util.RequestUtil;
 import util.cache.Cache;
 import util.cache.CacheMgr;
 import util.database.SqlHelp;
+import util.web.RequestUtil;
 
 
 /**
@@ -35,7 +35,7 @@ import util.database.SqlHelp;
  *
  */  
 public abstract class BaseControll {
-	private static final String RES_TYPE = "_KEY";
+	private static final String RES_TYPE = "_RES";
 	private static final String TYPE_XML = "XML";
 	private static final String TYPE_JSON = "JSON";
 
