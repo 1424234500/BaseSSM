@@ -61,11 +61,15 @@ public class CacheMgr implements Call{
 	 * 2.加载数据库 
 	 */
 	public static void reload(Cache<String> cache){
-		Tools.out("** init load cache ");
+		log.info("** init load cache ");
 		
 		String classRoot = CacheMgr.class.getResource("/").getPath();
 		File dir = new File(classRoot);
-		Tools.out(dir.getPath(), dir.getAbsolutePath(), dir.getName(), dir.getPath(),dir.list());
+		log.info(dir.getPath());
+		log.info(dir.getAbsolutePath());
+		log.info(dir.getName());
+		log.info(dir.getPath());
+		log.info(dir.list());
 		for (String item : dir.list()) {
 			String path = classRoot + item;
 			if (FileUtil.check(path) == 0 && path.endsWith(".properties")) {
@@ -80,15 +84,19 @@ public class CacheMgr implements Call{
 //			Object value = keyValue.get("VALUE");
 //			cache.put(key, value);
 //		}
-		Tools.out("**! init load cache ");
+		log.info("**! init load cache ");
 
 	}
 	
+	@Override
 	public void call(){
 		Cache<String> cache = getInstance();
-		if(cache == null) return ;
+		if(cache == null){
+			log.error(" cache init error xxxxxxxxxxxxxxxxxxx");
+			return;
+		}
 		
-		log.info("** 附加缓存");
+		log.info("** 开始测试 附加缓存");
 
 		List<Object> list = new ArrayList<>();
 		list.add("string item");
@@ -114,7 +122,12 @@ public class CacheMgr implements Call{
 				.put("map3", bean2)
 				);
 		cache.put("list", list);
-
+		
+		if(cache.get("int", 0) == 1){
+			log.info(" save and read ok ");
+		}else{
+			log.error(" save and read error xxxxxxxxxxxxxxxx");
+		}
 		log.info("**! 附加缓存");
 	}
 

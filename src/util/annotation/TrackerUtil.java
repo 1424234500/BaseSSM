@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import util.ClassUtil;
+import util.Tools;
 
 /**
  * 注解扫描处理器工具 抽离出目标注解(Class, Method, Field)的处理实现 支持处理链? 一次扫描 所有注解全部处理 只处理本项目下的注解
@@ -65,16 +66,18 @@ public class TrackerUtil {
 				ElementType[] et = target.value(); //Field Method Type
 				String clsName = cls.getName(); 				//util.annotation.DBTable
 				String trackerClsName = clsName + "Tracker";	//util.annotation.DBTableTracker
-				Object makerObj = ClassUtil.newInstance(trackerClsName);
-				//new Tracker(UseCase.class, ElementType.METHOD,  new UseCaseTracker()),
-				if(makerObj != null){
-					OnAnnotation maker = (OnAnnotation) makerObj;
-					for(ElementType type : et){
-						map.get(type).add(new Tracker((Class<? extends Annotation>) cls, type, maker));
+				try{
+					Object makerObj = ClassUtil.newInstance(trackerClsName);
+					//new Tracker(UseCase.class, ElementType.METHOD,  new UseCaseTracker()),
+					if(makerObj != null){
+						OnAnnotation maker = (OnAnnotation) makerObj;
+						for(ElementType type : et){
+							map.get(type).add(new Tracker((Class<? extends Annotation>) cls, type, maker));
+						}
 					}
-					
+				}catch(Exception e){
+					Tools.out(" annotation scan error: " + clsName + " 's tracker error " + e.toString());
 				}
-				
 			}
 			
 			

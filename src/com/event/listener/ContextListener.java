@@ -87,10 +87,11 @@ public class ContextListener implements ServletContextListener {
 		String[] arr = str.split(",");
 		int i = 1;
 		for(final String clz : arr){
+			final int ii = i++;
 			//使用缓冲队列任务的形式来 隔离 避免runtimeException 相干
-			log.info("********** step." + i++ + " ****************");
-			ThreadUtil.execute(Type.CachedThread, new Runnable(){
+			ThreadUtil.execute(Type.SingleThread, new Runnable(){
 				public void run(){
+					log.info("********** step." + ii + " ****************");
 					ClassUtil.doClassMethod(clz, "call");
 				}
 			});

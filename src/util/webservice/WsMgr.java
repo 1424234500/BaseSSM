@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import util.Call;
 
 /**
- * webService模块控制
+ * webService 服务端模块控制
  *
  */
 public class WsMgr implements Call{
@@ -16,11 +16,18 @@ public class WsMgr implements Call{
 	 */
 	@Override
 	public void call() {
-		log.info("** init WebService ");
+		log.info("** init WebService provider ");
 		
 		
+
 		
-		log.info("**! init WebService ");
+		
+		log.info("**! init WebService provider ");
+		
+		log.info("-- test ");
+		
+		
+		log.info("--! test ");
 	}
 
 	

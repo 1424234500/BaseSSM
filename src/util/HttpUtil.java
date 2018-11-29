@@ -156,14 +156,14 @@ public class HttpUtil {
 		try{
 			response = client.execute(httpPost);
 		}catch(Exception e){
-			log.info("请求异常" + e.toString());
+			log.info("post error " + e.toString());
 			throw e;
 		}
 		String res = "";
 		try{
 			res = getResponseData(response, encode);	
 		}catch(Exception e){
-			log.info("解析数据" + e.toString());
+			log.info("parse error " + e.toString());
 			throw e;
 		}
 		
@@ -182,14 +182,14 @@ public class HttpUtil {
 		try{
 			response = client.execute(httpGet);
 		}catch(Exception e){
-			log.info("请求异常" + e.toString());
+			log.info("get error " + e.toString());
 			throw e;
 		}
 		String res = "";
 		try{
 			res = getResponseData(response, encode);	
 		}catch(Exception e){
-			log.info("解析数据" + e.toString());
+			log.info("parse error " + e.toString());
 			throw e;
 		}
 		

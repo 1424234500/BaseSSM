@@ -19,7 +19,7 @@ public class TestTracker implements OnAnnotation{
 	@Override
 	public Status make(Annotation annotation, ElementType type, Object object, Class<?> cls) {
 //		Tools.out(this, annotation, type, object);
-		Test instance = (Test)annotation;
+//		Test instance = (Test)annotation;
 		
 		if(type.equals(ElementType.METHOD)){
 			Method method = (Method)object;
@@ -33,7 +33,7 @@ public class TestTracker implements OnAnnotation{
 				method.setAccessible(true);
 				try {
 					if(! method.getReturnType().equals(void.class) )
-						res = (boolean) ClassUtil.doClassMethod(cls, method);
+						res = (Boolean) ClassUtil.doClassMethod(cls, method);
 					else{
 						ClassUtil.doClassMethod(cls, method);
 						res = true;
@@ -43,13 +43,13 @@ public class TestTracker implements OnAnnotation{
 					res = false;
 				}
 				if(res){
-					Tools.out("TestTracker", cls.getName(), method.getName(), "true-------");
+					Tools.out("TestTracker", cls.getName(), method.getName(), "true---------");
 				}else{
-					Tools.out("TestTracker", cls.getName(), method.getName(), "false-------");
+					Tools.out("TestTracker", cls.getName(), method.getName(), "false--xxxxxxxxxxx");
 				}
 
 			}else{
-				throw new RuntimeException(cls.getName() + " " + method.getName() + " test测试方法 必须boolean 或者 无返回值 且无参数");
+				Tools.out(cls.getName() + " " + method.getName() + " test测试方法 必须boolean 或者 无返回值 且无参数");
 			}
 			
 			

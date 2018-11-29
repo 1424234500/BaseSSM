@@ -84,12 +84,12 @@ public class ThreadUtil {
 	    if(mapExec.get(type) == null){
 		    switch (type) {
 		        case SingleThread:
-		            // 构造一个只支持一个线程的线程池,相当于newFixedThreadPool(1)
+		            // 构造一个只支持一个线程的线程池,相当于newFixedThreadPool(1) 队列
 		            // ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>())
 		        	mapExec.put(type, Executors.newSingleThreadExecutor());
 		            break;
 		        case CachedThread:
-		            // 构造一个缓冲功能的线程池
+		            // 构造一个缓冲功能的线程池 缓冲执行 不能当作 队列
 		            // ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
 		        	mapExec.put(type, Executors.newCachedThreadPool());
 		            break;

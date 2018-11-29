@@ -27,6 +27,8 @@ import util.cache.CacheMgr;
  * 
  * 类控制 反转 缓存<?类加载机制自带缓存>
  *
+ * 策略 所有方法 可抛出 RuntimeException
+ * 
  */
 public class ClassUtil {
 	public static Cache<String> cache = CacheMgr.getInstance();
@@ -44,6 +46,7 @@ public class ClassUtil {
 				cls = Class.forName(className);
 			} catch (ClassNotFoundException cne) {
 				out("反射类", className, "加载异常", cne.toString(), cne.getCause());
+				throw new RuntimeException(cne);
 			}
 		}
 		return cls;
@@ -51,10 +54,18 @@ public class ClassUtil {
 	/**
 	 * 实例化 类
 	 * @param cls
+	 * @throws RuntimeException
 	 */
 	public static Object newInstance(String className, Object...constructorArgs){
 		return newInstance(loadClass(className), constructorArgs);
 	}
+	/**
+	 * 
+	 * @param cls
+	 * @param constructorArgs
+	 * @throws RuntimeException
+	 * @return
+	 */
 	public static Object newInstance(Class<?> cls, Object...constructorArgs){
 		Object res = null;
 		try{
