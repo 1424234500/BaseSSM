@@ -2,6 +2,7 @@ package util.cache;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -9,7 +10,6 @@ import org.apache.log4j.Logger;
 import util.Bean;
 import util.Call;
 import util.FileUtil;
-import util.Tools;
 import util.setting.SettingUtil;
 
 /**
@@ -61,15 +61,20 @@ public class CacheMgr implements Call{
 	 * 2.加载数据库 
 	 */
 	public static void reload(Cache<String> cache){
-		log.info("** init load cache ");
+		log.info("***初始化缓存");
 		
 		String classRoot = CacheMgr.class.getResource("/").getPath();
 		File dir = new File(classRoot);
-		log.info(dir.getPath());
-		log.info(dir.getAbsolutePath());
-		log.info(dir.getName());
-		log.info(dir.getPath());
-		log.info(dir.list());
+//		log.info(dir.getPath());
+//		log.info(dir.getAbsolutePath());
+//		log.info(dir.getName());
+//		log.info(Arrays.toString(dir.list()));
+		Bean bean = new Bean();
+		bean.put("cache_dir_getPath", dir.getPath());
+		bean.put("cache_dir_getAbsolutePath", dir.getAbsolutePath());
+		bean.put("cache_dir_getName", dir.getName());
+		bean.put("files", Arrays.asList(dir.list()));
+		
 		for (String item : dir.list()) {
 			String path = classRoot + item;
 			if (FileUtil.check(path) == 0 && path.endsWith(".properties")) {
@@ -84,7 +89,7 @@ public class CacheMgr implements Call{
 //			Object value = keyValue.get("VALUE");
 //			cache.put(key, value);
 //		}
-		log.info("**! init load cache ");
+		log.info("**!初始化完毕------------------ ");
 
 	}
 	
@@ -92,11 +97,11 @@ public class CacheMgr implements Call{
 	public void call(){
 		Cache<String> cache = getInstance();
 		if(cache == null){
-			log.error(" cache init error xxxxxxxxxxxxxxxxxxx");
+			log.error(" cache 初始化 异常 xxxxxxxxxxxxxxxxxxx");
 			return;
 		}
 		
-		log.info("** 开始测试 附加缓存");
+		log.info("** 开始测试 附加缓存--------");
 
 		List<Object> list = new ArrayList<>();
 		list.add("string item");
@@ -128,7 +133,7 @@ public class CacheMgr implements Call{
 		}else{
 			log.error(" save and read error xxxxxxxxxxxxxxxx");
 		}
-		log.info("**! 附加缓存");
+		log.info("**! 附加缓存----------------");
 	}
 
 }

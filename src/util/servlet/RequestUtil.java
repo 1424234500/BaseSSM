@@ -1,4 +1,4 @@
-package util.web;
+package util.servlet;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

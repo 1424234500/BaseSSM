@@ -26,7 +26,7 @@ import util.XmlUtil;
 import util.cache.Cache;
 import util.cache.CacheMgr;
 import util.database.SqlHelp;
-import util.web.RequestUtil;
+import util.servlet.RequestUtil;
 
 
 /**

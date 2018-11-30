@@ -1,8 +1,6 @@
 package com.event.listener;
 
 import java.io.File;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
@@ -39,6 +37,8 @@ public class ContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         // 加载配置参数
         log.info(".........................................................");
+        log.info(".........................................................");
+        log.info(".........................................................");
         log.info("正在启动系统 ... ...");
         ServletContext sc = sce.getServletContext();
         // 获取系统真实路径
@@ -47,7 +47,6 @@ public class ContextListener implements ServletContextListener {
         if (!systemPath.endsWith(File.separator)) {
             systemPath += ",";
         }
-        
         String contextPath = sc.getContextPath();
         if (contextPath.equals("/")) {
             contextPath = "/";
@@ -68,6 +67,8 @@ public class ContextListener implements ServletContextListener {
 
         log.info("系统初始化完毕，开始接收请求！");
         log.info("........................................................");
+        log.info("........................................................");
+        log.info("........................................................");
 
         
     }
@@ -82,7 +83,7 @@ public class ContextListener implements ServletContextListener {
 		
 		//初始化缓存配置
 		Cache<String> cache = CacheMgr.getInstance();
-		String str = cache.get("onstart", ""); //来源于*.properties
+		String str = cache.get("on_list_start", ""); //来源于*.properties
 //		onstart=util.cache.CacheMgr,util.annotation.TrackerMgr
 		String[] arr = str.split(",");
 		int i = 1;
@@ -91,7 +92,9 @@ public class ContextListener implements ServletContextListener {
 			//使用缓冲队列任务的形式来 隔离 避免runtimeException 相干
 			ThreadUtil.execute(Type.SingleThread, new Runnable(){
 				public void run(){
-					log.info("********** step." + ii + " ****************");
+					log.info("*******************************************");
+					log.info("********** step." + ii + "    ");
+					log.info("*******************************************");
 					ClassUtil.doClassMethod(clz, "call");
 				}
 			});
@@ -124,8 +127,12 @@ public class ContextListener implements ServletContextListener {
 
 	@Override
     public void contextDestroyed(ServletContextEvent arg0) {
-    	
+        log.info("...... ...................................................");
+        log.info("...... ...................................................");
+        log.info("...... ...................................................");
     	log.info("系统关闭！");
+        log.info("...... ...................................................");
+        log.info("...... ...................................................");
         log.info("...... ...................................................");
 
 

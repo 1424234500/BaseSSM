@@ -18,7 +18,7 @@ import com.service.LoginService;
 import util.Bean;
 import util.cache.Cache;
 import util.cache.CacheMgr;
-import util.web.RequestUtil;
+import util.servlet.RequestUtil;
 
 /**
  * 拦截器 日志 登录/访问权限 事务   监控所有用户操作和登录并记录日志数据库

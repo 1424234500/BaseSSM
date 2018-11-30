@@ -15,7 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.controller.Context;
 import com.service.LogService;
 
-import util.web.RequestUtil;
+import util.servlet.RequestUtil;
 
 
 /**

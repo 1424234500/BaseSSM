@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.service.StudentService;
 
 import util.JsonUtil;
-import util.web.RequestUtil;
+import util.servlet.RequestUtil;
 
 
 /**

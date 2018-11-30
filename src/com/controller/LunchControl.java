@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import util.MapListUtil;
 import util.Tools;
-import util.web.RequestUtil;
+import util.servlet.RequestUtil;
 
 @Controller
 @RequestMapping("/lunch")

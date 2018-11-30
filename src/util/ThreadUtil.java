@@ -64,7 +64,7 @@ public class ThreadUtil {
 					log.warn("Thread show " + es.toString());
 				}
 			}
-		}, 60, 60, TimeUnit.SECONDS);
+		}, 300, 300, TimeUnit.SECONDS);
 		
 	}
 //	private static ScheduledExecutorService 			  scheduleExec;

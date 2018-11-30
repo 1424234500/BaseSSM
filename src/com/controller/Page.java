@@ -1,5 +1,7 @@
 package com.controller;
 
+import java.io.Serializable;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Component;
@@ -9,7 +11,8 @@ import util.LangUtil;
 import util.Tools;
 
 @Component
-public class Page {
+public class Page implements Serializable{
+	private static final long serialVersionUID = 1L;
 //	static int defaultEachPageNum = 5;
 	long NUM = 0;	//总数据条数
 	int SHOWNUM = 5;//每页数量

@@ -20,7 +20,7 @@ import com.service.StudentService;
 import util.Bean;
 import util.MapListUtil;
 import util.Tools;
-import util.web.RequestUtil;
+import util.servlet.RequestUtil;
 
 /** 
  * 测试AngularJs的后台
