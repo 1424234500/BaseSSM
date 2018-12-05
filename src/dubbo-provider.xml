@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
-       xmlns="http://www.springframework.org/schema/beans"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
-       http://dubbo.apache.org/schema/dubbo 
-       http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
-
-    <!-- consumer's application name, used for tracing dependency relationship (not a matching criterion), don't set it same as provider -->
-    <dubbo:application name="dubbo-provider"/>
-    <!-- use multicast registry center to discover service -->
-    <!-- dubbo:registry address="multicast://224.5.6.7:1234" -->
-   <!--  <dubbo:registry address="redis://localhost:6379"/>-->
-    <!-- generate proxy for the remote service, then demoService can be used in the same way as the local regular interface -->
-    <dubbo:reference id="serviceProvider" check="false" interface="util.dubbo.provider.ServiceProvider"/>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://code.alibabatech.com/schema/dubbo
+	http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+	<!-- 具体的实现bean -->
+	<bean id="demoService" class="io.kuaibao.provider.service.impl.UserServiceImpl" />
+	<!-- 提供方应用信息，用于计算依赖关系 -->
+	<dubbo:application name="dubbo_provider"  />
+	<!-- 使用zookeeper注册中心暴露服务地址 -->
+	<dubbo:registry address="zookeeper://192.168.124.131:2181" />
+	<!-- 用dubbo协议在20880端口暴露服务 -->
+	<dubbo:protocol name="dubbo" port="20881" />
+	<!-- 声明需要暴露的服务接口 -->
+	<dubbo:service interface="io.kuaibao.provider.service.UserService" ref="demoService" />
 </beans>
