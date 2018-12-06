@@ -64,20 +64,7 @@ public class LangUtil {
              call.onString(String.valueOf(obj));
          } else{//按照基本类型 key-value转化
         	 if(obj != null){
-            	 Map<String, Object> map = new HashMap<>();
-	        	 Field[] fields = obj.getClass().getDeclaredFields();
-	        	 for(Field item : fields){
-	        		 String key = item.getName();
-	        		 Object value = null;
-	        		 item.setAccessible(true);
-	        		 try {
-						value = item.get(obj);
-						map.put(key, value);
-					} catch (IllegalArgumentException | IllegalAccessException e) { //私有不计算策略
-						e.printStackTrace();
-					}
-	        	 }
-	        	 log.info("turn obj to " + map.keySet() + " from " + obj);
+            	 Map<String, Object> map = LangUtil.turnObj2Map(obj, new HashMap<String, Object>());
 	        	 call.onMap(map);
         	 }else{
         		 call.onString("null");
@@ -86,6 +73,27 @@ public class LangUtil {
 		
 	}
 	
+	
+	public static Map<String, Object> turnObj2Map(Object obj, HashMap<String, Object> hashMap) {
+		Map<String, Object> map = new HashMap<>();
+		Field[] fields = obj.getClass().getDeclaredFields();
+		for (Field item : fields) {
+			String key = item.getName();
+			Object value = null;
+			item.setAccessible(true);
+			try {
+				value = item.get(obj);
+				map.put(key, value);
+			} catch (IllegalArgumentException | IllegalAccessException e) { // 私有不计算策略
+				e.printStackTrace();
+			}
+		}
+   	 	log.info("turn obj to " + map.keySet() + " from " + obj);
+
+		return map;
+	}
+
+
 	/**
 	 * 目标类型转换
 	 * 

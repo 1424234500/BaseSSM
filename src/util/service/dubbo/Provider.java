@@ -37,14 +37,10 @@ public class Provider implements Call{
 		String port = "8089";
 		List<Object> list = new ArrayList<>();
 		list.add(new ServiceClassWebserviceImpl());
-		int i = 0;
-		for(Object obj : list){
 
-			System.setProperty("java.net.preferIPv4Stack", "true");
-			ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { "dubbo-provider.xml" });
-			context.start(); 
-
-		}
+		System.setProperty("java.net.preferIPv4Stack", "true");
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { "dubbo-provider.xml" });
+		context.start(); 
 		log.info("**! 初始化完毕 dubbo provider------------------- ");
 		
 		log.info("-- 开始测试dubbo --------------");
