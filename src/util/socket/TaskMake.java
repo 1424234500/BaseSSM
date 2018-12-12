@@ -1,6 +1,7 @@
-package util;
+package util.socket;
 
-import util.socket.ThreadUtilServer;
+import util.ThreadUtil;
+import util.Tools;
 
 
 public class TaskMake{

@@ -10,40 +10,41 @@ package util.scheduler;
  * 移除任务
  * 修改任务
  * 
+ * 策略 异常上抛 用者处理
  */
 public interface Scheduler{
 	
 	 /**
      * 启动
      */
-    public Boolean start();
+    public void start() throws Exception;
 
 	 /**
      * 暂停
      */
-    public Boolean pause();
+    public void pause() throws Exception;
 
     
     /**
      * 关闭
      */
-    public Boolean shutdown();
+    public void shutdown() throws Exception;
 
     /**
      * 添加任务
      */
-    public Boolean add(Task task);
+    public void add(Task task) throws Exception;
     
     
     /**
      * 移除任务
      */
-    public Boolean remove(String id);
+    public void remove(Task task) throws Exception;
     
     /**
      * 修改任务
      */
-    public Boolean update(Task task);
+    public void update(Task task) throws Exception;
     
     
     

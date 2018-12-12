@@ -11,10 +11,10 @@ import util.service.service.ServiceHelloRmi;
  *
  *
  */
-public class ServiceClassRmiImpl extends UnicastRemoteObject implements ServiceHelloRmi{
+public class ServiceHelloRmiImpl extends UnicastRemoteObject implements ServiceHelloRmi{
 	private static final long serialVersionUID = 1L;
 
-    public ServiceClassRmiImpl() throws RemoteException {
+    public ServiceHelloRmiImpl() throws RemoteException {
         super();
     }
     

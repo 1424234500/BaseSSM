@@ -1,5 +1,7 @@
 package util.scheduler;
 
+import org.apache.log4j.Logger;
+
 import util.Call;
 
 /**
@@ -7,6 +9,7 @@ import util.Call;
  *
  */
 public class SchedulerMgr implements Call{
+	private static Logger log = Logger.getLogger(SchedulerMgr.class);
 
 	private static Scheduler scheduler = null;
 
@@ -38,12 +41,22 @@ public class SchedulerMgr implements Call{
 	 * 2.加载数据库 
 	 */
 	public static void reload(Scheduler scheduler){
-		scheduler.add(new Task());
+		Task task = new Task("util.scheduler.job.JobTest", "out", "scheduler tools out");
+		task.pattern.add("0/50 0/10 * * * ?");
+		try {
+			scheduler.add(task);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void call(){
 		Scheduler scheduler = getInstance();
-		scheduler.start();
+		try {
+			scheduler.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

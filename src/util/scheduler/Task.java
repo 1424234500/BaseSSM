@@ -1,10 +1,13 @@
 package util.scheduler;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * 用于任务调度的任务
+ * 
+ * 定时执行某个函数
  *
  */
 public class Task {
@@ -32,8 +35,14 @@ public class Task {
 	String about;
 	
 	/**
+	 * 任务初始化后 回调对象
+	 */
+	Object make;
+	
+	/**
 	 * 多触发器 
 	 * CRON表达式    含义 
+	"0/10 * * * * ?"     
 	"0 0 12 * * ?"    每天中午十二点触发 
 	"0 15 10 ? * *"    每天早上10：15触发 
 	"0 15 10 * * ?"    每天早上10：15触发 
@@ -50,14 +59,20 @@ public class Task {
 
 	
 	Task(){
-		
+		pattern = new ArrayList<>();
+	}
+	Task(String className, String methodName, Object...args){
+		this();
+		this.className = className;
+		this.methodName = methodName;
+		this.args = args;
 	}
 	/**
 	 * 以反射 类名 函数名 和参数名作为统一 id
 	 */
 	@Override
 	public String toString() {
-		return className + "." + methodName + "" + Arrays.toString(args);
+		return "" + className + "." + methodName + Arrays.toString(args);
 	}
 	
 	

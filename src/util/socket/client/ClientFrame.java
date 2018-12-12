@@ -1,10 +1,10 @@
 package util.socket.client;
 
-import util.TaskMake.TaskInterface;
-import util.TaskMake;
 import util.Tools;
 import util.setting.Setting;
 import util.socket.InterfaceOut;
+import util.socket.TaskMake;
+import util.socket.TaskMake.TaskInterface;
 
 public abstract class ClientFrame implements Client, InterfaceOut{
 
