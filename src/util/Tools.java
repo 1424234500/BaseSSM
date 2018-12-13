@@ -1,5 +1,7 @@
 package util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -31,6 +33,18 @@ public class Tools {
 		
 	}
 
+	public static String toString(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+
+        try {
+            throwable.printStackTrace(pw);
+            return sw.toString();
+        } finally {
+            pw.close();
+        }
+    }
+	
 	public static String fillInt(Object obj, int len){
 		return fillStringBy(obj+"", " ", len, 1);
 	}
