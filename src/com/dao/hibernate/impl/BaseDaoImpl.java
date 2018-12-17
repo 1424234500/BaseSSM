@@ -26,9 +26,9 @@ import com.dao.hibernate.BaseDao;
  
 @Repository("baseDao")
 public class BaseDaoImpl implements BaseDao  {
-	static public Logger logger = Logger.getLogger("Hibernate"); 
+	static public Logger log = Logger.getLogger("Hibernate"); 
 	public void out(String str){
-		logger.info(str);
+		log.debug(str);
 	}
 	
 	@Autowired

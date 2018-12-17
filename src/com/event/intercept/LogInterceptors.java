@@ -91,7 +91,7 @@ public class LogInterceptors implements HandlerInterceptor{
         // 设置开始时间  线程绑定变量（该数据只有当前请求的线程可见）
         startTimeThreadLocal.set(System.currentTimeMillis());
         
-        //log4j 日志栈控制
+        //log4j 日志栈控制 配置输出 %X{uid} %X{remoteAddr}
         NDC.push(request.getRemoteAddr() + ":" + request.getRemotePort());
 
         Context.setRequest(request);

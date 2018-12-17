@@ -138,7 +138,7 @@ public class LangUtil {
 	 */
 	public static String getUUID() {
 		String uuid = UUID.randomUUID().toString();
-		uuid = uuid.replaceAll("-", "_");
+		uuid = uuid.replaceAll("-", "");
 		uuid = hexTo64(uuid);
 		return uuid;
 	}
