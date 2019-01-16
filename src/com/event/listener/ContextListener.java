@@ -47,7 +47,8 @@ public class ContextListener implements ServletContextListener {
         if (!systemPath.endsWith(File.separator)) {
             systemPath += ",";
         }
-        String contextPath = sc.getContextPath();
+//        String contextPath = sce.getContextPath();
+        String contextPath = "/";
         if (contextPath.equals("/")) {
             contextPath = "/";
         } else if (contextPath.endsWith("/")) {
