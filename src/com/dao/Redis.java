@@ -11,6 +11,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import util.SerializeUtil;
 import util.Tools;
+import util.cache.CacheMgr;
  
 public class Redis   { 
 
@@ -77,7 +78,7 @@ public class Redis   {
 	/**
 	* 添加一个list 通过byte 序列化 lpush头插入 rpush尾插入
 	*/
-	public void setList(String keyName, List<Object> list){ 
+	public void listSet(String keyName, List<Object> list){ 
 		Jedis jedis = this.getJedis();
 		if(jedis.exists(keyName)){
 			jedis.del(keyName);
@@ -87,6 +88,23 @@ public class Redis   {
 		}
 		close(jedis);
 	}
+	/**
+	* 添加 通过byte 序列化 lpush头插入 rpush尾插入
+	*/
+	public void listRpush(String keyName, Object obj){ 
+		Jedis jedis = this.getJedis();
+		jedis.rpush(keyName.getBytes(), SerializeUtil.serialize(obj));
+		close(jedis);
+	}
+	/**
+	* 添加 通过byte 序列化 lpush头插入 rpush尾插入
+	*/
+	public void listLpush(String keyName, Object obj){ 
+		Jedis jedis = this.getJedis();
+		jedis.lpush(keyName.getBytes(), SerializeUtil.serialize(obj));
+		close(jedis);
+	}
+	
 	/**
 	 * 获取list
 	 */
@@ -209,8 +227,7 @@ public class Redis   {
 		config.setMaxWaitMillis(1000); 
         // 设置空闲连接
         config.setMaxIdle(10); 
-        
-		pool = new JedisPool(config, "localhost");
+		pool = new JedisPool(config, CacheMgr.getInstance().get("redis.host", "localhost"));
  
 		keys = new HashSet<String>();
 		out("redis init -----------------------" + cc++);

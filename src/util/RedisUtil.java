@@ -50,10 +50,11 @@ public class RedisUtil   {
 		if(value instanceof List ){
 			List list = (List)value;
 			for(Object item : list){
-				jedis.rpush(key.getBytes(), SerializeUtil.serialize(item));
+//				jedis.rpush(key.getBytes(), SerializeUtil.serialize(item));
 			}
 		}else{
-			jedis.set(key.getBytes(), SerializeUtil.serialize(value));
+			jedis.set(key, value.toString());
+//			jedis.set(key.getBytes(), SerializeUtil.serialize(value));
 		}
 		//后置设定过期时间
 		jedis.expire(key, (int)Math.ceil(expire / 1000));

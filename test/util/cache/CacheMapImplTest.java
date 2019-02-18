@@ -136,7 +136,7 @@ public class CacheMapImplTest extends CacheRedisImpl {
 
 	@Test
 	public void testStartup() { 
-		Cache cache = new CacheMapImpl();
+		Cache cache = CacheMgr.getInstance(Type.REDIS);
 		cache.put("str01", "000", 3600 * 1000);
 		cache.put("str01", "001", 60 * 1000);
 		cache.put("str02", "000", 100);

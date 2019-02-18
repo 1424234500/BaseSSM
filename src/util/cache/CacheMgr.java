@@ -4,12 +4,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import util.Bean;
 import util.Call;
 import util.FileUtil;
+import util.database.Dao;
 import util.setting.SettingUtil;
 
 /**
@@ -20,7 +22,8 @@ import util.setting.SettingUtil;
  */
 public class CacheMgr implements Call{
 	static public Logger log = Logger.getLogger("Cache"); 
-
+	static public Type DEFAULT_TYPE = Type.REDIS;
+	
 	/**
 	 * 用以保证默认的cache只初始化一次
 	 */
@@ -50,7 +53,7 @@ public class CacheMgr implements Call{
 			cache = new CacheRedisImpl();
 			break;
 		default:
-			cache = new CacheMapImpl();
+			cache = getInstance(DEFAULT_TYPE);
 		}
 		return cache;
 	}
@@ -69,11 +72,11 @@ public class CacheMgr implements Call{
 //		log.info(dir.getAbsolutePath());
 //		log.info(dir.getName());
 //		log.info(Arrays.toString(dir.list()));
-		Bean bean = new Bean();
-		bean.put("cache_dir_getPath", dir.getPath());
-		bean.put("cache_dir_getAbsolutePath", dir.getAbsolutePath());
-		bean.put("cache_dir_getName", dir.getName());
-		bean.put("files", Arrays.asList(dir.list()));
+
+		cache.put("cache_dir_getPath", dir.getPath());
+		cache.put("cache_dir_getAbsolutePath", dir.getAbsolutePath());
+		cache.put("cache_dir_getName", dir.getName());
+		cache.put("files", Arrays.asList(dir.list()));
 		
 		for (String item : dir.list()) {
 			String path = classRoot + item;
@@ -82,17 +85,23 @@ public class CacheMgr implements Call{
 			}
 		}
 		
-//		Dao dao = new Dao();
-//		//key value info time
-//		for(Map<String, Object> keyValue : dao.queryList("select * from sys_config")){
-//			String key = (String) keyValue.get("KEY");
-//			Object value = keyValue.get("VALUE");
-//			cache.put(key, value);
-//		}
+		initOracle(cache);
 		log.info("**!初始化完毕------------------ ");
 
 	}
-	
+	private static void initOracle(Cache<String> cache) {
+		try {
+			Dao dao = new Dao();
+			//key value info time
+			for(Map<String, Object> keyValue : dao.queryList("select * from sys_config")){
+				String key = (String) keyValue.get("KEY");
+				Object value = keyValue.get("VALUE");
+				cache.put(key, value);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
 	@Override
 	public void call(){
 		Cache<String> cache = getInstance();
@@ -141,3 +150,6 @@ public class CacheMgr implements Call{
 enum Type {
 	MAP, EHCACHE, REDIS,
 }
+
+
+
