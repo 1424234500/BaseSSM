@@ -7,27 +7,21 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 /**
- * <pre>
- *  
  * 自己定义的协议 
  *  数据包格式 
- * +——----——+——-----——+——----——+ 
- * |  长度             |   数据       | 
- * +——----——+——-----——+——----——+ 
- * 2.传输数据的长度contentLength，int类型 
- * 3.要传输的数据,长度不应该超过2048，防止socket流的攻击
- * </pre>
+ *  ^020F{data:alksdjfka}
+ * 1.开始符号 ^，1个字节
+ * 2.传输数据的长度contentLength，int类型，4个字节
+ * 3.要传输的数据,长度不应该超过2048
  */
 public class NettyDecoder extends ByteToMessageDecoder {
 
 	/**
-	 * <pre>
-	 *  
 	 * 表示数据的长度contentLength，int类型，占据4个字节.
-	 * </pre>
 	 */
-	public final int BASE_LENGTH = 4;
-
+	public final int BASE_LENGTH = 6;
+	public final char START_WITH = '^';
+	
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
 		// 可读长度必须大于基本长度
