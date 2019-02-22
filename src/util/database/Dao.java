@@ -30,7 +30,7 @@ public class Dao {
 	public Dao(){
 		this.pool = PoolMgr.getInstance();
 	}
-	public Dao(TypePool type){
+	public Dao(Type type){
 		this.pool = PoolMgr.getInstance(type);
 	}
 	public void setDs(String dsName){

@@ -17,19 +17,21 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 public class NettyDecoder extends ByteToMessageDecoder {
 
 	/**
-	 * 表示数据的长度contentLength，int类型，占据4个字节.
+	 * 包头长度
 	 */
-	public final int BASE_LENGTH = 6;
+	public final int BASE_LENGTH = 5;
 	public final char START_WITH = '^';
 	
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
+		
 		// 可读长度必须大于基本长度
 		if (buffer.readableBytes() >= BASE_LENGTH) {
 
 			int beginReader = buffer.readerIndex(); // 记录包头开始的index
 			buffer.markReaderIndex(); // 标记包头开始的index
-
+			
+			char startWith = buffer.readChar(); //开始标识
 			int length = buffer.readInt(); // 消息的长度
 			// 判断请求数据包数据是否到齐
 			if (buffer.readableBytes() < length) { // 还原读指针

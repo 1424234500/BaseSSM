@@ -22,7 +22,7 @@ import util.setting.SettingUtil;
  */
 public class CacheMgr implements Call{
 	static public Logger log = Logger.getLogger("Cache"); 
-	static public Type DEFAULT_TYPE = Type.REDIS;
+	static public Type DEFAULT_TYPE = Type.MAP;
 	
 	/**
 	 * 用以保证默认的cache只初始化一次
@@ -52,8 +52,6 @@ public class CacheMgr implements Call{
 		case REDIS:
 			cache = new CacheRedisImpl();
 			break;
-		default:
-			cache = getInstance(DEFAULT_TYPE);
 		}
 		return cache;
 	}
@@ -85,7 +83,7 @@ public class CacheMgr implements Call{
 			}
 		}
 		
-		initOracle(cache);
+		//initOracle(cache);
 		log.info("**!初始化完毕------------------ ");
 
 	}

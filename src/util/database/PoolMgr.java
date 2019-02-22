@@ -10,18 +10,19 @@ import util.cache.CacheMgr;
  *
  */
 class PoolMgr{
-
+	
 	private PoolMgr() {
 	}
-	private static EnumMap<TypePool, Pool> connMap;
+	private static final Type DEFAULT_TYPE=Type.C3P0;
+	private static EnumMap<Type, Pool> connMap;
 	static {
-		connMap = new EnumMap<>(TypePool.class);
+		connMap = new EnumMap<>(Type.class);
 	}
 	public static Pool getInstance() {
-		return getInstance(TypePool.C3P0);
+		return getInstance(DEFAULT_TYPE);
 	}
 
-	public static Pool getInstance(TypePool type) {
+	public static Pool getInstance(Type type) {
 		Pool conn = connMap.get(type);
 		if(conn == null){
 			switch(type){
@@ -32,7 +33,7 @@ class PoolMgr{
 				
 				break;
 			default:
-				conn = new PoolC3p0Impl();
+				return getInstance(DEFAULT_TYPE);
 			}
 			connMap.put(type, conn);
 		}
@@ -42,7 +43,7 @@ class PoolMgr{
 
 }
 
-enum TypePool{
+enum Type{
 	C3P0,JDBC
 }
 

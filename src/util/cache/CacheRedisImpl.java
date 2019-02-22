@@ -24,8 +24,10 @@ import util.Tools;
 
 /**
  * 缓存服务实现类
+ * 只支持 key-value key-list key-zset
  * redis实现
  */
+@Deprecated
 class CacheRedisImpl implements Cache<String> {
 	public interface Fun<T>{
 		public T make(Jedis jedis) ;

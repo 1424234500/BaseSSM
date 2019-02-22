@@ -102,7 +102,7 @@ public class SqlHelp{
 	 * id, value, name
 	 */
 	public static String makeMapKeys(Map<?, ?> map){
-		String res = "";
+		String res = "  ";
 		for(Object key : map.keySet()){
 			res = res + key + ", ";
 		}
@@ -124,7 +124,7 @@ public class SqlHelp{
 	 * id1, value2, name3
 	 */
 	public static String makeMapValues(Map<?, ?> map){
-		String res = "";
+		String res = "  ";
 		for(Object key : map.keySet()){
 			res = res + (map.get(key)).toString() + ", ";
 		}
