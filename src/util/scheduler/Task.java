@@ -2,7 +2,21 @@ package util.scheduler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import org.quartz.CronScheduleBuilder;
+import org.quartz.Job;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+
+import util.ClassUtil;
+import util.Tools;
 
 /**
  * 用于任务调度的任务
@@ -19,15 +33,7 @@ public class Task {
 	/**
 	 * com.task.TaskTest
 	 */
-	String className;
-	/**
-	 * doTest
-	 */
-	String methodName;
-	/**
-	 * args
-	 */
-	Object[] args;
+	String className; 
 	
 	/**
 	 * 这是个测试任务
@@ -35,9 +41,10 @@ public class Task {
 	String about;
 	
 	/**
-	 * 任务初始化后 回调对象
+	 * 任务添加 使用job triiger
 	 */
-	Object make;
+	JobDetail jobDetail;
+	Trigger trigger;
 	
 	/**
 	 * 多触发器 
@@ -55,26 +62,64 @@ public class Task {
 	"0 10,44 14 ? 3 WED"    三月的每周三的14：10和14：44触发 
 	"0 15 10 ? * MON-FRI"    每个周一、周二、周三、周四、周五的10：15触发
 	 */
-	List<String> pattern;
+	Set<String> pattern;
 
 	
-	Task(){
-		pattern = new ArrayList<>();
+	public Task(){
+		pattern = new HashSet<>();
 	}
-	Task(String className, String methodName, Object...args){
+	/**
+	 * 构造一个任务
+	 * @param className
+	 * @param methodName
+	 * @param args
+	 */
+	public Task(String className, String about, String...crons){
 		this();
 		this.className = className;
-		this.methodName = methodName;
-		this.args = args;
+		this.about = about;
+		pattern.addAll(Arrays.asList(crons));
 	}
 	/**
 	 * 以反射 类名 函数名 和参数名作为统一 id
 	 */
 	@Override
 	public String toString() {
-		return "" + className + "." + methodName + Arrays.toString(args);
+		return "Task:" + className + " [" + about + "]";
+	}
+	public void addCron(String str) {
+		this.pattern.add(str);
+	}
+	public Boolean removeCron(String str) {
+		return this.pattern.remove(str);
 	}
 	
 	
 	
+
+	JobDetail getJobDetail(){
+		String name = this.toString();
+		Class clz = ClassUtil.loadClass(className);
+		this.jobDetail = JobBuilder
+			.newJob (clz)
+			.withIdentity(name)
+			.withDescription(this.about)
+			.build();
+			
+		return this.jobDetail;
+	}
+	
+	Trigger getTrigger(){
+		TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
+
+		Set<String> trr = this.pattern;
+		for(String cron : trr){
+			triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(cron));
+		}
+		this.trigger = triggerBuilder.build();
+		return this.trigger;
+	}
+	
+	
 }
+	

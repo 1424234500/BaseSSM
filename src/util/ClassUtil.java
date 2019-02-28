@@ -116,6 +116,16 @@ public class ClassUtil {
 		return doClassMethod(className, new Object[]{}, methodName, methodArgs);
 	}
 	/**
+	 * 简单构造 com.util.Tools.out
+	 */
+	public static Object doPackage(String packageName, Object... methodArgs) {
+		int index = packageName.lastIndexOf(".");
+		String className = packageName.substring(0, index);
+		String methodName =  packageName.substring(index + 1);
+		return doClassMethod(className, methodName, methodArgs);
+	}
+	
+	/**
 	 * 特定构造
 	 */
 	public static Object doClassMethod(String className, Object[] constructorArgs, String methodName, Object... methodArgs) {

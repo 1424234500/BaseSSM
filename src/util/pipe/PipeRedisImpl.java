@@ -38,6 +38,9 @@ public class PipeRedisImpl implements Pipe<String>{
 	 */
 	private RedisMgr redisPool;
 
+	/**
+	 * 线程池消费 每个线程都去消费
+	 */
 	private ExecutorService threadPool;
 	
 	@Override
@@ -79,7 +82,7 @@ public class PipeRedisImpl implements Pipe<String>{
 
 	@Override
 	public boolean put(String obj) {
-		redisPool.listLPush(this.key, Arrays.asList(obj));
+		redisPool.listRPush(this.key, Arrays.asList(obj));
 		return true;
 	}
 
@@ -101,8 +104,8 @@ public class PipeRedisImpl implements Pipe<String>{
 	}
 
 	/**
-	 * 1线程 定时轮询  拿到资源 新建线程处理
-	 * 多线程 各自轮询 消费 消费完后继续拿资源
+	 * 单线程 定时轮询  拿到资源 存入队列 新建线程处理     多拿存下来慢慢用
+	 * 多线程 各自轮询  拿到资源 消费处理 继续拿资源	  量力获取
 	 */
 	@Override
 	public void startConsumer(int threadSize, final Fun<String> executer) {
@@ -113,9 +116,10 @@ public class PipeRedisImpl implements Pipe<String>{
 			threadPool.execute(new Runnable() {
 				@Override
 				public void run() {
+					String keyJedis = key + "-" + now;
 					log.warn("Start thread " + now);
 					while(! Thread.interrupted()) {
-						String obj = get();
+						String obj = redisPool.getJedis(keyJedis).lpop(key);//get();
 						if(obj != null) {
 //							log.error("Get pipe " + obj);
 //							threadPool.notify();
@@ -131,6 +135,8 @@ public class PipeRedisImpl implements Pipe<String>{
 							}
 						}
 					}
+					
+					redisPool.close(keyJedis);
 				}
 			});
 		}

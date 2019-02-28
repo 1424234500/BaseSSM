@@ -10,6 +10,7 @@ import util.ClassUtil;
 import util.service.webservice.Provider;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.quartz.CronScheduleBuilder;
@@ -33,51 +34,16 @@ class SchedulerQuartzImpl implements util.scheduler.Scheduler {
 	
 	private Scheduler getScheduler() throws SchedulerException{
 		if (schedulerFactory == null) {
-			log.info(" * init scheduler quartz SchedulerFactory");
+			log.warn(" * init scheduler quartz SchedulerFactory");
 			schedulerFactory = new StdSchedulerFactory();
 		}
 		if (scheduler == null) {
-			log.info(" * init scheduler quartz Scheduler");
+			log.warn(" * init scheduler quartz Scheduler");
 			scheduler = schedulerFactory.getScheduler();
 		}
 		return scheduler;
 	} 
-	
-	private JobDetail makeJobDetail(final Task task){
-		String name = task.toString();
-//		Job job = new Job(){
-//			@Override
-//			public void execute(JobExecutionContext arg0) throws JobExecutionException {
-//				log.info(" # scheduler quartz execute " + task.toString());
-//				ClassUtil.doClassMethod(task.className, task.methodName, task.args);
-//				log.info(" # scheduler quartz execute over ");
-//			}
-//		};
-		Class clz = ClassUtil.loadClass(task.className);
-		
-		JobDetail jobDetail = JobBuilder.newJob(clz)
-				.withIdentity(name)
-				.build();
-		
-		return jobDetail;
-	}
-	
-	private Trigger makeTrigger(final Task task){
-//		Trigger trigger = TriggerBuilder.newTrigger()
-//		.withIdentity("trigger1", "group3")
-//		.withSchedule(SimpleScheduleBuilder.simpleSchedule()
-//		.withIntervalInSeconds(3)
-//		.repeatForever()).build();
-		TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger();
 
-		List<String> trr = task.pattern;
-		for(String cron : trr){
-			triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(cron));
-		}
-		
-		return triggerBuilder.build();
-	}
-	
 	@Override
 	public void start() throws Exception {
 		getScheduler().start();
@@ -93,20 +59,24 @@ class SchedulerQuartzImpl implements util.scheduler.Scheduler {
 	@Override
 	public void add(Task task) throws Exception {
 		Scheduler scheduler = getScheduler();
-		JobDetail jobDetail = makeJobDetail(task);
-		Trigger trigger = makeTrigger(task);
+		JobDetail jobDetail = task.getJobDetail();//makeJobDetail(task);
+		Trigger trigger = task.getTrigger();//makeTrigger(task);
 		// 将任务及其触发器放入调度器
-		scheduler.scheduleJob(jobDetail, trigger);		
+		scheduler.scheduleJob(jobDetail, trigger);	
 	}
 	@Override
 	public void remove(Task task) throws Exception {
-		JobDetail job = (JobDetail)(task.make);
+		JobDetail job = task.getJobDetail();
 		getScheduler().deleteJob(job.getKey());
 	}
+	/**
+	 * 只修改触发器 
+	 * 以className methodName args[] 为键修改
+	 */
 	@Override
 	public void update(Task task) throws Exception {
-
-		
+		remove(task);
+		add(task);
 	} 
 
 }

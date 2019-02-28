@@ -1,6 +1,7 @@
 package util.database;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Set;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import sun.util.logging.resources.logging;
 import util.Tools;
 import util.cache.Cache;
 import util.cache.CacheMgr;
@@ -36,13 +38,7 @@ public class RedisMgr   {
 	 * 					} 
 	 */
 	
-	/**
-	 * 存储所有 添加到redis的map的key值集合
-	 */
-	private Set<String> keys;
-	public Set<String> getKeys(){
-		return keys;
-	}
+	
 	public void clearKeys(){ 
 		Jedis jedis = this.getJedis();
 		for(String key : keys){
@@ -230,17 +226,36 @@ public class RedisMgr   {
 		close(jedis);
 		return res;
 	}
-	
+	/**
+	 * 不销毁的 独用连接
+	 * @param key
+	 */
+	public Jedis getJedis(String key) {
+		Jedis res = mapJedisLong.get(key);
+		if(res == null) {
+			res = getJedis();
+			mapJedisLong.put(key, res);
+		}
+		return res;
+	}
+	public void close(String key) {
+		Jedis res = mapJedisLong.get(key);
+		close(res);
+		mapJedisLong.remove(key);
+	}
 	
 	public Jedis getJedis(){
+		get++;
+//		out(this.toString());
 		return pool.getResource();
 	}
 	public void close(Jedis jedis){
 		if(jedis != null){
 			jedis.close();
+			get--;
 		}
 	}
-	public RedisMgr(){ 
+	private RedisMgr(){ 
 		Cache<String> cache = CacheMgr.getInstance();
 		
 		JedisPoolConfig config = new JedisPoolConfig();
@@ -254,18 +269,41 @@ public class RedisMgr   {
 		pool = new JedisPool(config, cache.get("redis.host", "localhost"));
  
 		keys = new HashSet<String>();
-		out("redis init -----------------------" + cc++);
-	}
-	static int cc = 0;
-	private JedisPool pool;
-	private static RedisMgr instance; 
-	public static  RedisMgr getInstance() {
-		if (instance == null) {
-			instance = new RedisMgr();
+		mapJedisLong = new HashMap<>();
+		out("redis init ----------------------- " + cc++);
+		if(cc > 1) {
+			out("----------------------------");
+			out("----------------------------");
+			out("---------单例失败？？？？？------------");
+			out("----------------------------");
+			out("----------------------------");
 		}
-		return instance;
 	}
-
+	int cc = 0;
+	int get = 0;
+	int close = 0;
+	/**
+	 * 保持不断掉的jedis
+	 */
+	Map<String, Jedis> mapJedisLong;
+	JedisPool pool;
+	/**
+	 * 存储所有 添加到redis的map的key值集合
+	 */
+	private Set<String> keys;
+	public Set<String> getKeys(){
+		return keys;
+	}
+	public static  RedisMgr getInstance() {
+		return SingletonFactory.instance;
+	}
+	//单例
+	private static class SingletonFactory{
+		static RedisMgr instance = new RedisMgr();
+	}
+	public String toString() {
+		return ("long:" + mapJedisLong.size() + " " + "get:" + get + " cc:" + cc);
+	}
 	public void out(Object...objs){
 		Tools.out(objs);
 	}

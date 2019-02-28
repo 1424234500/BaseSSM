@@ -60,7 +60,7 @@ public class LogServiceImpl implements LogService,Serializable {
 		beanUrl.put("count", bean.get("count", 0) + 1);
 		
 		bean.put(url, beanUrl);
-		cache.put(CACHE_KEY, bean, 120000);
+		cache.put(CACHE_KEY, bean);
 
 	}
 

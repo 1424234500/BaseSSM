@@ -1,16 +1,22 @@
 package util.scheduler.job;
 
-import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 import util.Tools;
+import util.scheduler.TaskJob;
 
-public class JobTest implements Job{
-	
+public class JobTest extends TaskJob{
+
 	@Override
-	public void execute(JobExecutionContext arg0) throws JobExecutionException {
-		Tools.out("scheduler quartz test");
+	public void run() {
+		Tools.out("scheduler quartz run test");
+		
+	}
+
+	@Override
+	public void execute(JobExecutionContext context, Class clz, String about) {
+		Tools.out("scheduler quartz execute test ", clz, about);
+		
 	}
 	
 }

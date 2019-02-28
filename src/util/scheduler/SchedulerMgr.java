@@ -18,7 +18,6 @@ public class SchedulerMgr implements Call{
 	public static Scheduler getInstance() {
 		if (scheduler == null) {
 			scheduler = getInstance(Type.QUARTZ);
-			reload(scheduler);
 		}
 		return scheduler;
 	}
@@ -40,9 +39,10 @@ public class SchedulerMgr implements Call{
 	 * 1.加载配置文件
 	 * 2.加载数据库 
 	 */
-	public static void reload(Scheduler scheduler){
-		Task task = new Task("util.scheduler.job.JobTest", "out", "scheduler tools out");
-		task.pattern.add("0/50 0/10 * * * ?");
+	public void reload(Scheduler scheduler){
+		log.warn("Reload scheduler from file / db");
+		Task task = new Task("util.scheduler.job.JobTest","scheduler tools out");
+		task.addCron("0/50 0/10 * * * ?");
 		try {
 			scheduler.add(task);
 		} catch (Exception e) {
@@ -54,6 +54,7 @@ public class SchedulerMgr implements Call{
 		Scheduler scheduler = getInstance();
 		try {
 			scheduler.start();
+			reload(scheduler);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

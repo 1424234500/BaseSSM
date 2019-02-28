@@ -14,8 +14,8 @@ import util.Fun;
  * 系统管道实现
  * 文件实现
  * 数据库实现
- * 	redis
- *
+ * redis list
+ * redis subscribe
  */
 public interface Pipe<T>{
 	/**

@@ -1,0 +1,23 @@
+package util;
+
+import org.junit.Test;
+
+import util.scheduler.Scheduler;
+import util.scheduler.SchedulerMgr;
+import util.scheduler.Task;
+
+public class TestSchedu {
+	
+	@Test
+	public void makeDay() throws Exception{
+		Task task = new Task("util.scheduler.job.JobTest", "this is a schdeler", "*/2 * * * * ?");
+		Scheduler sch = SchedulerMgr.getInstance();
+		sch.add(task);
+		sch.start();
+		
+		while(true) {
+			
+		}
+		
+	}
+}

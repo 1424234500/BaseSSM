@@ -6,6 +6,11 @@ public class TestLang {
 
 	@Test
 	public void makeDay(){
+		
+		ClassUtil.doPackage("util.Tools.out", "aaaa");
+		ClassUtil.doPackage("c", "aaaa", "bbb");
+		ClassUtil.doPackage("", "aaaa", "bbb");
+		
 		int i = 0;
 		long l = 1l;
 		double d = 2d;
