@@ -14,7 +14,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import util.Call;
 import util.HttpUtil;
 import util.ThreadUtil;
-import util.service.serviceImpl.ServiceClassWebserviceImpl;
+import util.service.service.ServiceDubbo;
 
 /**
  * service provider
@@ -22,10 +22,7 @@ import util.service.serviceImpl.ServiceClassWebserviceImpl;
  */
 public class Provider implements Call{
 	private static Logger log = Logger.getLogger(Provider.class); 
-	private static Map<String, Object> map;
-	static {
-		map = new HashMap<>();
-	}
+
 	/**
 	 * 初始化服务
 	 * 验证测试
@@ -33,19 +30,17 @@ public class Provider implements Call{
 	@Override
 	public void call() {
 		log.info("** 初始化 dubbo provider ---------------------- ");
-		
-		String port = "8089";
-		List<Object> list = new ArrayList<>();
-		list.add(new ServiceClassWebserviceImpl());
-
-		System.setProperty("java.net.preferIPv4Stack", "true");
+//		com.alibaba.dubbo.container.Main.main(new String[] {"dubbo-provider.xml"});
+		 
+//		System.setProperty("java.net.preferIPv4Stack", "true");
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { "dubbo-provider.xml" });
 		context.start(); 
 		log.info("**! 初始化完毕 dubbo provider------------------- ");
 		
 		log.info("-- 开始测试dubbo --------------");
 		try {
-//			log.info(HttpUtil.get(map.keySet().iterator().next()));
+//			  ServiceDubbo service = (ServiceDubbo)context.getBean("serviceDubbo");
+//			  log.warn(service.sayHello("in args[]" ));
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error("test dubbo service error !" + e.toString());
@@ -55,9 +50,10 @@ public class Provider implements Call{
 	}
 
 	
-	@Test
-	public void test(){
+	public static void main(String[] argv) {
 		new Provider().call();
-		ThreadUtil.sleep(3600 * 1000);
+		while(true) {
+			
+		}
 	}
 }
