@@ -42,7 +42,7 @@ public class SchedulerMgr implements Call{
 	public void reload(Scheduler scheduler){
 		log.warn("Reload scheduler from file / db");
 		Task task = new Task("util.scheduler.job.JobTest","scheduler tools out");
-		task.addCron("0/50 0/10 * * * ?");
+		task.addCron("0/30 * * * * ?");
 		try {
 			scheduler.add(task);
 		} catch (Exception e) {

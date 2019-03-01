@@ -46,6 +46,8 @@
   * SocketNIO socket nio模式
   * SocketNetty netty框架
 
+* scheduler 定时器模块 负责定时器任务管理 使用quartz实现
+
 * service 远程服务模块 
 	* service 用于暴露的通用接口api
 	* serviceImpl 实现类

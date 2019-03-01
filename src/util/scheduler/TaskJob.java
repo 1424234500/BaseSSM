@@ -20,6 +20,6 @@ public abstract class TaskJob implements Job,Runnable {
 		
 	}
 
-	public abstract void execute(JobExecutionContext context, Class clz, String about);
+	public abstract void execute(JobExecutionContext context, Class<?> clz, String about);
 	
 }

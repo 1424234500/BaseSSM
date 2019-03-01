@@ -14,6 +14,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
+
 /**
  * win32工具窗口 鼠标
  * 
@@ -23,24 +24,21 @@ import java.io.IOException;
 public class RobotUtil {
 	public static volatile Robot robot = null;
 	
-	private RobotUtil() {
+	private RobotUtil() { }
 
-	}
-
-	public static Robot getInstance() {
-		if (robot == null) {
-			synchronized (RobotUtil.class) {
-				if (robot == null) {
-					try {
-						robot = new Robot();
-					} catch (AWTException e) {
-						e.printStackTrace();
-					}
-				}
+	private static class SingletonFactory{           
+		  private static Robot instance;
+		  static {
+			 try {
+				instance = new Robot();
+			} catch (AWTException e) {
+				e.printStackTrace();
 			}
-		}
-		return robot;
+		  }
 	}
+	public static Robot getInstance(){           
+	    return SingletonFactory.instance;           
+	}  
 
 	/**
 	 * 按键按下
@@ -153,6 +151,16 @@ public class RobotUtil {
 
 		};
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(trans, null);
+	}
+
+	public static String getRuntime() {
+		Runtime runtime = Runtime.getRuntime();
+		String res = "Runtime: \n";
+		res += " maxMemory: " + Tools.calcSize(runtime.maxMemory()) + " \n";
+		res += " freeMemory: " + Tools.calcSize(runtime.freeMemory()) + " \n";
+		res += " totalMemory: " + Tools.calcSize(runtime.totalMemory()) + " \n";
+		
+		return res;
 	}
 
 }

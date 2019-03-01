@@ -14,7 +14,7 @@ public class JobTest extends TaskJob{
 	}
 
 	@Override
-	public void execute(JobExecutionContext context, Class clz, String about) {
+	public void execute(JobExecutionContext context, Class<?> clz, String about) {
 		Tools.out("scheduler quartz execute test ", clz, about);
 		
 	}

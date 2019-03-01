@@ -14,6 +14,7 @@ import com.service.impl.FileServiceImpl;
 
 import util.ClassUtil;
 import util.HttpUtil;
+import util.RobotUtil;
 import util.ThreadUtil;
 import util.ThreadUtil.Type;
 import util.Tools;
@@ -66,6 +67,7 @@ public class ContextListener implements ServletContextListener {
         startComp();
         startTestSelf();
 
+        addShutdownHook();	//添加java程序关闭监听
         log.info("系统初始化完毕，开始接收请求！");
         log.info("........................................................");
         log.info("........................................................");
@@ -73,7 +75,20 @@ public class ContextListener implements ServletContextListener {
 
         
     }
-    /**
+    private void addShutdownHook() {
+    	Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+            	log.warn("----------销毁 执行ShutdownHook----------");
+            	String nowTime = Tools.getNowTimeL();
+            	String str = RobotUtil.getRuntime();
+            	log.warn(nowTime);
+            	log.warn(str);
+            	log.warn("----------销毁 执行ShutdownHook 完毕----------");
+            }
+        });
+		
+	}
+	/**
      * 挂载组件 初始化模块
      */
     private void startComp(){
