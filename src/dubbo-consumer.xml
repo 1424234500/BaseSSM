@@ -9,30 +9,35 @@
 	
 	<!-- 可配置于classPath:dubbo.properties -->
 	
-    <!-- 方应用信息，用于计算依赖关系 -->
-	<dubbo:application name="dubbo_provider_ssm_consumer" owner="cph" logger="log4j"  />
+    <!-- name提供方应用名 owner负责人 -->
+	<dubbo:application name="dubbo_ssm_consumer" owner="cph" logger="log4j"  />
 	
 	<!-- 提供服务端口 -->
 	<dubbo:protocol name="dubbo" port="20881" />
 	
 	<!-- 注册中心 -->
 	
-	<!-- zookeeper-->
-	<dubbo:registry address="127.0.0.1:2181,122.10.1.12:2182" protocol="zookeeper" />
+	<!-- zookeeper 版本可配？ enable="true" ,122.10.1.12:2182 -->
+	<dubbo:registry address="127.0.0.1:2181" protocol="zookeeper"  />
 	<!-- redis -->		
 	
+	<!-- 监控中心 -->
+	<!-- 从注册中心获取监控地址 --> 
+	<!-- <dubbo:monitor id="dubbo_provider_monitor" protocal="registry"  />  -->
+	<!-- 直连 -->
+	<!-- <dubbo:monitor address="122.21.21.12:2213" /> -->	
+
 	<!-- 指定了集群容错模式，此处为快速失败 -->
     <dubbo:provider cluster="failfast"/>
 
 
-	<!-- 服务提供 1-->
-	
+	<!-- 服务提供 1 可同时提供和消费 -->
+
 	<!-- 服务消费 2 -->
 	
     <!-- 指向远程服务代理,和provider中相同-->
-    <dubbo:reference id="serviceClass" interface="util.service.service.ServiceClass" version="1.0" check="false" />
+	<dubbo:reference id="serviceClass" interface="util.service.service.ServiceClass" version="1.0" check="false" />
    	<dubbo:reference id="serviceDubbo" interface="util.service.service.ServiceDubbo" version="1.0" check="false" />
-   
 	
 
 </beans>

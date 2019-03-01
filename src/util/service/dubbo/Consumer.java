@@ -26,5 +26,8 @@ public class Consumer {
     	ServiceDubbo service = (ServiceDubbo)context.getBean("serviceDubbo");
         System.out.println(service.sayHello("args[]"));
         
+        while(true) {
+        	
+        }
     }
 }
