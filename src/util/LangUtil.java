@@ -1,7 +1,6 @@
 package util;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -73,7 +72,12 @@ public class LangUtil {
 		
 	}
 	
-	
+	/**
+	 * class bean对象转换为map
+	 * @param obj
+	 * @param hashMap
+	 * @return
+	 */
 	public static Map<String, Object> turnObj2Map(Object obj, HashMap<String, Object> hashMap) {
 		Map<String, Object> map = new HashMap<>();
 		Field[] fields = obj.getClass().getDeclaredFields();
