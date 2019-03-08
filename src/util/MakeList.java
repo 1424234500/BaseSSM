@@ -1,9 +1,7 @@
 package util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * List工厂类 new MakeList<T>().add(object).add(object).build();

@@ -94,7 +94,11 @@ class Singleton {
      * 私有静态内部类
      */
     private static class SingletonFactory{           
-        private static Singleton instance = new Singleton();           
+        private static Singleton instance;
+        static {
+        	System.out.println("静态内部类初始化" + SingletonFactory.class);
+        	instance = new Singleton();  
+        }
     }
     /**
      * 内部类模式 可靠

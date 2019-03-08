@@ -1,10 +1,8 @@
 package util;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,8 +19,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.log4j.Logger;
-
-import com.controller.FileControll;
 
 /**
  * Http tools for: http get http post with encode stream userAgent
@@ -118,7 +114,7 @@ public class HttpUtil {
 	 * 
 	 * @param name null or '' 则每次返回一个新浏览器 否则缓存返回历史的同名浏览器
 	 */
-	private static HttpClient getClient(String name){
+	public static HttpClient getClient(String name){
 		HttpClient client = null;
 		if(name == null || name.length() == 0){
 			client = makeHttpClient();
@@ -135,7 +131,7 @@ public class HttpUtil {
 	 * 获取新的浏览器httpClient
 	 * @return
 	 */
-	private static HttpClient getClient(){
+	public static HttpClient getClient(){
 		return getClient("");
 	}
 	public static String post(String url, String data, String encode, String userAgent) throws Exception {
@@ -196,4 +192,11 @@ public class HttpUtil {
 		return res;
 	}
 
+	
+	
+	
+	
+	
+	
+	
 }

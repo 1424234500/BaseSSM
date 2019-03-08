@@ -9,12 +9,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.controller.Page;
-
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import util.Bean;
 import util.LangUtil;
+import util.Page;
 import util.SortUtil;
 import util.Tools;
 
@@ -109,7 +108,7 @@ class CacheEhcacheImpl implements Cache<String> {
 		V res = defaultValue;
 		Element ele = cache.get(key);
 		if(ele != null){
-			res = (V) (LangUtil.turn(ele.getObjectKey(), defaultValue));
+			res = (V) (LangUtil.turn(ele.getObjectValue(), defaultValue));
 		}
 		return res;
 	}

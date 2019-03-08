@@ -3,7 +3,7 @@ package util;
 import org.junit.Test;
 
 import util.ThreadUtil.Type;
-import util.design.ThreadSyncCreatorCoster;
+import util.demo.ThreadSyncCreatorCoster;
 
 public class TestCreatorCsumer {
 	int newThread = 1;

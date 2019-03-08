@@ -201,7 +201,7 @@ public class FileUtil {
 			if (fun != null)
 				while ((c = inputStream.read(bytes)) != -1) {
 					temp = new String(bytes, 0, c, "utf-8");
-					sb.append(temp);
+//					sb.append(temp);
 					fun.make(temp);
 				}
 			else
@@ -237,7 +237,7 @@ public class FileUtil {
 			String temp = null;
 			if (fun != null)
 				while ((temp = bufferedReader.readLine()) != null) {
-					sb.append(temp);
+//					sb.append(temp);  //回调则返回null
 					fun.make(temp);
 				}
 			else

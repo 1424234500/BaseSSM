@@ -1,4 +1,4 @@
-package com.controller;
+package util;
 
 import java.io.Serializable;
 
@@ -6,9 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Component;
 
-import util.Bean;
-import util.LangUtil;
-import util.Tools;
+import com.controller.Context;
 
 @Component
 public class Page implements Serializable{

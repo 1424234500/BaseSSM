@@ -31,10 +31,24 @@
 			replicateUpdatesViaCopy=true, replicateRemovals=true "/>
 		</cache>
 		-->
-	<!-- 集群环境 RMI同步设置 --> 
+		
+	<!-- 集群环境 RMI同步设置 
+	 peerDiscovery 方式：atutomatic 为自动 ；
+	 mulicastGroupAddress 广播组地址：230.0.0.1；
+	 mulicastGroupPort 广播组端口：40001；
+	 timeToLive 搜索某个网段上的缓存：
+	 	0是限制在同一个服务器，1是限制在同一个子网，32是限制在同一个网站，
+	 	64是限制在同一个region，128是同一块大陆，还有个256；
+ 	hostName：主机名或者ip，用来接受或者发送信息的接口。
+ 	同时组播地址可以指定 D 类 IP 地址空间，范围从 224.0.1.0 到 238.255.255.255 中的任何一个地址。
+	--> 
 	<cacheManagerPeerProviderFactory
 		class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
-		properties="peerDiscovery=automatic, multicastGroupAddress=230.0.0.1,	multicastGroupPort=9999, timeToLive=1" />
+		properties="
+		peerDiscovery=automatic, 
+		multicastGroupAddress=230.0.0.1,
+		multicastGroupPort=9999, 
+		timeToLive=1" />
 
 	<cacheManagerPeerListenerFactory
 		class="net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory" />

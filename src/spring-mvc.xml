@@ -19,7 +19,7 @@
  	<task:annotation-driven/> 
 	
 	<!-- 拦截器已采用url过滤.do模式只拦截controller，此处无效？ -->
-	<!-- 装配拦截器  实现aop 事务 日志 权限 -->  
+	<!-- 装配拦截器  实现aop 事务 日志 权限 限流 -->  
     <mvc:interceptors>  
   		<!-- 日志拦截访问url 外层bean拦截所有 --> 
      	<bean class="com.event.intercept.LogInterceptors" />   
@@ -29,7 +29,6 @@
 	 	   <!-- 资源拦截例外 -->
            <!--  <mvc:exclude-mapping path="/**/*.css"/> -->
            <mvc:exclude-mapping path="/include/**"/> 
-           
    	 	   <mvc:exclude-mapping path="/*/**.ajax" />
            <!-- 登录拦截例外 -->
 	 	   <mvc:exclude-mapping path="/*/*onlogin.do" />

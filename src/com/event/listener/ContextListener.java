@@ -9,11 +9,11 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
 
-import com.controller.Page;
 import com.service.impl.FileServiceImpl;
 
 import util.ClassUtil;
 import util.HttpUtil;
+import util.Page;
 import util.RobotUtil;
 import util.ThreadUtil;
 import util.ThreadUtil.Type;
@@ -44,7 +44,6 @@ public class ContextListener implements ServletContextListener {
         ServletContext sc = sce.getServletContext();
         // 获取系统真实路径
         String systemPath = sc.getRealPath("/");
-        
         if (!systemPath.endsWith(File.separator)) {
             systemPath += ",";
         }
@@ -105,11 +104,11 @@ public class ContextListener implements ServletContextListener {
 		int i = 1;
 		for(final String clz : arr){
 			final int ii = i++;
-			//使用缓冲队列任务的形式来 隔离 避免runtimeException 相干
+			//使用缓冲队列任务的形式来 隔离 避免runtimeException 和相干
 			ThreadUtil.execute(Type.SingleThread, new Runnable(){
 				public void run(){
 					log.info("*******************************************");
-					log.info("********** step." + ii + "    ");
+					log.info("********** step." + ii + "\t " + clz + ".call()");
 					log.info("*******************************************");
 					ClassUtil.doClassMethod(clz, "call");
 				}

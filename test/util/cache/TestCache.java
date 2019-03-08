@@ -40,7 +40,7 @@ public class TestCache{
 		maxThread = 1;
 		nowThread = 0;
 		//存取共次数
-		maxDo = 30;
+		maxDo = 300;
 		nowDo = 0;
 		lastTime = System.currentTimeMillis();
 		for(int i = 0; i < maxThread; i++){

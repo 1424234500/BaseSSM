@@ -3,11 +3,8 @@ package util;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import org.apache.commons.lang.StringUtils;
 
 import util.setting.Setting;
 

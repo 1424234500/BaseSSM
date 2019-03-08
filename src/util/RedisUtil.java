@@ -1,24 +1,10 @@
 package util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.apache.commons.collections.MapUtils;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisPubSub;
-import util.Fun;
-import util.MapListUtil;
-import util.SerializeUtil;
-import util.Tools;
-import util.cache.Cache;
  
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class RedisUtil   { 

@@ -6,11 +6,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
-
-import com.sun.org.apache.xalan.internal.xsltc.compiler.Pattern;
 
 public class Tools {
 	

@@ -9,6 +9,7 @@
 	
 	<!-- 可配置于classPath:dubbo.properties -->
 	
+	
     <!-- name提供方应用名 owner负责人 -->
 	<dubbo:application name="dubbo_ssm_provider" owner="cph" logger="log4j"  />
 	
@@ -17,7 +18,7 @@
 	
 	<!-- 注册中心 -->
 	
-	<!-- zookeeper 版本可配？ enable="true" ,122.10.1.12:2182 -->
+	<!-- zookeeper 版本可配？ enable="true" ,122.10.1.12:2182 register="false" 只订阅-->
 	<dubbo:registry address="127.0.0.1:2181" protocol="zookeeper"  />
 	<!-- redis -->		
 	
@@ -32,7 +33,13 @@
 
 
 	<!-- 服务提供 1 可同时提供和消费 -->
-
+	
+	<!-- service implementation, as same as regular local bean
+    <bean id="demoService" class="org.apache.dubbo.demo.provider.DemoServiceImpl"/>
+    	declare the service interface to be exported
+    <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoService"/>
+     -->
+     
 	<!-- 配置暴露服务接口 alias="hello-dubbo"  -->
 	<dubbo:service ref="serviceDubbo" interface="util.service.service.ServiceDubbo" timeout="30000" version="1.0" />
     <!-- 配置暴露服务接口 实现类 -->
@@ -52,3 +59,30 @@
 	
 
 </beans>
+<!-- 
+应用负责人，用于服务治理
+dubbo.owner=dzm
+#组织名称(BU或部门)，用于注册中心区分服务来源
+dubbo.organization=dzmsoft
+#注册中心地址
+dubbo.registry.address=zookeeper://192.168.5.122:2181?backup=192.168.5.122:2182,192.168.5.122:2183
+#端口号，同一电脑不可复用
+dubbo.protocol=20881
+#是否启用JSR303标准注解验证
+dubbo.service.validation=true
+#服务版本，通常在接口不兼容时版本号才需要升级
+dubbo.service.version=1.0.0
+#远程服务调用超时时间(毫秒)
+dubbo.service.timeout=5000
+#远程服务调用重试次数，不包括第一次调用，不需要重试请设为0
+dubbo.service.retries=2
+#负载均衡策略，可选值：random,roundrobin,leastactive，分别表示：随机，轮循，最少活跃调用
+dubbo.service.loadbalance=leastactive
+#每服务消费者每服务每方法最大并发调用数
+dubbo.service.actives=150
+
+#启动时检查提供者是否存在，true报错，false忽略
+dubbo.reference.check=false
+#服务版本，与服务提供者的版本一致
+dubbo.reference.version=1.0.0
+ -->

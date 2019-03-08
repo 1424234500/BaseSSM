@@ -31,13 +31,16 @@ public class CacheMgr implements Call{
 
 	public CacheMgr() {
 	}
-
-	public static Cache<String> getInstance() {
-		if (cache == null) {
+    private static class SingletonFactory{           
+        private static Cache<String> cache;
+        static {
+        	System.out.println("静态内部类初始化" + SingletonFactory.class);
 			cache = getInstance(Type.MAP);
 			reload(cache);
-		}
-		return cache;
+        }
+    }
+	public static Cache<String> getInstance() {
+		return SingletonFactory.cache;
 	}
 
 	public static Cache<String> getInstance(Type type) {
