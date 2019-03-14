@@ -5,6 +5,7 @@ import java.util.*;
 import util.pipe.Pipe;
 import util.pipe.PipeException;
 import util.pipe.PipeMgr;
+import util.pipe.PipeMgr.Type;
 
 public class TestMain {
 	TestMain() throws PipeException, InterruptedException{
@@ -16,7 +17,7 @@ public class TestMain {
 		}
 		Tools.out(map.size());
 		
-		Pipe<String> pipe = PipeMgr.getPipeRedis("queue");
+		Pipe<String> pipe = PipeMgr.getPipe(Type.REDIS, "queue");
 
 		int i = 20;
 		while(true) {

@@ -13,6 +13,7 @@ public class PipeMgr implements Call{
 	public enum Type {
 		PIPE,FILE,DATABASE,REDIS,REDIS_BROADCAST
 	}
+	@SuppressWarnings("unchecked")
 	public static <T> Pipe<T> getPipe(Type type, String key){
 		Pipe<T> pipe = null;
 		switch(type) {
@@ -28,11 +29,6 @@ public class PipeMgr implements Call{
 		return pipe;
 	}
 	
-	public static Pipe<String> getPipeRedis(String key) throws PipeException {
-		Pipe<String> pipe = new PipeRedisImpl();
-		pipe.start(key);
-		return pipe;
-	}
 	  
 	public void call(){
 	}
