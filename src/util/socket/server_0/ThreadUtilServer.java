@@ -1,4 +1,4 @@
-package util.socket;
+package util.socket.server_0;
 
 import java.util.Collection;
 import java.util.HashMap;

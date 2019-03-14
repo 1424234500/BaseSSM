@@ -16,7 +16,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import util.Tools;
-import util.socket.Msg;
+import util.socket.server_0.Msg;
 
 public class ClientUI extends JFrame  {
 

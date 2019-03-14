@@ -1,4 +1,4 @@
-package util.socket;
+package util.socket.server_0;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -14,8 +14,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import util.setting.Setting;
-import util.socket.netty.NettyDecoder;
-import util.socket.netty.NettyEncoder;
+import util.socket.server_0.netty.NettyDecoder;
+import util.socket.server_0.netty.NettyEncoder;
 
 /**
  * 底层 socket 基本实现 负责实现socket通信 的 连接建立 并调用上层server的 事件 send receive

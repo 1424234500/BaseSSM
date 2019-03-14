@@ -5,10 +5,9 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import util.RobotUtil;
 import util.Tools;
 import util.setting.Setting;
-import util.socket.SocketUtil;
+import util.socket.server_0.SocketUtil;
 
 public class ClientIO extends ClientFrame {
  

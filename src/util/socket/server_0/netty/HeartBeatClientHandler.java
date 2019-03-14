@@ -1,4 +1,4 @@
-package util.socket.netty;  
+package util.socket.server_0.netty;  
   
 import java.util.Date;  
   
@@ -16,11 +16,11 @@ import util.Tools;
 public class HeartBeatClientHandler extends ChannelInboundHandlerAdapter {  
   
     
-    private static final ByteBuf HEARTBEAT_SEQUENCE = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer("Heartbeat",  CharsetUtil.UTF_8));  
-      
-    private static final int TRY_TIMES = 3;  
-      
-    private int currentTime = 0;  
+//    private static final ByteBuf HEARTBEAT_SEQUENCE = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer("Heartbeat",  CharsetUtil.UTF_8));  
+//      
+//    private static final int TRY_TIMES = 3;  
+//      
+//    private int currentTime = 0;  
     
     public void out(Object...objects){
     	Tools.out("心跳", Tools.objects2string(objects));

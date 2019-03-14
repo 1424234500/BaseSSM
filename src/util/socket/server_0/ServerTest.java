@@ -1,4 +1,4 @@
-package util.socket;
+package util.socket.server_0;
 
 public class ServerTest {
 

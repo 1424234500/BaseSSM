@@ -3,14 +3,12 @@ package util.socket.client;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.channels.SocketChannel;
 
-import util.RobotUtil;
 import util.Tools;
 import util.setting.Setting;
-import util.socket.SocketUtil;
+import util.socket.server_0.SocketUtil;
 
 public class ClientNIO extends ClientFrame {
  

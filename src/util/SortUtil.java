@@ -17,10 +17,10 @@ public class SortUtil {
 	 * 都是List参数的情况 不能自动转换 List<Bean> -> List<Map>  但是可以转换 Bean -> Map
 	 * ? extends 的用处
 	 */
-	public static void sort(final List<? extends Map<?,?>> list, final boolean ifReverse, final Object...keys){
-		Collections.sort(list, new Comparator<Map<?,?>>() {
+	public static void sort(final List<? extends Map> list, final boolean ifReverse, final Object...keys){
+		Collections.sort(list, new Comparator<Map>() {
 			@Override
-			public int compare(Map<?, ?> o1, Map<?, ?> o2) {
+			public int compare(Map o1, Map o2) {
 				int res = 0;
 				if(o1 != null && o2 != null){
 					for(Object key : keys){

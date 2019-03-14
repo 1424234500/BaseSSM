@@ -2,13 +2,9 @@ package util.socket.client;
  
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.concurrent.TimeUnit;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
@@ -18,19 +14,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
-import io.netty.handler.timeout.IdleStateHandler;
-import io.netty.util.ReferenceCountUtil;
-import util.RobotUtil;
 import util.Tools;
 import util.setting.Setting;
-import util.socket.SocketNetty;
-import util.socket.SocketUtil;
-import util.socket.SocketNetty.HandlerNetty;
-import util.socket.netty.NettyDecoder;
-import util.socket.netty.NettyEncoder;
+import util.socket.server_0.netty.NettyDecoder;
+import util.socket.server_0.netty.NettyEncoder;
 
 public class ClientNetty extends ClientFrame {
 	ChannelHandlerContext socket;

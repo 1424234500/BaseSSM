@@ -1,8 +1,8 @@
-package util.socket;
+package util.socket.server_0;
 
 import util.Tools;
 import util.setting.Setting;
-import util.socket.TaskMake.TaskInterface;
+import util.socket.server_0.TaskMake.TaskInterface;
 
 /**
  * 底层 socket 架构调用抽象 
