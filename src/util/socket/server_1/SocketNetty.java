@@ -51,17 +51,17 @@ public class SocketNetty {
 			.handler(new LoggingHandler(LogLevel.INFO))
 			.childHandler(
 					new ChannelInitializer<SocketChannel>() {
-					@Override
-					public void initChannel(SocketChannel ch) throws Exception {
-						ChannelPipeline p = ch.pipeline();
-//						p.addLast(new LoggingHandler(LogLevel.INFO));
-						p.addLast(new IdleStateHandler(10, 0, 0, TimeUnit.SECONDS)); 	//5s心跳包 
-//						p.addLast( new ObjectEncoder(),  new ObjectDecoder(ClassResolvers.cacheDisabled(null)))
-					    p.addLast(new NettyEncoder(), new NettyDecoder());  
-//						p.addLast(new HeartBeatClientHandler());  
-						p.addLast(new SessionHandler());
-
-					}
+						@Override
+						public void initChannel(SocketChannel ch) throws Exception {
+							ChannelPipeline p = ch.pipeline();
+	//						p.addLast(new LoggingHandler(LogLevel.INFO));
+							p.addLast(new IdleStateHandler(10, 0, 0, TimeUnit.SECONDS)); 	//5s心跳包 
+	//						p.addLast( new ObjectEncoder(),  new ObjectDecoder(ClassResolvers.cacheDisabled(null)))
+						    p.addLast(new NettyEncoder(), new NettyDecoder());  
+	//						p.addLast(new HeartBeatClientHandler());  
+							p.addLast(new SessionHandler());
+	
+						}
 			});
 
 			// Start the server.

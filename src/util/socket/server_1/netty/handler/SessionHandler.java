@@ -1,8 +1,15 @@
 package util.socket.server_1.netty.handler;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import util.Tools;
+import util.socket.server_1.session.Session;
+import util.socket.server_1.session.SessionMgr;
+import util.socket.server_1.session.SessionService;
+import util.socket.server_1.session.SessionServiceListImpl;
 
 	/**
 	 * netty的handler
@@ -12,8 +19,7 @@ import util.Tools;
 	 *
 	 */
 	public class SessionHandler extends ChannelInboundHandlerAdapter {
-		
-		
+		private static SessionService<ChannelHandlerContext> sessionService = new SessionServiceListImpl<ChannelHandlerContext>();
 		
 		public void out(Object...objects) {
 			Tools.out(objects);
@@ -42,7 +48,7 @@ import util.Tools;
 			super.handlerAdded(ctx);
 			out("handlerAdded", ctx);
 			
-			
+			sessionService.sessionAdd(ctx);
 			
 		}
 	
@@ -51,13 +57,16 @@ import util.Tools;
 			super.handlerRemoved(ctx);
 			out("handlerRemoved", ctx);
 			
-			
+			sessionService.sessionRemove(ctx);
+
 		}
 	
 		@Override
 		public void channelRead(ChannelHandlerContext ctx, Object msg) {
 			out("channelRead", msg); 
 			
+			sessionService.sessionOnRead(ctx);
+
 			
 		}
 	
