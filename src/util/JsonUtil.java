@@ -1,11 +1,13 @@
 package util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +22,7 @@ public class JsonUtil {
 	 * map转json
 	 * @param obj
 	 */
-	public static String makeJson(Map obj) {
+	public static String makeJson(Object obj) {
         String res = "";
         try {
             JSONObject jo = new JSONObject(obj);
@@ -34,7 +36,7 @@ public class JsonUtil {
 	 * list转json
 	 * @param list
 	 */
-    public static String makeJson(List list) {
+    public static String makeJson(Collection<?> list) {
         String res = "";
         try {
             JSONArray ja = new JSONArray(list);
@@ -43,67 +45,8 @@ public class JsonUtil {
             e.printStackTrace();
         }
         return res;
-    }
-    public static String makeJson(Object cmd, Map obj) {
-        String res = "";
-        try {
-            JSONObject jomap = new JSONObject(obj);
+    }  
 
-            JSONObject jo = new JSONObject();
-            jo.put("cmd", cmd);
-            jo.put("result", jomap);
-            res = jo.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return res;
-    }
-    public static String makeJson(Object cmd, List<Object> list) {
-        String res = "";
-        try {
-            JSONObject jo = new JSONObject();
-            jo.put("cmd", cmd);
-            jo.put("result", toJSONArray(list));
-            res = jo.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return res;
-    }
-
-    // msg json {"cmd":"conn","value":"connok" }
-    public static String makeJson(Object cmd, Object... values) {
-        String res = "";
-        try {
-            JSONObject jo = new JSONObject();
-            jo.put("cmd", cmd);
-            int i = 0;
-            for (Object value : values) {
-                jo.put("value" + i++, value);
-            }
-            res = jo.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return res;
-    }
-
-    
-    /**
-     * 递归 map 编码 为 JSONObject
-     */
-    private static JSONObject toJSONObject(Map map){
-    	JSONObject res = new JSONObject(map);
-    	return res;
-    }
-    /**
-     * 递归 list 编码 为 JSONArray
-     */
-    private static JSONArray toJSONArray(List list){
-    	JSONArray res = new JSONArray(list);
-    	return res;
-    }
     /**
      * 递归 解析JSONArray为list
      */
@@ -128,10 +71,10 @@ public class JsonUtil {
     /**
      * 递归 解析JSONObject为map
      */
-    private static Map toMap(JSONObject jo) throws JSONException{
-    	Map map = new HashMap();
+    private static Bean toMap(JSONObject jo) throws JSONException{
+    	Bean map = new Bean();
         //迭代多有的Key值  
-        Iterator it = jo.keys();  
+        Iterator<?> it = jo.keys();  
         //遍历每个Key值  
         while (it.hasNext()) {  
             //将key值转换为字符串  
@@ -155,59 +98,32 @@ public class JsonUtil {
      * 解析json为map/list/string
      * @param jsonstr
      */
-    public static Object get(String jsonstr) {
+    public static <T> T get(String jsonstr) {
         try {
         	int type = getType(jsonstr);
         	if(type == 0){
-        		return jsonstr;
+        		return (T) jsonstr;
         	}
             if(type == 1){
                 JSONObject jo = new JSONObject(jsonstr);
-            	return toMap(jo);
+            	return (T) toMap(jo);
             }else if(type == 2){
             	JSONArray ja = new JSONArray(jsonstr);
-            	return toList(ja);
+            	return (T) toList(ja);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
-    /**
-     * 解析json为map 
-     * @param jsonstr
-     */
-    public static Map<String, Object> getMap(String jsonstr) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        try {
-            JSONObject jo = new JSONObject(jsonstr);
-            map = toMap(jo);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return map;
-    }
-    /**
-     * 解析json为list
-     * @param jsonstr
-     */
-    public static List<?> getList(String jsonstr) {
-        List<?> res = new ArrayList<>();
-        try {
-        	JSONArray ja = new JSONArray(jsonstr);
-            res = toList(ja);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return res;
-    } 
+ 
 	/**
 	 * 0字符串 1map 2list
 	 */
     public static int getType(String jsonstr){
     	int res = 0;
     	if(jsonstr != null){
-	    	String str = jsonstr.replace(" ", "");
+	    	String str = StringUtils.strip(jsonstr);
 	    	if(str.length() > 0){
 	    		if(str.charAt(0) == '{' && str.charAt(str.length() - 1) == '}'){
 	    			res = 1;

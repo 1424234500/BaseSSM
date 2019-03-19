@@ -59,7 +59,7 @@ public class Msg{
 		}
 	}
 	public Msg(String jsonstr){
-        Map map = JsonUtil.getMap(jsonstr);
+        Map map = JsonUtil.get(jsonstr);
         this.setOk(MapListUtil.getMap(map, "ok", "0"));
         this.setInfo(MapListUtil.getMap(map, "in", ""));
         this.setId(MapListUtil.getMap(map, "id", ""));

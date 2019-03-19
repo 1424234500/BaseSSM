@@ -15,8 +15,8 @@ public abstract class ClientFrame implements Client, InterfaceOut{
 	
 	ClientUI clientUi;
 	public ClientFrame(){
-		reconnect = Setting.getInt("reconnect_count", 20);
-		sleeptime = Setting.getLong("reconnect_sleep", 1000);
+		reconnect = Setting.get("reconnect_count", 20);
+		sleeptime = Setting.get("reconnect_sleep", 1000);
 	}
 	@Override
 	public void setUI(ClientUI cui){

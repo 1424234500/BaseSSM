@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.Properties;
 
 import util.FileUtil;
+import util.LangUtil;
 import util.Tools;
 
 /**
@@ -60,18 +61,13 @@ public class Setting {
 		}
 		return res;
 	}
-	public static String getString(String key, String defaultValue){
-		return getProperty(key, defaultValue+"");
+	public static <T> T get(String key, T defaultValue){
+		return LangUtil.turn(getProperty(key, ""), defaultValue);
 	}
-	public static int getInt(String key, int defaultValue){
-		return Tools.parseInt(getProperty(key, defaultValue+""));
+	public static <T> T get(String key){
+		return get(key, null);
 	}
-	public static long getLong(String key, long defaultValue){
-		return Tools.parseLong(getProperty(key, defaultValue+""));
-	}
-	public static Double getDouble(String key, double defaultValue){
-		return Tools.parseDouble(getProperty(key, defaultValue+""));
-	}
+
 	
 	
 	

@@ -16,13 +16,13 @@ public class ClientIO extends ClientFrame {
 	int serverPort = 8090; 
 	
 	ClientIO(){
-		serverPort = Setting.getInt("socket_port_io", 8090);
+		serverPort = Setting.get("socket_port_io", 8090);
 		try {
-			serverIp = Setting.getString("socket_ip", Tools.getServerIp(InetAddress.getLocalHost().getHostAddress()));
+			serverIp = Setting.get("socket_ip", Tools.getServerIp(InetAddress.getLocalHost().getHostAddress()));
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-		serverIp = Setting.getString("socket_ip", "127.0.0.1");
+		serverIp = Setting.get("socket_ip", "127.0.0.1");
 	}
 	ClientIO(String ip, int port){
 		this.serverIp = ip;

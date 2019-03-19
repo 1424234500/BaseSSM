@@ -99,7 +99,7 @@ public class StudentControll {
 
 		Map map = studentServiceHibernate.get(id );
 		
-	    pw.write("" + JsonUtil.makeJson("obj", map));
+	    pw.write("" + JsonUtil.makeJson(map));
 	}
 	   
 	 
@@ -168,7 +168,7 @@ public class StudentControll {
 
 		Map map = studentServiceMybatis.get(id );
 		
-	    pw.write("" + JsonUtil.makeJson("obj", map));
+	    pw.write("" + JsonUtil.makeJson(map));
 	}
 	    
 	 

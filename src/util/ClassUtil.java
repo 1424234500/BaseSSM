@@ -358,11 +358,11 @@ public class ClassUtil {
 				} 
 				//常用对象类型
 				else if(type.equals("hashmap")){ //无法实例化原生Map 
-					res = new HashMap<Object, Object>(JsonUtil.getMap(value));
+					res = (HashMap<?,?>)(JsonUtil.get(value));
 				}else if(type.equals("arraylist")){ //无法实例化原生List
-					res = new ArrayList<Object>(JsonUtil.getList(value));
+					res = (ArrayList<?>)(JsonUtil.get(value));
 				}else if(type.equals("bean")){
-					res = new Bean(JsonUtil.getMap(value));
+					res = new Bean((Map<?, ?>) JsonUtil.get(value));
 				}
 				//序列化传输 必须使用序列化 完整的str byte[]的数据  注意!!此处序列化会执行构造函数
 				else if(type.equals("seria") || type.equals("serializeUtil")){

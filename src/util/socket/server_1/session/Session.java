@@ -1,59 +1,83 @@
 package util.socket.server_1.session;
 
-public class Session<SOCK> {
+import java.util.*;
 
-	
-	//同时建立索引在数据结构中ServerImpl
-	String sysKey;	//所属系统
-	String key;		//客户编号
-	
-	SOCK socket;
+import util.Bean;
+import util.JsonUtil;
+import util.socket.server_1.Msg;
 
+public class Session<T> {
+	/**
+	 * 会话信息
+	 */
+	String id;	//登录用户
+	Set<String> subscribeKeys;	//订阅keys
 	
-	public boolean like(SOCK sock){
-	return this.socket == sock;
+	
+	/**
+	 * socket实体以及 key send实现回调
+	 */
+	Socket<T> socket;	
+	
+	public Session(Socket<T> socket) {
+		this.socket = socket;
+		subscribeKeys = new HashSet<>();
 	}
-	
-	
-	public String getSysKey() {
-	return sysKey;
+	public void setSession(Socket<T> socket) {
+		this.socket = socket;
 	}
-	
-	
-	
-	public void setSysKey(String sysKey) {
-	this.sysKey = sysKey;
+	private void send(Msg msg) {
+		
+		session.socket.send( );
 	}
-	
-	
-	
 	public String getKey() {
-	return key;
+		return this.socket.key();
 	}
-	
-	
-	
-	public void setKey(String key) {
-	this.key = key;
+
+	/**
+	 * 判定session是否相同
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		@SuppressWarnings("unchecked")
+		Session<T> to = (Session<T>) obj;
+		return this.socket.key().equals(to.socket.key());
+		//return super.equals(obj);
 	}
-	
-	
-	
-	public SOCK getSocket() {
-	return socket;
-	}
-	
-	
-	
-	public void setSocket(SOCK socket) {
-	this.socket = socket;
-	}
-	
-	
-	
+
 	@Override
 	public String toString() {
-	return "ToClient [sysKey=" + sysKey + ", key=" + key + ", socket=" + socket + "]";
+		return "Session[key=" + getKey() + " socket=" + socket + "]";
 	}
+	
+	
+	/**
+	 * session负责自己处理业务
+	 * @param msg
+	 */
+	public void onData(Object msg) {
+		
+		
 
+		
+		
+		
+	}
+	
+	public void onLogin(Object msg) {
+		Bean bean = JsonUtil.get(msg.toString());
+		String user = bean.get("id", "");
+		String pwd = bean.get("pwd", "");
+		
+		Msg res = new Msg();
+		res.setTo(id);
+		res.setInfo("hello login");
+		res.setData(msg);
+		
+		send(res);
+		
+	}
+	
+	
+	
 }

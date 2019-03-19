@@ -21,7 +21,7 @@ import util.setting.SettingUtil;
  *
  */
 public class CacheMgr implements Call{
-	static public Logger log = Logger.getLogger("Cache"); 
+	private static Logger log = Logger.getLogger("Cache"); 
 	static public Type DEFAULT_TYPE = Type.MAP;
 	
 	/**

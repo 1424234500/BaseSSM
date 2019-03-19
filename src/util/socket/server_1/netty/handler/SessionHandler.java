@@ -10,6 +10,7 @@ import util.socket.server_1.session.Session;
 import util.socket.server_1.session.SessionMgr;
 import util.socket.server_1.session.SessionService;
 import util.socket.server_1.session.SessionServiceListImpl;
+import util.socket.server_1.session.Socket;
 
 	/**
 	 * netty的handler
@@ -19,7 +20,30 @@ import util.socket.server_1.session.SessionServiceListImpl;
 	 *
 	 */
 	public class SessionHandler extends ChannelInboundHandlerAdapter {
-		private static SessionService<ChannelHandlerContext> sessionService = new SessionServiceListImpl<ChannelHandlerContext>();
+		private static SessionService<ChannelHandlerContext> sessionService = new SessionServiceListImpl<>();
+		private class SocketNettyImpl extends Socket<ChannelHandlerContext>{
+			public SocketNettyImpl(ChannelHandlerContext socket) {
+				super(socket);
+			}
+
+			@Override
+			public String key() {
+				//ChannelHandlerContext(SessionHandler#0, [id: 0x9a9c3c84, L:/127.0.0.1:8092 - R:/127.0.0.1:34612])
+				String ss[] = this.socket.toString().split(" ");
+				//R:/127.0.0.1:34612
+				String key = ss[ss.length - 1];	
+				//127.0.0.1:34612
+				key = key.substring(3);
+				out(key);
+				return key;
+			}
+
+			@Override
+			public void send(Object obj) {
+				this.socket.writeAndFlush(obj);
+			}
+			
+		}
 		
 		public void out(Object...objects) {
 			Tools.out(objects);
@@ -48,8 +72,7 @@ import util.socket.server_1.session.SessionServiceListImpl;
 			super.handlerAdded(ctx);
 			out("handlerAdded", ctx);
 			
-			sessionService.sessionAdd(ctx);
-			
+			sessionService.sessionAdd(new SocketNettyImpl(ctx));
 		}
 	
 		@Override
@@ -57,7 +80,7 @@ import util.socket.server_1.session.SessionServiceListImpl;
 			super.handlerRemoved(ctx);
 			out("handlerRemoved", ctx);
 			
-			sessionService.sessionRemove(ctx);
+			sessionService.sessionRemove(new SocketNettyImpl(ctx));
 
 		}
 	
@@ -65,9 +88,7 @@ import util.socket.server_1.session.SessionServiceListImpl;
 		public void channelRead(ChannelHandlerContext ctx, Object msg) {
 			out("channelRead", msg); 
 			
-			sessionService.sessionOnRead(ctx);
-
-			
+			sessionService.sessionOnRead(new SocketNettyImpl(ctx), msg);
 		}
 	
 		@Override

@@ -45,7 +45,9 @@ public class LogServiceImpl implements LogService,Serializable {
 	}
 	
 	
-	
+	/**
+	 * 切换 线程安全的计数方案
+	 */
 	@Override
 	public void exeStatis(String url, String params, long costtime) {
 		url = url.split("\\.")[0]; //url编码
