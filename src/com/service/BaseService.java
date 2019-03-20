@@ -18,7 +18,8 @@ public interface BaseService {
 	/**
 	 * 查询列名字集合List<String>
 	 */
-	public List<Object> findColumns(String sql);
+	public List<String> findColumns(String sql);
+	public List<String> getColumns(String tableName);
 
 	/**
 	 * 查询结果集合
@@ -44,11 +45,5 @@ public interface BaseService {
 	 */
 	public Long count(String sql, Object... params);
 
-	/**
-	 *  查询出来的结果为一个String
-	 */
-	public String getString(String sql, Object... params);
-
-	public List<Object> getColumns(String tableName);
 
 }

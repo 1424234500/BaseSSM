@@ -2,7 +2,6 @@ package util.database;
 
 import java.util.EnumMap;
 
-import util.cache.CacheMgr;
 
 /**
  * 连接池 管理器
@@ -13,27 +12,24 @@ class PoolMgr{
 	
 	private PoolMgr() {
 	}
-	private static final Type DEFAULT_TYPE=Type.C3P0;
 	private static EnumMap<Type, Pool> connMap;
 	static {
 		connMap = new EnumMap<>(Type.class);
 	}
 	public static Pool getInstance() {
-		return getInstance(DEFAULT_TYPE);
+		return getInstance(null);
 	}
 
 	public static Pool getInstance(Type type) {
 		Pool conn = connMap.get(type);
 		if(conn == null){
 			switch(type){
-			case C3P0:
-				conn = new PoolC3p0Impl();
-				break;
 			case JDBC:
 				
 				break;
+			case C3P0:
 			default:
-				return getInstance(DEFAULT_TYPE);
+				conn = new PoolC3p0Impl();
 			}
 			connMap.put(type, conn);
 		}

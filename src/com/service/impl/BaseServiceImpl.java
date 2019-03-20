@@ -39,6 +39,11 @@ public class BaseServiceImpl implements BaseService,Serializable {
 	public List findColumns(String sql) {
 		return baseDao.findColumns(sql);
 	}
+	@Override
+	public List<String> getColumns(String tableName) {
+		return baseDao.getColumns(tableName);
+	}
+
 
 	@Override
 	public List<Map<String, Object>> find(String sql, Object... params) {
@@ -66,15 +71,6 @@ public class BaseServiceImpl implements BaseService,Serializable {
 		return baseDao.count(sql, params);
 	}
 
-	@Override
-	public String getString(String sql, Object... params) {
-		return baseDao.getString(sql, params);
-	}
-
-	@Override
-	public List<Object> getColumns(String tableName) {
-		return baseDao.getColumns(tableName);
-	}
  
 
 }

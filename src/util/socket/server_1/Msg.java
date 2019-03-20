@@ -33,9 +33,12 @@ public class Msg{
 	
 	@Override
 	public String toString() {
-		Bean bean = new Bean().set(KEY_ID, "msg_"+LangUtil.getUUID())
+		Bean bean = new Bean()
+				.set(KEY_ID, "msg_"+LangUtil.getUUID())
 				.set(KEY_FROM, from)
-				.set(KEY_TO, to).set(KEY_DATA, data).set(KEY_INFO, info);
+				.set(KEY_TO, to)
+				.set(KEY_DATA, data)
+				.set(KEY_INFO, info);
 		return bean.toString();
 	}
 	public String getFrom() {
@@ -61,13 +64,7 @@ public class Msg{
 	public void setData(Object data) {
 		this.data = data;
 	}
-	public String getInfo() {
-		return info;
-	}
-	public void setInfo(String info) {
-		this.info = info;
-	}
-	
+
 	public String getInfo() {
 		return info;
 	}

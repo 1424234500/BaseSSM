@@ -9,24 +9,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import util.Tools;
-
+import org.apache.log4j.Logger;
+import util.Page;
 
 /**
  * 数据库常用操作工具
  * 选择一种连接池实现
  * 每种连接池对应多种数据源 多种数据库
  * 
+ * jdbc 
  * 一个实例 绑定 连接池 和 数据源  但 底层 是同一个连接池 且 每个连接池每个 数据源是 唯一 
  */
-public class Dao {
+public class Dao implements BaseDao{
+	private static Logger log = Logger.getLogger(Dao.class); 
+
 	private Pool pool;
 	private String dsName;
 	private Connection conn;
-	private Map<String, PreparedStatement> psIndex = new HashMap<>();
 	
-	private Boolean boolAutoClose = true;
 	public Dao(){
 		this.pool = PoolMgr.getInstance();
 	}
@@ -36,72 +36,30 @@ public class Dao {
 	public void setDs(String dsName){
 		this.dsName = dsName;
 	}
-	/**
-	 * 默认自动关闭连接conn 自动关闭 prepare
-	 * 批量操作时最好设置false 手动close conn和prepare
-	 */
-	public void setAutoClose(Boolean bool){
-		this.boolAutoClose = bool;
-	}
-	
+
 	// 获取链接
 	private Connection getConnection() throws SQLException {
-		if(conn == null || conn.isClosed())
-			conn = pool.getConn(dsName);
+		if(conn == null || conn.isClosed()) {
+			conn = this.pool.getConn(dsName);
+		}
 		return conn;
 	}
-	// 获取
-	private PreparedStatement getPrepareStatement(Connection conn, String sql) throws SQLException {
-		PreparedStatement ps = psIndex.get(sql);
-		if(ps == null){
-			ps = conn.prepareStatement(sql);
-			psIndex.put(sql, ps);
-		}
-		return ps;
+	private void close(Connection conn, PreparedStatement pst, ResultSet rs) {
+		this.pool.close(conn, pst, rs);
 	}
+//	PreparedStatement ps = conn.prepareStatement(sql);
+//	conn = this.pool.getConn(dsName);
+//	this.pool.close(conn, pst, rs);
 
-	private void out(Object...objects) {
-		if (true) {
-			Tools.out(this, objects);
-		}
-	}
-	private void except(Object...objects) {
-		Tools.out(this, objects);
-	}
-	// 得到list数据
-	public List<Map<String, Object>> queryList(String sql, Object... objects) {
-		List<Map<String, Object>> res = null;
-		ResultSet resultSet = null;
-		Connection conn = null;
-		PreparedStatement preparedStatement = null;
-		try {
-			conn = this.getConnection();
-			preparedStatement = this.getPrepareStatement(conn, sql);
-
-			for (int i = 0; i < objects.length; i++) {
-				preparedStatement.setObject(i + 1, objects[i]); 
-				// string int obj 转换与查询问题！？？！
-			}
-			resultSet = preparedStatement.executeQuery();
-			res = rs2list(resultSet);
-		} catch (Exception e) {
-			except(sql, objects, e.toString());
-			res = new ArrayList<>();
-		} finally {
-			close(resultSet, preparedStatement, conn);
-		}
-		return res;
-	}
-
-	private List<Map<String, Object>> rs2list(ResultSet resultSet) {
+	private List<Map<String, Object>> rs2list(ResultSet rs) {
 		List<Map<String, Object>> res = new ArrayList<Map<String, Object>>();
 		try {
-			ResultSetMetaData md = resultSet.getMetaData(); // 得到结果集(rs)的结构信息，比如字段数、字段名等
+			ResultSetMetaData md = rs.getMetaData(); // 得到结果集(rs)的结构信息，比如字段数、字段名等
 			int columnCount = md.getColumnCount(); // 返回此 ResultSet 对象中的列数
-			while (resultSet.next()) {
-				Map<String, Object> map = new HashMap<>();
+			while (rs.next()) {
+				Map<String, Object> map = new HashMap<>(columnCount);
 				for (int i = 1; i <= columnCount; i++) {
-					map.put(md.getColumnName(i), resultSet.getObject(i));
+					map.put(md.getColumnName(i), rs.getObject(i));
 				}
 				res.add(map);
 			}
@@ -110,140 +68,141 @@ public class Dao {
 		}
 		return res;
 	}
-
-	/**
-	 * 查询一条数据
-	 */
-	public Map<String, Object> queryOne(String sql, Object... objects) {
-		sql = " select * from ( " + sql + " ) where rownum <= 1 ";
-		List<Map<String, Object>> res = queryList(sql, objects);
-		if (res != null) {
-			if (res.size() >= 1) {
-				return res.get(0);
-			}
-		}
-		return null;
-	}
-
-	public int execSQL(String sql, Object... objects) {
-		int res = -1;
-
-		Connection connection = null;
-		PreparedStatement preparedStatement = null;
+ 
+	@Override
+	public List<String> findColumns(String sql) {
+		List<String> res = null;
+		Connection conn = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
 		try {
-			connection = this.getConnection();
-			preparedStatement = this.getPrepareStatement(conn, sql);
-
-			for (int i = 0; i < objects.length; i++) {
-				preparedStatement.setObject(i + 1, objects[i]);
+			conn = this.getConnection();
+			pst = conn.prepareStatement(sql);
+			rs = pst.executeQuery();
+			ResultSetMetaData md = rs.getMetaData();
+			int columnCount = md.getColumnCount();
+			res = new ArrayList<>(columnCount);
+			for(int i=0; i < columnCount; i++){
+				res.add(md.getColumnName(i+1));
 			}
-			res = preparedStatement.executeUpdate();
-
-			out("execute = " + sql + " args:" + Tools.objects2string(objects));
 		} catch (Exception e) {
-			except(sql, objects, e.toString());
+			log.error(sql, e);
 		} finally {
-			// 5. 关闭数据库资源: 由里向外关闭.
-			close(null, preparedStatement, connection);
+			close(conn, pst, rs);
 		}
 		return res;
 	}
-
-	/**
-	 * 释放数据库资源的方法
-	 * 若是不自动关闭则 只关闭resultSet
-	 * 缓存conn和prepareStatement
-	 */
-	private void close(ResultSet resultSet, PreparedStatement preparedStatement, Connection connection) {
-		if(this.boolAutoClose){
-			for(String key : psIndex.keySet()){
-				this.pool.close(null, psIndex.get(key), null);
-			}
-			this.psIndex.clear();
-
-			this.pool.close(connection, preparedStatement, resultSet);
-			this.conn = null;
-			
-		}else{
-			this.pool.close(null, null, resultSet);
-		}
+	@Override
+	public List<String> getColumns(String tableName) {
+		return findColumns("SELECT COLUMN_NAME FROM ALL_TAB_COLUMNS WHERE TABLE_NAME = upper('" + tableName + "') ORDER BY COLUMN_ID");
 	}
-	/**
-	 * 关闭所有缓存的prepareStatement 关闭当前打开的conn
-	 */
-	public void close(){
-		for(String key : psIndex.keySet()){
-			this.pool.close(null, psIndex.get(key), null);
-		}
-		this.psIndex.clear();
-		this.pool.close(this.conn, null, null);
-	}
-
-	/**
-	 * 得到当前数据库 的 当前表的 列名=id/ID 的 大于0的 当前表中并不存在的 最小的 整形的 id号 转为的 字符串
-	 */
-	public String getAId(String tableName, String columnName, int startI) {
-
-		Connection connection = null;
-		PreparedStatement preparedStatement = null;
-		ResultSet resultSet = null;
-		int i = startI;
-		boolean flag = true;
-		try {
-			connection = getConnection();
-			// 疑问：表名无法用？号占位！？
-			preparedStatement = connection.prepareStatement("select  " + columnName + "  from   " + tableName,
-					ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			resultSet = preparedStatement.executeQuery();
-
-			if (resultSet.next())
-				while (true) {
-					resultSet.first();
-					flag = true;
-					do {
-						if (resultSet.getString(1).equals("" + i)) {
-							flag = false;
-							break;
-						}
-					} while (resultSet.next());
-					if (flag) {
-						out("id:" + i);
-						break;
-					}
-					i++;
-				}
-		} catch (SQLException e) {
-			except(tableName, columnName, startI, e.toString());
-			return "-1";
-		} finally {
-			close(resultSet, preparedStatement, connection);
-		}
-		return "" + i;
-	}
-
-	// 查询记录条数专用
-	public int executeCount(String sql, Object... objects) {
-		int res = 0;
-
-		ResultSet resultSet = null;
+	@Override
+	public List<Map<String, Object>> find(String sql, Object... objects) {
+		List<Map<String, Object>> res = null;
 		Connection conn = null;
-		PreparedStatement preparedStatement = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
 		try {
 			conn = this.getConnection();
-			preparedStatement = this.getPrepareStatement(conn, "select count(*) from (" + sql + ")");
-
+			pst = conn.prepareStatement(sql);
 			for (int i = 0; i < objects.length; i++) {
-				preparedStatement.setObject(i + 1, objects[i]); 
+				pst.setObject(i + 1, objects[i]); 
+				// string int obj 转换与查询问题！？？！
 			}
-			resultSet = preparedStatement.executeQuery();
-			while (resultSet.next()) {
-				res = resultSet.getInt(1); // 取出count(*) 第一个整数
+			rs = pst.executeQuery();
+			res = rs2list(rs);
+		} catch (Exception e) {
+			res = new ArrayList<>();
+			log.error(SqlHelp.makeSql(sql, objects), e);
+		} finally {
+			close(conn, pst, rs);
+		}
+		return res;
+
+	}
+	@Override
+	public Map<String, Object> findOne(String sql, Object... objects) {
+		List<Map<String, Object>> list = this.find("select * from " + sql + " where rownum <= 1 ", objects);
+		Map<String, Object> res = null;
+		if(list.size() >= 1) {
+			res = list.get(0);
+		}
+		return res;
+	}
+	@Override
+	public List<Map<String, Object>> findPage(String sql, int page, int rows, Object... objects) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public List<Map<String, Object>> findPage(Page page, String sql, Object... params) {
+		page.setNUM(this.count(sql, params ));
+		return this.findPage(sql,page.getNOWPAGE(),page.getSHOWNUM(), params );
+	}
+	
+	@Override
+	public int executeSql(String sql, Object... objects) {
+		int res = 0;
+		Connection conn = null;
+		PreparedStatement pst = null;
+		try {
+			conn = this.getConnection();
+			pst = conn.prepareStatement(sql);
+			for (int i = 0; i < objects.length; i++) {
+				pst.setObject(i + 1, objects[i]);
+			}
+			res = pst.executeUpdate();
+		} catch (Exception e) {
+			res = -1;
+			log.error(SqlHelp.makeSql(sql, objects), e);
+		} finally {
+			close(conn, pst, null);
+		}
+		return res;
+	}
+	public int[] executeSql(String sql, List<List<Object>> objs) {
+		int[] res = {};
+		Connection conn = null;
+		PreparedStatement pst = null;
+		try {
+			conn = this.getConnection();
+			pst = conn.prepareStatement(sql);
+			for(List<Object> objects : objs) {
+				for (int i = 0; i < objects.size(); i++) {
+					pst.setObject(i + 1, objects.get(i));
+				}
+				pst.addBatch();
+			}
+			res = pst.executeBatch();
+		} catch (Exception e) {
+			log.error(sql + " batch size:"+objs.size(), e);
+		} finally {
+			close(conn, pst, null);
+		}
+		return res;
+	}
+	@Override
+	public int count(String sql, Object... objects) {
+		int res = 0;
+
+		Connection conn = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		try {
+			conn = this.getConnection();
+			pst = conn.prepareStatement("select count(*) from (" + sql + ")");
+			for (int i = 0; i < objects.length; i++) {
+				pst.setObject(i + 1, objects[i]); 
+			}
+			rs = pst.executeQuery();
+			while (rs.next()) {
+				res = rs.getInt(1); // 取出count(*) 第一个整数
 				break;
 			}
 		} catch (Exception e) {
-			except(sql, objects, e.toString());
+			log.error(SqlHelp.makeSql(sql, objects), e);
 		} finally {
-			close(resultSet, preparedStatement, conn);
+			close(conn, pst, null);
 		}
 		return res;
 	}

@@ -181,7 +181,7 @@ public abstract class BaseControll {
 		String tableName = getTableName();
 		if(!Tools.notNull(tableName))
 			throw new Exception("没有配置表");
-		List<Object> res = baseService.getColumns(tableName); 
+		List<String> res = baseService.getColumns(tableName); 
 		return RequestUtil.getParam(request, res);
 	}
 	/**
@@ -212,7 +212,7 @@ public abstract class BaseControll {
 
 		if(!Tools.notNull(tableName))
 			throw new Exception("没有配置表");
-		List<Object> res = baseService.getColumns(tableName); 
+		List<String> res = baseService.getColumns(tableName); 
 		if(res.size() <= 0)
 			throw new Exception("该表 " + tableName + " 没有列 ");
 		return (String)res.get(0);
@@ -299,7 +299,7 @@ public abstract class BaseControll {
 			echo(false, "未闻表名");
 			return;
 		}
-		List<Object> res = baseService.getColumns(tableName);
+		List<String> res = baseService.getColumns(tableName);
 		echo(res);
 	}
 	String getTableName(){

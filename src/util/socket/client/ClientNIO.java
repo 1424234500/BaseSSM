@@ -17,13 +17,13 @@ public class ClientNIO extends ClientFrame {
 	int serverPort = 8091; 
 	
 	ClientNIO(){
-		serverPort = Setting.getInt("socket_port_nio", 8091);
+		serverPort = Setting.get("socket_port_nio", 8091);
 		try {
-			serverIp = Setting.getString("socket_ip", Tools.getServerIp(InetAddress.getLocalHost().getHostAddress()));
+			serverIp = Setting.get("socket_ip", Tools.getServerIp(InetAddress.getLocalHost().getHostAddress()));
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-		serverIp = Setting.getString("socket_ip", "127.0.0.1");
+		serverIp = Setting.get("socket_ip", "127.0.0.1");
 	}
 	ClientNIO(String ip, int port){
 		this.serverIp = ip;

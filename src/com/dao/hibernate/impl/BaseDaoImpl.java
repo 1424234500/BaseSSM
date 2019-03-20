@@ -45,9 +45,9 @@ public class BaseDaoImpl implements BaseDao  {
 	/**
 	 * 获取列名集合的第一种方式
 	 */
-	public List<Object> findColumns(String sql){
+	public List<String> findColumns(String sql){
 		final String sqlStr=sql;
-		final List<Object> list=new ArrayList<Object>();
+		final List<String> list=new ArrayList<String>();
 		getCurrentSession().doWork( new Work() {  
 		    public void execute(Connection connection) {
 		    	try{
@@ -111,17 +111,8 @@ public class BaseDaoImpl implements BaseDao  {
 		return ((Number) q.uniqueResult()).longValue();
 	}
 	
-	@Override
-	public String getString(String sql, Object... params) {
-		SQLQuery q = getCurrentSession().createSQLQuery(sql);
-		setParams(q, params);
-		Object res = q.uniqueResult();
-		return  res == null ? "" : res.toString();
-	}
-	
-	
 	@SuppressWarnings("unchecked")
-	public List<Object> getColumns(String tableName){
+	public List<String> getColumns(String tableName){
 		String sql = "";
 		//oracle
 		sql = "SELECT COLUMN_NAME FROM ALL_TAB_COLUMNS WHERE TABLE_NAME = upper('" + tableName + "') ORDER BY COLUMN_ID";
@@ -133,7 +124,7 @@ public class BaseDaoImpl implements BaseDao  {
 		SQLQuery q = getCurrentSession().createSQLQuery(sql);
 		setParams(q);
 		List<Map<String, Object>> list = q.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
-		List<Object> res = new ArrayList<Object>();
+		List<String> res = new ArrayList<String>();
 		
 		if(list != null){
 			for(Map<String, Object> map : list){

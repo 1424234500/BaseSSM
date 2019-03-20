@@ -1,7 +1,9 @@
-package com.dao.hibernate;
+package util.database;
 
 import java.util.List;
 import java.util.Map;
+
+import util.Page;
 
 /**
  * 基础数据库操作类
@@ -33,7 +35,6 @@ public interface BaseDao {
 	 * @return 结果集
 	 */
 	public List<Map<String, Object>> find(String sql, Object... params);
-
 	public Map<String, Object> findOne(String sql, Object... params);
 
 	/**
@@ -50,17 +51,19 @@ public interface BaseDao {
 	 * @return 结果集
 	 */
 	public List<Map<String, Object>> findPage(String sql, int page, int rows, Object... params);
+	public List<Map<String, Object>> findPage(Page page, String sql, Object... params);
 
 	/**
 	 * 执行SQL语句
-	 * 
-	 * @param sql
-	 *            SQL语句
-	 * @param params
-	 *            参数
 	 * @return 响应行数
 	 */
 	public int executeSql(String sql, Object... params);
+
+	/**
+	 * 批量执行sql
+	 * @return
+	 */
+	public int[] executeSql(String sql, List<List<Object>> objs);
 
 	/**
 	 * 统计
@@ -68,7 +71,7 @@ public interface BaseDao {
 	 * @param params  参数
 	 * @return 数目
 	 */
-	public Long count(String sql, Object... params);
+	public int count(String sql, Object... params);
 
 	
 }

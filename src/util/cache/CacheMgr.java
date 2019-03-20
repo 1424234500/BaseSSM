@@ -94,7 +94,7 @@ public class CacheMgr implements Call{
 		try {
 			Dao dao = new Dao();
 			//key value info time
-			for(Map<String, Object> keyValue : dao.queryList("select * from sys_config")){
+			for(Map<String, Object> keyValue : dao.find("select * from sys_config")){
 				String key = (String) keyValue.get("KEY");
 				Object value = keyValue.get("VALUE");
 				cache.put(key, value);

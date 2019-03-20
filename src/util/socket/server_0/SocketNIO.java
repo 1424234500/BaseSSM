@@ -25,7 +25,7 @@ public  class SocketNIO extends SocketFrame<SocketChannel>  {
 	
  
 	public SocketNIO(){
-		serverPort = Setting.getInt("socket_port_nio", 8091);
+		serverPort = Setting.get("socket_port_nio", 8091);
 	}
 
 	@Override

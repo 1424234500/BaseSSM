@@ -25,13 +25,13 @@ public class ClientNetty extends ClientFrame {
 	int serverPort = 8091; 
 	
 	ClientNetty(){
-		serverPort = Setting.getInt("socket_port_netty", 8092);
+		serverPort = Setting.get("socket_port_netty", 8092);
 		try {
-			serverIp = Setting.getString("socket_ip", Tools.getServerIp(InetAddress.getLocalHost().getHostAddress()));
+			serverIp = Setting.get("socket_ip", Tools.getServerIp(InetAddress.getLocalHost().getHostAddress()));
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-		serverIp = Setting.getString("socket_ip", "127.0.0.1");
+		serverIp = Setting.get("socket_ip", "127.0.0.1");
 	}
 	ClientNetty(String ip, int port){
 		this.serverIp = ip;

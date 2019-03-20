@@ -25,7 +25,7 @@ public  class SocketIO extends SocketFrame<Socket>  {
 
  
 	public SocketIO(){
-		serverPort = Setting.getInt("socket_port_io", 8090);
+		serverPort = Setting.get("socket_port_io", 8090);
 	}
 
 	@Override
