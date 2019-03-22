@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -12,18 +13,14 @@ import util.Fun;
 import util.database.RedisMgr;
 
 /**
- * 管道 跨 进程通信工具
- * 行字符串-存取  对象存取-编码解码
- * 同步  阻塞 阻塞队列 
- * LinkedBlockingQueue
- * ArrayBlockingQueue
  * 
- * 系统管道实现
- * 文件实现
- * 数据库实现
- * 	redis
- *
  * 使用redis list作为存储结构
+ * 
+ * 常用于多进程 多线程生产 多线程消费 上下文隔离场景
+ * 只被消费一次 抢占处理
+ * 
+ * 避免上下级影响
+ * 并提供缓冲功能
  * 
  */
 public class PipeRedisImpl implements Pipe<String>{
@@ -65,7 +62,7 @@ public class PipeRedisImpl implements Pipe<String>{
 
 	@Override
 	public boolean remove(String obj) {
-		
+		redisPool.del(this.key);
 		return false;
 	}
 
@@ -87,13 +84,13 @@ public class PipeRedisImpl implements Pipe<String>{
 	}
 
 	@Override
-	public boolean putL(Collection<String> objs) {
+	public boolean putHead(Collection<String> objs) {
 		redisPool.listLPush(this.key, objs);
 		return true;
 	}
 
 	@Override
-	public boolean putL(String obj) {
+	public boolean putHead(String obj) {
 		redisPool.listLPush(this.key, Arrays.asList(obj));
 		return true;
 	}
@@ -119,17 +116,15 @@ public class PipeRedisImpl implements Pipe<String>{
 					String keyJedis = key + "-" + now;
 					log.warn("Start thread " + now);
 					while(! Thread.interrupted()) {
+						//！！！！！！消费 加锁 互斥问题
+						//:Todo
 						String obj = redisPool.getJedis(keyJedis).lpop(key);//get();
 						if(obj != null) {
-//							log.error("Get pipe " + obj);
-//							threadPool.notify();
+							log.debug("Comsumer get " + obj.toString());
 							executer.make(obj);
 						}else {
 							try {
-								//按照序号 依次等待 50 + now * 1000
-								long tt = 100;
-//								log.info("Wait " + tt);
-								Thread.sleep(tt);
+								Thread.sleep(Pipe.SLEEP_THREAD);
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}
@@ -148,7 +143,16 @@ public class PipeRedisImpl implements Pipe<String>{
 		}
 	}
 	
-	
+	@Override
+	public void await(long timeout, TimeUnit unit) {
+		if(threadPool != null && !threadPool.isShutdown()) {
+			try {
+				threadPool.awaitTermination(timeout, unit);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	
 }

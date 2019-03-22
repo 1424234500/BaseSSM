@@ -2,7 +2,6 @@ package util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +17,22 @@ import org.json.JSONObject;
 
 
 public class JsonUtil {
+	public static void main(String[] argv) {
+		Bean bean = new Bean().set("key1", 23).set("key2", 232);
+		Tools.out(makeJson(bean));
+		List<Object> list = new ArrayList<>();
+		list.add("asdf");
+		list.add(bean);
+		Tools.out(makeJson(list));
+	}
+	
+	
+	
 	/**
 	 * map转json
 	 * @param obj
 	 */
-	public static String makeJson(Object obj) {
+	public static String makeJson(Map<?,?> obj) {
         String res = "";
         try {
             JSONObject jo = new JSONObject(obj);

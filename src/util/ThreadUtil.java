@@ -74,10 +74,18 @@ public class ThreadUtil {
 	 * @param type         线程池类型
 	 * @param corePoolSize 只对Fixed和Scheduled线程池起效
 	 */
-	private static ExecutorService getExecutorServiceInstance(Type type) {
+	public static ExecutorService getExecutorServiceInstance(Type type) {
 		return getExecutorServiceInstance(type, CacheMgr.getInstance().get("corePoolSize", 5));
 	}
-	private static ExecutorService getExecutorServiceInstance(Type type, final int corePoolSize) {
+	/**
+	 * 固定数量线程池
+	 * @param corePoolSize
+	 * @return
+	 */
+	public static ExecutorService getExecutorServiceInstance(int corePoolSize) {
+		return Executors.newFixedThreadPool(corePoolSize);
+	}
+	public static ExecutorService getExecutorServiceInstance(Type type, final int corePoolSize) {
 //	    type = type % 4;
 		// 构造有定时功能的线程池
 	    // ThreadPoolExecutor(corePoolSize, Integer.MAX_VALUE, 10L, TimeUnit.MILLISECONDS, new BlockingQueue<Runnable>)
@@ -206,7 +214,10 @@ public class ThreadUtil {
 	 */
 	public static <T> Future<T> submit(Type type, Callable<T> task) {
 		ExecutorService exec = getExecutorServiceInstance(type);
-	    return exec.submit(task);
+	    Future<T> future = exec.submit(task);
+//		future.cancel(false);
+//	    future.get();
+		return future;
 	}
 
 	/**

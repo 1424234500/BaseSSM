@@ -63,7 +63,6 @@ public class Bean extends HashMap{
      * @param def 缺省对象
      * @return 对象值
      */ 
-	@SuppressWarnings("unchecked")
 	public <T> T get(Object key, T defaultValue){
 		Object obj = get(key);
 //		匹配大小写命名
@@ -74,6 +73,7 @@ public class Bean extends HashMap{
 		
 		return res;
 	}
+
     
 
     /**

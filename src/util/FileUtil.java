@@ -1,9 +1,11 @@
 package util;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.LineIterator;
 
 public class FileUtil {
 
@@ -225,7 +228,19 @@ public class FileUtil {
 	 * 
 	 * @param path
 	 * @return
+	 * @throws IOException 
 	 */
+	public static int readByLines(File file, Fun<String> fun) throws IOException {
+		int lines = 0;
+		LineIterator it = FileUtils.lineIterator(file, "utf-8");
+		while(it.hasNext()) {
+			String line = it.nextLine();
+			lines++;
+			fun.make(line);
+		}
+		it.close();
+		return lines;
+	}
 	public static String readByLines(String path, Fun<String> fun) {
 		String content = null;
 
@@ -336,7 +351,32 @@ public class FileUtil {
 		}
 		return true;
 	}
-
+	/**
+	 * 
+	 */
+	public static void writeFile() throws Exception {
+		//字符流写入字符到文件 char[] string
+		FileWriter fw = new FileWriter(new File("aaa"), false);
+		fw.write("aaaaaaaaa");
+		fw.flush();
+		
+		//字符流类来处理字符数据 char[] string
+		BufferedWriter bw = new BufferedWriter(fw);
+		bw.write("bbbbb");
+		bw.write(new char[]{'a','b'});
+		bw.close();
+		
+		//原始二进制数据的字节流类 byte
+		FileOutputStream op = new FileOutputStream(new File("bbb"));
+		op.write("asdf".getBytes());
+		op.close();
+		 try (FileOutputStream fop = new FileOutputStream(new File("ccc"))) {
+			 
+		 }catch(Exception e) {
+			 
+		 }
+	}
+	
 	/**
 	 * 按照文件类型读取 path .xls .xlsx 表格 .c .txt .python 文本类型
 	 */

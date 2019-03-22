@@ -21,9 +21,11 @@ public class PipeMgr implements Call{
 			pipe = (Pipe<T>) new PipeRedisBroadcastImpl();
 			break;
 		case REDIS:
-		default:
 			pipe = (Pipe<T>) new PipeRedisImpl();
 			break;
+		case PIPE:
+		default:
+			pipe = (Pipe<T>) new PipeListImpl<T>();
 		}
 		pipe.start(key);
 		return pipe;

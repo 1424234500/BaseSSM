@@ -22,6 +22,7 @@ public interface SubPub<T> {
 	 * @return
 	 */
 	Boolean subscribe(String channel, OnSubscribe<T> onSubscribe);
+	Boolean unSubscribe(String channel, OnSubscribe<T> onSubscribe);
 	
 	/**
 	 * 订阅处理回调

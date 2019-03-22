@@ -1,16 +1,10 @@
 package util.socket.server_1.netty.handler;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import util.Tools;
-import util.socket.server_1.session.Session;
-import util.socket.server_1.session.SessionMgr;
-import util.socket.server_1.session.SessionService;
-import util.socket.server_1.session.SessionServiceListImpl;
-import util.socket.server_1.session.Socket;
+import util.socket.server_1.session.*;
 
 	/**
 	 * netty的handler
@@ -20,7 +14,7 @@ import util.socket.server_1.session.Socket;
 	 *
 	 */
 	public class SessionHandler extends ChannelInboundHandlerAdapter {
-		private static SessionService<ChannelHandlerContext> sessionService = new SessionServiceListImpl<>();
+		private static SessionService<ChannelHandlerContext> sessionService = new SessionServiceListImpl<ChannelHandlerContext>();
 		private class SocketNettyImpl extends Socket<ChannelHandlerContext>{
 			public SocketNettyImpl(ChannelHandlerContext socket) {
 				super(socket);
@@ -35,6 +29,7 @@ import util.socket.server_1.session.Socket;
 				//127.0.0.1:34612
 				key = key.substring(3);
 				out(key);
+//				key = this.socket.toString();
 				return key;
 			}
 

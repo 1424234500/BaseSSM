@@ -1,6 +1,9 @@
 package util.pipe;
 
 import java.util.Collection;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -10,18 +13,15 @@ import util.Fun;
 import util.database.RedisMgr;
 
 /**
- * 管道 跨 进程通信工具
- * 行字符串-存取  对象存取-编码解码
- * 同步  阻塞 阻塞队列 
- * LinkedBlockingQueue
- * ArrayBlockingQueue
  * 
- * 系统管道实现
- * 文件实现
- * 数据库实现
- * 	redis
- *
  * 使用redis publish subscribe 传递
+ * 
+ * 常用于多进程 多线程发布 多线程订阅 上下文隔离场景
+ * 实现一对多 一人发布 多人复制处理
+ * 
+ * 避免上下级影响
+ * 只提供订阅后的 弱缓冲功能
+ * 
  * 
  */
 public class PipeRedisBroadcastImpl implements Pipe<String>{
@@ -36,6 +36,12 @@ public class PipeRedisBroadcastImpl implements Pipe<String>{
 	 */
 	private RedisMgr redisPool;
 
+
+	/**
+	 * 线程池消费 每个线程都去消费
+	 */
+	private ExecutorService threadPool;
+	
 	@Override
 	public void start(String key){
 		this.key = key;
@@ -86,12 +92,12 @@ public class PipeRedisBroadcastImpl implements Pipe<String>{
 	}
 
 	@Override
-	public boolean putL(Collection<String> objs) {
+	public boolean putHead(Collection<String> objs) {
 		return true;
 	}
 
 	@Override
-	public boolean putL(String obj) {
+	public boolean putHead(String obj) {
 		return true;
 	}
 
@@ -107,19 +113,24 @@ public class PipeRedisBroadcastImpl implements Pipe<String>{
 	@Override
 	public void startConsumer(int threadSize, final Fun<String> executer) {
 		log.warn("StartConsumer");
+		threadPool = Executors.newFixedThreadPool(threadSize);
 		Jedis jedis = redisPool.getJedis(this.key);
 		jedis.subscribe(new JedisPubSub() {
-			public void onMessage(String channel, String message) {
-				log.warn("onMessage channel:" + channel + " message:" + message);
-				executer.make(message);
+			public void onMessage(String channel, final String message) {
+				log.debug("Consumer subcribe [" + channel + "] " + message);
+				threadPool.execute(new Runnable() {
+					public void run() {
+						executer.make(message);
+					}
+				});
 			}
 			
 			public void onSubscribe(String channel, int subscribedChannels) {
-				log.warn("onSubscribe channel:" + channel + " subscribedChannels:" + subscribedChannels);
+				log.debug("onSubscribe channel:" + channel + " subscribedChannels:" + subscribedChannels);
 			}
 			
 			public void onUnsubscribe(String channel, int subscribedChannels) {
-				log.warn("onUnsubscribe channel:" + channel + " subscribedChannels:" + subscribedChannels);
+				log.debug("onUnsubscribe channel:" + channel + " subscribedChannels:" + subscribedChannels);
 			}
 		}, this.key);
 		
@@ -127,8 +138,20 @@ public class PipeRedisBroadcastImpl implements Pipe<String>{
 	@Override
 	public void stopConsumer() {
 		redisPool.close(this.key);
+		if(threadPool != null && !threadPool.isShutdown()) {
+			threadPool.shutdown();
+		}
 	}
 	
-	
+	@Override
+	public void await(long timeout, TimeUnit unit) {
+		if(threadPool != null && !threadPool.isShutdown()) {
+			try {
+				threadPool.awaitTermination(timeout, unit);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 }

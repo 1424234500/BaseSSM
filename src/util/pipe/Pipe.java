@@ -1,6 +1,7 @@
 package util.pipe;
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import util.Fun;
 
@@ -11,53 +12,68 @@ import util.Fun;
  * LinkedBlockingQueue
  * ArrayBlockingQueue
  * 
+ * 内存实现
+ * redis list
+ * redis subscribe
  * 系统管道实现
  * 文件实现
  * 数据库实现
- * redis list
- * redis subscribe
  */
 public interface Pipe<T>{
+	/**
+	 * 多线程消费 空闲间隔
+	 */
+	long SLEEP_THREAD = 100;
 	/**
 	 * 初始化管道
 	 * @param key
 	 */
 	void start(String key);
 	/**
-	 * 销毁
+	 * 销毁管道
+	 * 清空队列
 	 */
 	void stop();
-	
+	/**
+	 * 停止管道 
+	 * 等待执行完毕
+	 */
+	void await(long timeout, TimeUnit unit);
+	/**
+	 * 移除元素
+	 * @param obj
+	 * @return
+	 */
 	boolean remove(T obj);
 	/**
-	 * 队尾 弹出
+	 * 获取队首 弹出
 	 */
 	T get();
 	
 	/**
-	 * 存入
+	 * 存入 排队 
 	 * @param objs
 	 * @return
 	 */
 	boolean put(Collection<T> objs);
 	/**
-	 * 存入
+	 * 存入 排队
 	 * @param obj
 	 * @return
 	 */
 	boolean put(T obj);
 	/**
-	 * 存入队首
+	 * 存入队首 优先
 	 * @param objs
 	 * @return
 	 */
-	boolean putL(Collection<T> objs);
+	boolean putHead(Collection<T> objs);
 	/**
-	 * 存入队首
+	 * 存入队首 优先
 	 * @param obj
 	 * @return
 	 */
-	boolean putL(T obj);
+	boolean putHead(T obj);
 	/**
 	 * 队列大小
 	 * @return
@@ -67,6 +83,7 @@ public interface Pipe<T>{
 	
 	/**
 	 * 开启消费者线程
+	 * 线程数 执行器
 	 */
 	void startConsumer(int threadSize, Fun<T> executer) ;
 

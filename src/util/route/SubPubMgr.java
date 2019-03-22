@@ -11,8 +11,8 @@ public class SubPubMgr implements Call{
 	private SubPubMgr() {}
  
 
-	public static SubPub<String> getSubPub(Integer threadCoreSize) {
-		SubPub<String> subPub =  new SubPubMapImpl<>();
+	public static <T> SubPub<T> getSubPub(Integer threadCoreSize) {
+		SubPub<T> subPub =  new SubPubMapImpl<>();
 		subPub.init(threadCoreSize);
 		return subPub;
 	}

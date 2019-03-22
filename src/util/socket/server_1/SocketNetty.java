@@ -53,6 +53,7 @@ public class SocketNetty {
 					new ChannelInitializer<SocketChannel>() {
 						@Override
 						public void initChannel(SocketChannel ch) throws Exception {
+							//过滤器 编码解码 心跳 会话业务 依次处理
 							ChannelPipeline p = ch.pipeline();
 	//						p.addLast(new LoggingHandler(LogLevel.INFO));
 							p.addLast(new IdleStateHandler(10, 0, 0, TimeUnit.SECONDS)); 	//5s心跳包 

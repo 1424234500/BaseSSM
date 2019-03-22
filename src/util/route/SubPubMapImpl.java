@@ -47,10 +47,20 @@ public class SubPubMapImpl<T> implements SubPub<T>{
 	}
 
 	@Override
+	public Boolean unSubscribe(String channel, OnSubscribe<T> onSubscribe) {
+		List<OnSubscribe<T>> list = subscribeTable.get(channel);
+		if(list == null) {
+			list = new CopyOnWriteArrayList<>();
+			subscribeTable.put(channel, list);
+		}
+		return list.remove(onSubscribe);
+	}
+	@Override
 	public void init(Integer threadSize) {
 //		pool = Executors.newFixedThreadPool(threadSize);	
 //        pool = new ThreadPoolExecutor(1, threadSize, 10L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
         subscribeTable = new ConcurrentHashMap<>();
 	}
+
 
 }

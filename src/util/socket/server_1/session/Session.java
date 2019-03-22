@@ -2,17 +2,28 @@ package util.socket.server_1.session;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 import util.Bean;
 import util.JsonUtil;
+import util.route.SubPub;
+import util.route.SubPub.OnSubscribe;
+import util.route.SubPubMgr;
 import util.socket.server_1.Msg;
 
-public class Session<T> {
+public class Session<T> implements OnSubscribe<Msg> {
+	private static Logger log = Logger.getLogger(Session.class); 
+
 	/**
 	 * 会话信息
 	 */
 	String id;	//登录用户
 	Set<String> subscribeKeys;	//订阅keys
-	
+
+    /**
+     * 路由 发布订阅
+     */
+    private SubPub<Msg> sub = SubPubMgr.getSubPub(0);
 	
 	/**
 	 * socket实体以及 key send实现回调
@@ -25,10 +36,6 @@ public class Session<T> {
 	}
 	public void setSession(Socket<T> socket) {
 		this.socket = socket;
-	}
-	private void send(Msg msg) {
-		
-		session.socket.send( );
 	}
 	public String getKey() {
 		return this.socket.key();
@@ -50,32 +57,24 @@ public class Session<T> {
 		return "Session[key=" + getKey() + " socket=" + socket + "]";
 	}
 	
+	 
 	
 	/**
-	 * session负责自己处理业务
-	 * @param msg
+	 * 登录成功后 订阅消息 单聊群聊特殊规则
 	 */
-	public void onData(Object msg) {
-		
-		
-
-		
-		
+	public void onLogin(Object msg) {
+		sub.subscribe(id, this);
+		sub.subscribe("all", this);
+		sub.subscribe("online", this);
 		
 	}
-	
-	public void onLogin(Object msg) {
-		Bean bean = JsonUtil.get(msg.toString());
-		String user = bean.get("id", "");
-		String pwd = bean.get("pwd", "");
-		
-		Msg res = new Msg();
-		res.setTo(id);
-		res.setInfo("hello login");
-		res.setData(msg);
-		
-		send(res);
-		
+	/**
+ 	 * session负责自己处理业务
+	 */
+	@Override
+	public Type onSubscribe(Msg object) {
+		log.info(object);
+		return null;
 	}
 	
 	
