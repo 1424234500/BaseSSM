@@ -24,11 +24,11 @@ import util.socket.server_1.session.*;
 			public String key() {
 				//ChannelHandlerContext(SessionHandler#0, [id: 0x9a9c3c84, L:/127.0.0.1:8092 - R:/127.0.0.1:34612])
 				String ss[] = this.socket.toString().split(" ");
-				//R:/127.0.0.1:34612
+				//R:/127.0.0.1:45316])
 				String key = ss[ss.length - 1];	
 				//127.0.0.1:34612
-				key = key.substring(3);
-				out(key);
+				key = key.substring(3).split("\\]")[0];
+//				out(key);
 //				key = this.socket.toString();
 				return key;
 			}

@@ -14,158 +14,81 @@ import util.JsonUtil;
 import util.LangUtil;
 import util.MapListUtil;
 import util.Tools;
+import util.socket.server_1.session.Session;
 
 /**
  * socket 传递 消息结构 
+ * 
+ * who 发来了一条消息  session:socket:key
+ * 			   msg
+ * 					//由服务端设置
+ * 					from key	来源			socket:key
+ * 					to	 key	去向			socket:key
+ * 					//由客户端发送
+ * 					type plugin 函数调用		login,message
+ * 					data onData 函数调用参数	bean
+ * 
+ * 					//plugin调用
+ * 					login 登录操作  未登录只能调用此plugin 此时没有self userId
+ * 						bean.user:000900
+ * 						bean.pwd:123456
+ * 						bean.device:asjfkajxkjakjdf
+ *							
+ *					message 发给user/group 请求转发
+ *						bean.to		发给目标用户	u_123,u_2323,g_xxx,s_all,s_online
+ *						bean.from	发送方来源	u_123,s_admin
+ *						bean.type	具体消息类型	text,image,voice,video,map
  *
  */
-public class Msg{
+public class Msg extends Bean{
+	private static final long serialVersionUID = 1L;
 	final private static String SPLIT = ",";
+	final private static String KEY_FROM = "from";
+	final private static String KEY_TO = "to";
 	
-	String type = "";
+	final private static String KEY_TYPE = "type";
+	final private static String KEY_DATA = "data";
 	
-	
-	/**
-	 * 需要写入 socket 传递的业务信息
-	 */
-	final private static String KEY_ID = "id";		//消息id 没有则生成
-	final private static String KEY_FROM = "from";	//业务发送方 user_id
-	final private static String KEY_TO = "to";		//业务接收方 user_id
-	final private static String KEY_DATA = "data";	//具体消息body
-	final private static String KEY_INFO = "info";	//说明
-	final private static String KEY_RES = "ok";		//是否成功 true false
-	
-	final private static String KEY_TYPE = "type";	//消息类型 业务处理分类plugin
-	final private static String TYPE_EVENT = "event";
-
-	/**
-	 * msg上下文处理相关信息
-	 */
-	final private static String CONTEXT_FROM = "_from";	//socket发送方 key
-	final private static String CONTEXT_TO = "_to";		//socket来源 key
-	final private static String CONTEXT = "aaa";
-	String _from = "";
-	String _to = "";
-	public Msg setKeyFrom(String key) {
-		this._from = key;
-		return this;
-	}
-	public Msg setKeyTo(String key) {
-		this._to = key;
-		return this;
-	}
-	public String getKeyFrom() {
-		return this._from;
-	}
-	public String getKeyTo() {
-		return this._to;
-	}
-	
-	
-//	final private static String KEY_SESSION = "session";	//发送方 消息绑定session
-//	Object fromSession;
-	
-	String id = "";
-	String from = "";
-	Set<String> to = new HashSet<>();
-	Bean data = new Bean();
-	String info = "";
-	boolean ok = false;
-	
-	@Override
-	public String toString() {
-		if(id.length() == 0) {
-			id = "msg_"+LangUtil.getUUID();
-		}
-		StringBuilder tt = new StringBuilder();
-		for(String tid : to) {
-			tt.append(SPLIT).append(tid);
-		}
-		String ttt = tt.toString().substring(SPLIT.length());
-		Bean bean = new Bean()
-				.set(KEY_ID, id)
-				.set(KEY_FROM, from)
-				.set(KEY_TO, ttt)
-				.set(KEY_DATA, data)
-				.set(KEY_RES, ok)
-				.set(KEY_INFO, info);
-		return bean.toString();
-	}
-	public Msg(){}
-	public Msg(String json){
+	public Msg(String json) {
 		Bean bean = JsonUtil.get(json);
-		setId(bean.get(KEY_ID, ""));
-		setFrom(bean.get(KEY_FROM, ""));
-		setTo(bean.get(KEY_TO, "").split(SPLIT));
-		setData(bean.get(KEY_DATA, new Bean()));
-		setOk(bean.get(KEY_RES, false));
-		setInfo(bean.get(KEY_INFO, ""));
-
+		this.setType(bean.get(KEY_TYPE, ""));
+		this.setData(bean.get(KEY_DATA, new Bean()));
 	}
-	public Msg setId(String id) {
-		this.id = id;
-		return this;
+	public Msg(String json, Session<?> session) {
+		this(json);
+		this.setFrom(session.getKey());//设置来源socket key session<T>
 	}
-	public String getId() {
-		return id;
-	}
-	public String getFrom() {
-		return from;
-	}
+	
+	
 	public Msg setFrom(String from) {
-		this.from = from;
+		this.set(KEY_FROM, from);
 		return this;
 	}
-	public Set<String> getTo() {
-		return to;
-	}
-	public Msg setTo(String...strings) {
-		for(String str : strings) {
-			this.to.add(str);
-		}
+	public Msg setTo(String to) {
+		this.set(KEY_TO, to);
 		return this;
-	}
-	public Msg setTo(Collection<? extends String> to) {
-		this.to.addAll(to);
-		return this;
-	}
-	public Bean getData() {
-		return data;
-	}
-	public Msg setData(Bean data) {
-		this.data = data;
-		return this;
-	}
-
-	public String getInfo() {
-		return info;
-	}
-	public Msg setInfo(String info) {
-		this.info = info;
-		return this;
-	}
-	public boolean isOk() {
-		return ok;
-	}
-	public Msg setOk(Boolean ok) {
-		this.ok = ok;
-		return this;
-	}
-
-	public String getType() {
-		return type;
 	}
 	public Msg setType(String type) {
-		this.type = type;
+		this.set(KEY_TYPE, type);
 		return this;
 	}
-//	public Msg setFromSession(Object obj) {
-//		this.fromSession = obj;
-//		return this;
-//	}
-//	@SuppressWarnings("unchecked")
-//	public <T> T getFromSession() {
-//		return (T)this.fromSession;
-//	}
+	public Msg setData(Bean data) {
+		this.set(KEY_DATA, data);
+		return this;
+	}
+	public String getFrom() {
+		return this.get(KEY_FROM, "");
+	}
+	public String getTo() {
+		return this.get(KEY_TO, "");
+	}
+	public String getType() {
+		return this.get(KEY_TYPE, "");
+	}
+	public Bean getData() {
+		return this.get(KEY_DATA, new Bean());
+	}
+	
+
 	
 }

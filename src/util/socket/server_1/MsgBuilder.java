@@ -6,20 +6,7 @@ package util.socket.server_1;
  *
  */
 public class MsgBuilder {
-	public static Msg getString(String str) {
-		Msg msg = new Msg()
-				.setOk(false)
-//				.setTo("self") 	//接收方不需要知道to
-				.setInfo(str);
-		return msg;
-	}
-	public static Msg getException(Exception e) {
-		Msg msg = new Msg()
-				.setOk(false)
-//				.setTo("self") 	//接收方不需要知道to
-				.setInfo(e.getMessage());
-		return msg;
-	}
+
 	
 	
 	

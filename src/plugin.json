@@ -1,29 +1,52 @@
-{
-	version:1.0,
-	about:"这是一些说明\nasdlfjaslk asdf",
-	
-	plugins:{
-		login:{
-			class:util.plugin.Login,
-			on:false,
-			limit:200,
-		}
-	
+{ 
+	version	:	1.0,
+	about	:	"这是一些说明\nasdlfjaslk asdf",
+	plugins	:	{
+		login	:	{
+			class	:	util.socket.server_1.plugin.LoginPlugin,
+			on		:	true,
+			limit	:	0,
+		},
+		login1	:	{
+			class	:	util.socket.server_1.plugin.Login,
+			on		:	false,
+			limit	:	1,
+		},
+		message	:	{
+			class	:	util.socket.server_1.plugin.MessagePlugin,
+			on		:	true,
+		},
+		test	:	{
+			class	:	util.socket.server_1.plugin.TestPlugin,
+			on		:	false,
+			limit	:	1,
+		},
 	},
 	
-	filters:[
+	filters	:	[
 		{
-			name:auth,
-			class:util.filter.Auth,
-			params:{
-				on:false,
-				limit:200,
-			},
-			excludes:[
+			class	:	util.socket.server_1.filter.AuthFilter,
+			on		:	true,
+			excludes	:	[
 				login,
-				login2,
+				login1,
 			],
-		}
+			params	:	{
+				str	:	aaaa,
+				tip	:	"未登录",
+			},
+		},
+		{
+			class	:	util.socket.server_1.filter.SizeFilter,
+			on		:	true,
+			excludes	:	[
+				test
+			],
+			params	:	{
+				size	:	2048,
+				tip		:	"最大长度不能超过",
+			},
+		},
 	
 	],
 

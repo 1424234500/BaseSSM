@@ -2,6 +2,7 @@ package util.socket.client;
  
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
@@ -14,10 +15,11 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import util.Tools;
 import util.setting.Setting;
-import util.socket.server_0.netty.NettyDecoder;
-import util.socket.server_0.netty.NettyEncoder;
+import util.socket.server_1.netty.handler.NettyDecoder;
+import util.socket.server_1.netty.handler.NettyEncoder;
 
 public class ClientNetty extends ClientFrame {
 	ChannelHandlerContext socket;
@@ -72,12 +74,11 @@ public class ClientNetty extends ClientFrame {
                     @Override  
                     public void initChannel(SocketChannel ch) throws Exception {  
 						ChannelPipeline p = ch.pipeline();
-//						p.addLast("ping", new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS)); 	//5s心跳包 
+						p.addLast("ping", new IdleStateHandler(10, 0, 0, TimeUnit.SECONDS)); 	//5s心跳包 
 //						p.addLast(new LoggingHandler(LogLevel.INFO));
 //						p.addLast( new ObjectEncoder(),  new ObjectDecoder(ClassResolvers.cacheDisabled(null)))
 					    p.addLast(new NettyEncoder(), new NettyDecoder());  
 						p.addLast(new HandlerNetty());
-
                     }  
                 });  
   

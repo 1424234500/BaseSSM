@@ -32,10 +32,12 @@ public class Session<T> implements OnSubscribe<Msg> {
 	
 	public Session(Socket<T> socket) {
 		this.socket = socket;
-		subscribeKeys = new HashSet<>();
 	}
 	public void setSession(Socket<T> socket) {
 		this.socket = socket;
+	}
+	public String getUser() {
+		return this.id;
 	}
 	public String getKey() {
 		return this.socket.key();
@@ -57,27 +59,47 @@ public class Session<T> implements OnSubscribe<Msg> {
 
 	@Override
 	public String toString() {
-		return "Session[key=" + getKey() + " socket=" + socket + "]";
+		return "Session[key=" + getKey() + " user=" + id + "]";
 	}
 	
 	 
-	
+	public Boolean isLogin() {
+		return this.id.length() != 0;
+	}
 	/**
-	 * 登录成功后 订阅消息 单聊群聊特殊规则
+	 * 长连接成功后 订阅socket消息
 	 */
-	public void onLogin(Object msg) {
-		sub.subscribe(id, this);
-		sub.subscribe("all", this);
-		sub.subscribe("online", this);
-		
+	public void onConnect() {
+		sub.subscribe(this.getKey(), this); 	//订阅当前socket
+		sub.subscribe("all_socket", this);		//订阅所有socket
+	}
+	public void onUnConnect() {
+		sub.unSubscribe(this.getKey(), this); 	//订阅当前socket
+		sub.unSubscribe("all_socket", this);	//订阅所有socket
+	}
+	/**
+	 * 登录成功后 订阅用户消息 单聊群聊特殊规则
+	 */
+	public void onLogin(Bean bean) {
+		this.id = bean.get("user", "");
+		sub.subscribe(this.getUser(), this);	//订阅当前登录用户userid
+		sub.subscribe("all_user", this);		//订阅所有登录用户
+	}
+	public void onUnLogin(Bean bean) {
+		sub.unSubscribe(this.getUser(), this);	//订阅当前登录用户userid
+		sub.unSubscribe("all_user", this);		//订阅所有登录用户
+		this.id = "";
 	}
 	/**
  	 * session负责自己处理业务
 	 */
 	@Override
-	public Type onSubscribe(Msg object) {
-		log.info(object);
-		send(object);
+	public Type onSubscribe(Msg msg) {
+		msg.setTo(this.getKey());
+		
+		log.info(msg);
+		
+		send(msg);
 		return Type.DEFAULT;
 	}
 	

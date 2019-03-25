@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.NDC;
 
 import util.Bean;
 import util.FileUtil;
@@ -14,11 +15,9 @@ import util.pipe.PipeMgr;
 import util.pipe.PipeMgr.Type;
 import util.route.SubPub;
 import util.route.SubPubMgr;
-import util.socket.server_1.Msg;
-import util.socket.server_1.MsgBuilder;
-import util.socket.server_1.MsgException;
-import util.socket.server_1.plugin.Plugin;
-import util.socket.server_1.plugin.PluginFactory;
+import util.socket.server_1.*;
+import util.socket.server_1.filter.*;
+import util.socket.server_1.plugin.*;
 
 /**
  * 用戶连接管理
@@ -41,44 +40,30 @@ public class SessionServiceListImpl<T> implements SessionService<T> {
      * 业务处理队列 消费
      */
     private Pipe<Msg> pipe = PipeMgr.getPipe(Type.PIPE, "session");
-    /**
-     * 路由 发布订阅
-     */
-    private SubPub<Msg> pub = SubPubMgr.getSubPub("msg_route", 0);
-    /**
-     * 业务处理器配置
-     */
-    private Bean plugins;
-    private List<Filter> filters = new ArrayList<Filter>();
 
-    public SessionServiceListImpl(){
+    @SuppressWarnings("unchecked")
+	public SessionServiceListImpl(){
     	String str = FileUtil.readByLines(ClassLoader.getSystemResource("").getPath() + "plugin.json", null);
 		Bean bean = JsonUtil.get(str);
-		plugins = (Bean)bean.get("plugins");
-		PluginFactory.init(plugins);	
-			
+		PluginFactory.init((Bean)bean.get("plugins"));	
+		FilterFactory.init((List<Bean>)bean.get("filters"));	
+		
+		
     	pipe.startConsumer(1, new Fun<Msg>() {
-			@SuppressWarnings("unchecked")
 			public Object make(Msg msg) {
+				Session<T> session = index.get(msg.getFrom());
+				NDC.push(session.toString());
 				try {
-					String type = msg.getType();
-
-					//过滤器链处理 过滤登录 例外 filter
-					
-					//按类别处理 业务 plugin  存储 加工 发送socket
-					Plugin plugin = PluginFactory.getPlugin(type);
-					if(plugin != null) {
-						plugin.onData(msg.getData());
+					if(FilterFactory.doFilter(session, msg)) {
+						PluginFactory.doPlugin(session, msg);
 					}
-				}catch(MsgException e) {
+				}catch(Exception e) {
 					log.error(e.toString(), e);
-					Session<T> session = index.get(msg.getKeyFrom());
-					session.send(MsgBuilder.getException(e));
+//					Session<T> session = index.get(msg.getFrom());
+//					session.send(MsgBuilder.getException(e));
 				}
-				return null;
-				
-				//发送一条消息给服务器
-				//
+				NDC.pop();
+				return true;
 			}
     	});
     	
@@ -92,6 +77,7 @@ public class SessionServiceListImpl<T> implements SessionService<T> {
 			log.error("add user have exist?" + key + " " + session);
 		}else {
 			session = new Session<T>(socket);
+			session.onConnect();
 			index.put(key, session);
 			log.debug("add user " + session);
 		}
@@ -99,8 +85,10 @@ public class SessionServiceListImpl<T> implements SessionService<T> {
 	@Override
 	public void sessionRemove(Socket<T> socket) {
 		String key = socket.key();
-		if(index.containsKey(key)) {
-			Session<T> session = index.remove(key);
+		Session<T> session = index.get(key);
+		if(session != null) {
+			session.onUnConnect();
+			index.remove(key);
 			sessionCheck(session, socket);
 			log.debug("add user " + session);
 		}else {
@@ -115,20 +103,20 @@ public class SessionServiceListImpl<T> implements SessionService<T> {
 			try {
 				sessionCheck(session, socket);
 				sessionData(session, msg);		//所有数据处理
-			}catch(MsgException e) {
+			}catch(Exception e) {
 				log.error(e.toString(), e);
-				session.send(MsgBuilder.getException(e));	//回执异常
+//				session.send(MsgBuilder.getException(e));	//回执异常
 			}
 		}else {//异常请求
 			log.error("receive msg from no user ? " + socket);
-			socket.send(new Msg().setOk(false).setInfo("receive msg from no user ? " + socket));
+//			socket.send(new Msg().setOk(false).setInfo("receive msg from no user ? " + socket));
 		}
 	}
 	/**
 	 * 校验 session-socket和socket是否相同
 	 */
 	private void sessionCheck(Session<T> session, Socket<T> socket) {
-		if(session.socket.equals(socket)) {
+		if(!session.socket.equals(socket)) {
 			log.error("check error f->t " + session + " " + socket);
 		}
 	}
@@ -142,8 +130,7 @@ public class SessionServiceListImpl<T> implements SessionService<T> {
 	 * 
 	 */
 	private void sessionData(Session<T> session, Object msgJsonStr) {
-		Msg msg = new Msg(msgJsonStr.toString());
-		msg.setKeyFrom(session.getKey());	//设置来源socket key session<T>
+		Msg msg = new Msg(msgJsonStr.toString(), session);
 		pipe.put(msg);
 	}
     
