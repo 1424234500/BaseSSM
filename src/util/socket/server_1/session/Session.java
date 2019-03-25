@@ -23,7 +23,7 @@ public class Session<T> implements OnSubscribe<Msg> {
     /**
      * 路由 发布订阅
      */
-    private SubPub<Msg> sub = SubPubMgr.getSubPub(0);
+    private SubPub<Msg> sub = SubPubMgr.getSubPub("msg_route", 0);
 	
 	/**
 	 * socket实体以及 key send实现回调
@@ -39,6 +39,9 @@ public class Session<T> implements OnSubscribe<Msg> {
 	}
 	public String getKey() {
 		return this.socket.key();
+	}
+	public void send(Object obj) {
+		this.socket.send(obj);
 	}
 
 	/**
@@ -74,7 +77,8 @@ public class Session<T> implements OnSubscribe<Msg> {
 	@Override
 	public Type onSubscribe(Msg object) {
 		log.info(object);
-		return null;
+		send(object);
+		return Type.DEFAULT;
 	}
 	
 	

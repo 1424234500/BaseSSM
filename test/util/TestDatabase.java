@@ -8,28 +8,27 @@ public class TestDatabase {
 	public void test0(int size){
 		long time = System.currentTimeMillis();
 		Dao dao = new Dao();
-		int  bcount = dao.executeCount("select * from student");
+		int  bcount = dao.count("select * from student");
 
 		for(int i = 0; i < size; i++){
 			String name = "test" + i;
 			dao = new Dao();
-			dao.execSQL("insert into student(id,name) values(seq_student.nextval,?)", name);
+			dao.executeSql("insert into student(id,name) values(seq_student.nextval,?)", name);
 		}
 		dao = new Dao();
-		int  acount = dao.executeCount("select * from student");
+		int  acount = dao.count("select * from student");
 		Tools.out(size, bcount, acount, Tools.calcTime(System.currentTimeMillis() - time));
 	}
 	public void test1(int size){
 		long time = System.currentTimeMillis();
 
 		Dao dao = new Dao();
-		int  bcount = dao.executeCount("select * from student");
-		dao.setAutoClose(true);
+		int  bcount = dao.count("select * from student");
 		for(int i = 0; i < size; i++){
 			String name = "test" + i;
-			dao.execSQL("insert into student(id,name) values(seq_student.nextval,?)", name);
+			dao.executeSql("insert into student(id,name) values(seq_student.nextval,?)", name);
 		}
-		int  acount = dao.executeCount("select * from student");
+		int  acount = dao.count("select * from student");
 		Tools.out(size, bcount, acount, Tools.calcTime(System.currentTimeMillis() - time));
 
 	}
@@ -39,15 +38,13 @@ public class TestDatabase {
 
 		Dao dao = new Dao();
 		
-		int  bcount = dao.executeCount("select * from student");
+		int  bcount = dao.count("select * from student");
 
-		dao.setAutoClose(false);
 		for(int i = 0; i < size; i++){
 			String name = "test" + i;
-			dao.execSQL("insert into student(id,name) values(seq_student.nextval,?)", name);
+			dao.executeSql("insert into student(id,name) values(seq_student.nextval,?)", name);
 		}
-		int  acount = dao.executeCount("select * from student");
-		dao.close();
+		int  acount = dao.count("select * from student");
 		Tools.out(Thread.currentThread(), size, bcount, acount, Tools.calcTime(System.currentTimeMillis() - time));
 	}
 	public void test3(int size){

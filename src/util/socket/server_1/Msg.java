@@ -21,12 +21,46 @@ import util.Tools;
  */
 public class Msg{
 	final private static String SPLIT = ",";
-	final private static String KEY_ID = "id";
-	final private static String KEY_FROM = "from";	//发送方 自动附加from
-	final private static String KEY_TO = "to";		//接收方 不需要知道to 
-	final private static String KEY_DATA = "data";
-	final private static String KEY_INFO = "info";
-	final private static String KEY_RES = "ok";
+	
+	String type = "";
+	
+	
+	/**
+	 * 需要写入 socket 传递的业务信息
+	 */
+	final private static String KEY_ID = "id";		//消息id 没有则生成
+	final private static String KEY_FROM = "from";	//业务发送方 user_id
+	final private static String KEY_TO = "to";		//业务接收方 user_id
+	final private static String KEY_DATA = "data";	//具体消息body
+	final private static String KEY_INFO = "info";	//说明
+	final private static String KEY_RES = "ok";		//是否成功 true false
+	
+	final private static String KEY_TYPE = "type";	//消息类型 业务处理分类plugin
+	final private static String TYPE_EVENT = "event";
+
+	/**
+	 * msg上下文处理相关信息
+	 */
+	final private static String CONTEXT_FROM = "_from";	//socket发送方 key
+	final private static String CONTEXT_TO = "_to";		//socket来源 key
+	final private static String CONTEXT = "aaa";
+	String _from = "";
+	String _to = "";
+	public Msg setKeyFrom(String key) {
+		this._from = key;
+		return this;
+	}
+	public Msg setKeyTo(String key) {
+		this._to = key;
+		return this;
+	}
+	public String getKeyFrom() {
+		return this._from;
+	}
+	public String getKeyTo() {
+		return this._to;
+	}
+	
 	
 //	final private static String KEY_SESSION = "session";	//发送方 消息绑定session
 //	Object fromSession;
@@ -34,7 +68,7 @@ public class Msg{
 	String id = "";
 	String from = "";
 	Set<String> to = new HashSet<>();
-	Object data = "";
+	Bean data = new Bean();
 	String info = "";
 	boolean ok = false;
 	
@@ -63,7 +97,7 @@ public class Msg{
 		setId(bean.get(KEY_ID, ""));
 		setFrom(bean.get(KEY_FROM, ""));
 		setTo(bean.get(KEY_TO, "").split(SPLIT));
-		setData(bean.get(KEY_DATA, null));
+		setData(bean.get(KEY_DATA, new Bean()));
 		setOk(bean.get(KEY_RES, false));
 		setInfo(bean.get(KEY_INFO, ""));
 
@@ -95,10 +129,10 @@ public class Msg{
 		this.to.addAll(to);
 		return this;
 	}
-	public Object getData() {
+	public Bean getData() {
 		return data;
 	}
-	public Msg setData(Object data) {
+	public Msg setData(Bean data) {
 		this.data = data;
 		return this;
 	}
@@ -118,6 +152,13 @@ public class Msg{
 		return this;
 	}
 
+	public String getType() {
+		return type;
+	}
+	public Msg setType(String type) {
+		this.type = type;
+		return this;
+	}
 //	public Msg setFromSession(Object obj) {
 //		this.fromSession = obj;
 //		return this;

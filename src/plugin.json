@@ -1,0 +1,37 @@
+{
+	version:1.0,
+	about:"这是一些说明\nasdlfjaslk asdf",
+	
+	plugins:{
+		login:{
+			class:util.plugin.Login,
+			on:false,
+			limit:200,
+		}
+	
+	},
+	
+	filters:[
+		{
+			name:auth,
+			class:util.filter.Auth,
+			params:{
+				on:false,
+				limit:200,
+			},
+			excludes:[
+				login,
+				login2,
+			],
+		}
+	
+	],
+
+
+
+
+}
+
+
+
+

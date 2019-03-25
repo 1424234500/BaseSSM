@@ -257,7 +257,7 @@ public class FileUtil {
 				}
 			else
 				while ((temp = bufferedReader.readLine()) != null) {
-					sb.append(temp);
+					sb.append(temp).append("\r\n");
 				}
 			content = sb.toString();
 			bufferedReader.close();
