@@ -1,32 +1,39 @@
 { 
-	version	:	1.0,
-	about	:	"这是一些说明\nasdlfjaslk asdf",
-	plugins	:	{
-		login	:	{
+	"version"	:	1.0,
+	"about"	:	"这是一些说明\nasdlfjaslk asdf",
+	"plugins"	:	{
+		"login"	:	{
 			class	:	util.socket.server_1.plugin.LoginPlugin,
 			on		:	true,
 			limit	:	0,
 		},
-		login1	:	{
+		"login1"	:	{
 			class	:	util.socket.server_1.plugin.Login,
 			on		:	false,
 			limit	:	1,
 		},
-		message	:	{
+		"message"	:	{
 			class	:	util.socket.server_1.plugin.MessagePlugin,
 			on		:	true,
 		},
-		test	:	{
-			class	:	util.socket.server_1.plugin.TestPlugin,
-			on		:	false,
-			limit	:	1,
+		"echo"	:	{
+			class	:	util.socket.server_1.plugin.EchoPlugin,
+			on		:	true,
+			limit	:	0,
 		},
 	},
 	
 	filters	:	[
 		{
-			class	:	util.socket.server_1.filter.AuthFilter,
+			class	:	util.socket.server_1.filter.MonitorFilter,
 			on		:	true,
+			params	:	{
+				tip	:	"监控",
+			},
+		},
+		{
+			class	:	util.socket.server_1.filter.AuthFilter,
+			on		:	false,
 			excludes	:	[
 				login,
 				login1,

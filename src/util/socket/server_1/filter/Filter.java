@@ -13,5 +13,5 @@ public abstract class Filter<T> {
 	Filter(Bean params){
 		this.params = params;
 	}
-	abstract Boolean doFilter(Session<T> session, Msg msg);
+	abstract Boolean doFilter(Session<T> session, MsgUp msg);
 }

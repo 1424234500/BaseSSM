@@ -19,12 +19,12 @@ public abstract class Plugin<T> {
 	/**
      * 路由 发布订阅
      */
-    SubPub<Msg> pub = SubPubMgr.getSubPub("msg_route", 0);
+    SubPub<MsgDown> pub = SubPubMgr.getSubPub("msg_route", 0);
     
 	Bean params;
 	Plugin(Bean params){
 		this.params = params;
 	}
-	abstract void onData(Session<T> session, Msg bean);
+	abstract void onData(Session<T> session, MsgUp bean);
 	
 }

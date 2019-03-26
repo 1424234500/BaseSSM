@@ -22,10 +22,10 @@ import io.netty.handler.codec.MessageToByteEncoder;
 	    	byte[] bs = jsonstr.getBytes(NettyDecoder.ENCODE);
 	    	
 	        // 1.写入消息的开头的信息标志  
-	    	out.writeByte(NettyDecoder.START_WITH);
+	    	out.writeChar(NettyDecoder.START_WITH);
 	    	// 2.写入长度
-	    	out.writeBytes(NettyDecoder.int2bytes(bs.length));
-//	        out.writeInt(bs.length);  
+//	    	out.writeBytes(NettyDecoder.int2bytes(bs.length));
+	        out.writeInt(bs.length);  
 	        // 3.写入消息的内容(byte[]类型)  
 	        out.writeBytes(bs);  
 	    }  

@@ -24,14 +24,14 @@ public class FilterFactory {
 //		size	:	2048,
 //	},
 //	
-	public static <T> Boolean doFilter(Session<T> session, Msg msg) throws MsgException {
+	public static <T> Boolean doFilter(Session<T> session, MsgUp msg) throws SocketException {
 		for(Bean bean : filters) {
 			if(!bean.get("on", false)) {
-				log.warn(Arrays.toString(new String[]{"过滤器已关闭", bean.toString()}));
+//				log.warn(Arrays.toString(new String[]{"过滤器已关闭", bean.toString()}));
 			}else {
 				@SuppressWarnings("unchecked")
 				List<String> excludes = (List<String>) bean.get("excludes");
-				if(excludes.contains(msg.getType())) {
+				if(excludes != null && excludes.contains(msg.getType())) {
 					log.info(Arrays.toString(new String[]{"例外", bean.toString(), msg.getType()}));
 				}else {
 					log.info(Arrays.toString(new String[]{"拦截", bean.toString(), msg.getType()}));
@@ -49,7 +49,7 @@ public class FilterFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> Filter<T> getFilter(String clz, Bean params) throws MsgException {
+	public static <T> Filter<T> getFilter(String clz, Bean params) throws SocketException {
 		Filter<T> filter = (Filter<T>) ClassUtil.newInstance(clz, params);
 		return filter;
 	}

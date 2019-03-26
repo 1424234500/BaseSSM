@@ -10,9 +10,12 @@ public class LoginPlugin<T> extends Plugin<T>{
 		super(params);
 	}
 
+	/**
+	 * {type:login,data:{user:123,pwd:123456} }	
+	 */
 	@Override
-	public void onData(Session<T> session, Msg msg) {
-		Bean data = msg.getData();
+	public void onData(Session<T> session, MsgUp msg) {
+		Bean data = (Bean) msg.getData();
 		String userId = data.get("user", "");
 		String pwd = data.get("pwd", "");
 		

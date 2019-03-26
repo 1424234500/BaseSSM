@@ -27,42 +27,49 @@ import util.socket.server_1.plugin.*;
  * 会话管理 消息传递路由 逻辑key 用户id
  * 具体消息由用户自己解决处理业务
  * 
- * 拆出登录请求 此时无用户id 单独处理登录拦截
- *
+ * 模拟arp rarp ip mac路由转换报文
+ * 
  */
-public class SessionServiceListImpl<T> implements SessionService<T> {
-	private static Logger log = Logger.getLogger(SessionServiceListImpl.class); 
+public class SessionServiceArpListImpl<T> implements SessionService<T> {
+	private static Logger log = Logger.getLogger(SessionServiceArpListImpl.class); 
+    
+
 	/**
-	 * 会话列表
+	 * 会话列表 Arp 	mac:<mac,ip>
 	 */
     private Map<String, Session<T>> index = new ConcurrentHashMap<>();
+    
     /**
      * 业务处理队列 消费
      */
-    private Pipe<Msg> pipe = PipeMgr.getPipe(Type.PIPE, "session");
+    private Pipe<MsgUp> pipe = PipeMgr.getPipe(Type.PIPE, "session");
 
     @SuppressWarnings("unchecked")
-	public SessionServiceListImpl(){
+	public SessionServiceArpListImpl(){
     	String str = FileUtil.readByLines(ClassLoader.getSystemResource("").getPath() + "plugin.json", null);
 		Bean bean = JsonUtil.get(str);
 		PluginFactory.init((Bean)bean.get("plugins"));	
 		FilterFactory.init((List<Bean>)bean.get("filters"));	
 		
 		
-    	pipe.startConsumer(1, new Fun<Msg>() {
-			public Object make(Msg msg) {
+    	pipe.startConsumer(1, new Fun<MsgUp>() {
+			public Object make(MsgUp msg) {
 				Session<T> session = index.get(msg.getFrom());
-				NDC.push(session.toString());
-				try {
-					if(FilterFactory.doFilter(session, msg)) {
-						PluginFactory.doPlugin(session, msg);
+				if(session != null) {
+					NDC.push(session.toString());
+					try {
+						if(FilterFactory.doFilter(session, msg) && msg.getType().length() > 0) {
+							PluginFactory.doPlugin(session, msg);
+						}
+					}catch(Exception e) {
+						log.error(e.toString(), e);
+						//插件处理异常 实时反馈异常
+						session.send(MsgBuilder.makeException(session, msg, e));
 					}
-				}catch(Exception e) {
-					log.error(e.toString(), e);
-//					Session<T> session = index.get(msg.getFrom());
-//					session.send(MsgBuilder.getException(e));
+					NDC.pop();
+				}else {
+					log.error("该用户已不存在 " + msg.toString());
 				}
-				NDC.pop();
 				return true;
 			}
     	});
@@ -100,16 +107,11 @@ public class SessionServiceListImpl<T> implements SessionService<T> {
 		String key = socket.key();
 		Session<T> session = index.get(key);
 		if(session != null) {
-			try {
-				sessionCheck(session, socket);
-				sessionData(session, msg);		//所有数据处理
-			}catch(Exception e) {
-				log.error(e.toString(), e);
-//				session.send(MsgBuilder.getException(e));	//回执异常
-			}
+			sessionCheck(session, socket);
+			sessionData(session, msg);		//所有数据处理
 		}else {//异常请求
 			log.error("receive msg from no user ? " + socket);
-//			socket.send(new Msg().setOk(false).setInfo("receive msg from no user ? " + socket));
+			socket.send("receive msg from no user ? " + socket);
 		}
 	}
 	/**
@@ -130,7 +132,7 @@ public class SessionServiceListImpl<T> implements SessionService<T> {
 	 * 
 	 */
 	private void sessionData(Session<T> session, Object msgJsonStr) {
-		Msg msg = new Msg(msgJsonStr.toString(), session);
+		MsgUp msg = new MsgUp(msgJsonStr.toString(), session);
 		pipe.put(msg);
 	}
     

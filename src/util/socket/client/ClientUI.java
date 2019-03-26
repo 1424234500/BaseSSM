@@ -55,7 +55,7 @@ public class ClientUI extends JFrame  {
 		jtfSend1.setText("raspberrypi");
 		jtfSend2.setText("0");
 //		jtfSend.setText("{\"cmd\":12,\"value0\":\"group\",\"value1\":\"100000\",\"value2\":\"text\",\"value3\":\"2017-05-24 00:03:31\",\"value4\":\"消息 "+ Tools.getNowTimeL() +"\"}");
-		jtfSend.setText("{\"sy\":\""+ name + "\"}");
+		jtfSend.setText("{type:echo,data:dddd}");
 
 		taShow = new JTextArea();
 
@@ -78,15 +78,17 @@ public class ClientUI extends JFrame  {
 			public void actionPerformed(ActionEvent e) {
 				String mmsg = ("" + jtfSend.getText());// 写入发送流到 客户端去
 				
-				String sysKey = jtfSend1.getText();	//发往系统
-				String key = jtfSend2.getText();	//发往用户连接
-				Msg msg = new Msg();
-				msg.setMsgType(Msg.DATA);
-				msg.setToKey(key);
-				msg.setToSysKey(sysKey);
-				msg.setFromSysKey(sysKey);
-				msg.put("data", mmsg);
-				client.send(msg.getData());
+//				String sysKey = jtfSend1.getText();	//发往系统
+//				String key = jtfSend2.getText();	//发往用户连接
+//				Msg msg = new Msg();
+//				msg.setMsgType(Msg.DATA);
+//				msg.setToKey(key);
+//				msg.setToSysKey(sysKey);
+//				msg.setFromSysKey(sysKey);
+//				msg.put("data", mmsg);
+//				String obj = msg.getData();
+				String obj = mmsg;
+				client.send(obj);
 			}
 		});
 		btLogin.addActionListener(new ActionListener() {

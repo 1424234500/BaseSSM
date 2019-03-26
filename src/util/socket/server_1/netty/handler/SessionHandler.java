@@ -1,9 +1,14 @@
 package util.socket.server_1.netty.handler;
 
 
+import java.util.Arrays;
+
+import org.apache.log4j.Logger;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import util.Tools;
+import util.socket.server_1.plugin.PluginFactory;
 import util.socket.server_1.session.*;
 
 	/**
@@ -14,7 +19,9 @@ import util.socket.server_1.session.*;
 	 *
 	 */
 	public class SessionHandler extends ChannelInboundHandlerAdapter {
-		private static SessionService<ChannelHandlerContext> sessionService = new SessionServiceListImpl<ChannelHandlerContext>();
+		private static Logger log = Logger.getLogger(PluginFactory.class); 
+
+		private static SessionService<ChannelHandlerContext> sessionService = new SessionServiceArpListImpl<ChannelHandlerContext>();
 		private class SocketNettyImpl extends Socket<ChannelHandlerContext>{
 			public SocketNettyImpl(ChannelHandlerContext socket) {
 				super(socket);
@@ -41,13 +48,13 @@ import util.socket.server_1.session.*;
 		}
 		
 		public void out(Object...objects) {
-			Tools.out(objects);
+			log.info(Arrays.toString(objects));
 		}
 		
 		@Override
 		public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
 			super.userEventTriggered(ctx, evt);
-			out("userEventTriggered", ctx, evt);
+//			out("userEventTriggered", ctx, evt);
 		}
 
 		@Override
@@ -95,8 +102,9 @@ import util.socket.server_1.session.*;
 		@Override
 		public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
 			// Close the connection when an exception is raised.
-			ctx.close();
+//			ctx.close();
 			out("exceptionCaught", ctx, cause);
+			log.error("exceptionCaught " + ctx.toString(), cause);
 		}
 	
 	}

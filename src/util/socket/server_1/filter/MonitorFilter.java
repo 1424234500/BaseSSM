@@ -4,20 +4,18 @@ import util.Bean;
 import util.socket.server_1.MsgUp;
 import util.socket.server_1.session.Session;
 
-public class AuthFilter<T> extends Filter<T>{
+public class MonitorFilter<T> extends Filter<T>{
 
-	AuthFilter(Bean params) {
+	MonitorFilter(Bean params) {
 		super(params);
 	}
 
 	@Override
 	public Boolean doFilter(Session<T> session, MsgUp msg) {
-		Boolean res = true;
-		if(!session.isLogin()) {
-			log.warn(this.params.get("tip", "") + " ");
-			res = false;
-		}
-		return res;
+		
+		log.debug("Monitor " + session.toString() + " " + msg.toString());
+		
+		return true;
 	}
 
 }

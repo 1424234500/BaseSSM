@@ -1,7 +1,7 @@
 package util.socket.server_1.filter;
 
 import util.Bean;
-import util.socket.server_1.Msg;
+import util.socket.server_1.MsgUp;
 import util.socket.server_1.session.Session;
 
 public class SizeFilter<T> extends Filter<T>{
@@ -11,7 +11,7 @@ public class SizeFilter<T> extends Filter<T>{
 	}
 
 	@Override
-	public Boolean doFilter(Session<T> session, Msg msg) {
+	public Boolean doFilter(Session<T> session, MsgUp msg) {
 		boolean res = true;
 		int length = msg.toString().length();
 		int maxSize = this.params.get("size", 0);

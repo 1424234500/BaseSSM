@@ -29,50 +29,70 @@ import util.socket.server_1.session.Session;
  * 					data onData 函数调用参数	bean
  * 
  * 					//plugin调用
+ *					{type:login,data:{user:walker,pwd:1234,device:xxxxx} }		
  * 					login 登录操作  未登录只能调用此plugin 此时没有self userId
  * 						bean.user:000900
  * 						bean.pwd:123456
  * 						bean.device:asjfkajxkjakjdf
- *							
+ * 
+ *					{type:message,data:{user:walker,pwd:1234} }		
  *					message 发给user/group 请求转发
- *						bean.to		发给目标用户	u_123,u_2323,g_xxx,s_all,s_online
- *						bean.from	发送方来源	u_123,s_admin
- *						bean.type	具体消息类型	text,image,voice,video,map
+ *						data.to		发给目标用户	u_123,u_2323,g_xxx,s_all,s_online
+ *						data.from	发送方来源	u_123,s_admin
+ *						data.type	具体消息类型	text,image,voice,video,map
+ *						data.body
+ *
+ *	ip mac路由模拟
+ *	ip		user:id		login 			用户收发消息都用于user:id
+ *	Arp Rarp  ip/id <-> mac/key
+ *  mac		socket:key	onConnection	而机器转发都用于 socket:key
+ *	
  *
  */
-public class Msg extends Bean{
+public class MsgUp extends Bean{
 	private static final long serialVersionUID = 1L;
 	final private static String SPLIT = ",";
+	
+	//系统上下文 函数调用控制
 	final private static String KEY_FROM = "from";
 	final private static String KEY_TO = "to";
 	
 	final private static String KEY_TYPE = "type";
 	final private static String KEY_DATA = "data";
 	
-	public Msg(String json) {
-		Bean bean = JsonUtil.get(json);
-		this.setType(bean.get(KEY_TYPE, ""));
-		this.setData(bean.get(KEY_DATA, new Bean()));
+	//业务上下文 
+	
+	
+	public MsgUp(String json) {
+		int t = JsonUtil.getType(json);
+		if(t == 1){
+			Bean bean = (Bean)JsonUtil.get(json);
+			this.setType(bean.get(KEY_TYPE, ""));
+			this.setData(bean.get(KEY_DATA));
+		}else {
+			this.setType("echo");
+			this.setData(new Bean().set("json", json));
+		}
 	}
-	public Msg(String json, Session<?> session) {
+	public MsgUp(String json, Session<?> session) {
 		this(json);
 		this.setFrom(session.getKey());//设置来源socket key session<T>
 	}
 	
 	
-	public Msg setFrom(String from) {
+	public MsgUp setFrom(String from) {
 		this.set(KEY_FROM, from);
 		return this;
 	}
-	public Msg setTo(String to) {
+	public MsgUp setTo(String to) {
 		this.set(KEY_TO, to);
 		return this;
 	}
-	public Msg setType(String type) {
+	public MsgUp setType(String type) {
 		this.set(KEY_TYPE, type);
 		return this;
 	}
-	public Msg setData(Bean data) {
+	public MsgUp setData(Object data) {
 		this.set(KEY_DATA, data);
 		return this;
 	}
@@ -85,8 +105,8 @@ public class Msg extends Bean{
 	public String getType() {
 		return this.get(KEY_TYPE, "");
 	}
-	public Bean getData() {
-		return this.get(KEY_DATA, new Bean());
+	public Object getData() {
+		return this.get(KEY_DATA);
 	}
 	
 
