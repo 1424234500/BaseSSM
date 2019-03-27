@@ -2,8 +2,7 @@ package util.socket.server_1.plugin;
 
 import util.Bean;
 import util.TimeUtil;
-import util.socket.server_1.*;
-import util.socket.server_1.session.*;
+import util.socket.server_1.Msg;
 
 public class EchoPlugin<T> extends Plugin<T>{
 
@@ -12,9 +11,12 @@ public class EchoPlugin<T> extends Plugin<T>{
 	}
 
 	@Override
-	public void onData(Session<T> session, MsgUp msg) {
-		session.send(new Bean().set("plugin", "echo").set("params", params).set("data", msg)
-				.set("time", TimeUtil.getTimeYmdHmss()));
+	public void onData(Msg msg) {
+//		session.send(new Bean().set("plugin", "echo").set("params", params).set("data", msg)
+//				.set("time", TimeUtil.getTimeYmdHmss()));
+		msg.setData(new Bean().set("data", msg.getData()).set("time", TimeUtil.getTimeSequence()));
+		msg.setType("echo");
+		pub.publish(msg.getFrom(), msg);
 	}
 
 }

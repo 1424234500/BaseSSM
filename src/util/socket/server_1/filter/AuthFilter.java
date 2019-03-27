@@ -1,7 +1,7 @@
 package util.socket.server_1.filter;
 
 import util.Bean;
-import util.socket.server_1.MsgUp;
+import util.socket.server_1.Msg;
 import util.socket.server_1.session.Session;
 
 public class AuthFilter<T> extends Filter<T>{
@@ -11,7 +11,7 @@ public class AuthFilter<T> extends Filter<T>{
 	}
 
 	@Override
-	public Boolean doFilter(Session<T> session, MsgUp msg) {
+	public Boolean doFilter(Session<T> session, Msg msg) {
 		Boolean res = true;
 		if(!session.isLogin()) {
 			log.warn(this.params.get("tip", "") + " ");

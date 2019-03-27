@@ -24,7 +24,7 @@ public class FilterFactory {
 //		size	:	2048,
 //	},
 //	
-	public static <T> Boolean doFilter(Session<T> session, MsgUp msg) throws SocketException {
+	public static <T> Boolean doFilter(Session<T> session, Msg msg) throws SocketException {
 		for(Bean bean : filters) {
 			if(!bean.get("on", false)) {
 //				log.warn(Arrays.toString(new String[]{"过滤器已关闭", bean.toString()}));
@@ -32,9 +32,9 @@ public class FilterFactory {
 				@SuppressWarnings("unchecked")
 				List<String> excludes = (List<String>) bean.get("excludes");
 				if(excludes != null && excludes.contains(msg.getType())) {
-					log.info(Arrays.toString(new String[]{"例外", bean.toString(), msg.getType()}));
+//					log.info(Arrays.toString(new String[]{"filter exclude", bean.toString(), msg.getType()}));
 				}else {
-					log.info(Arrays.toString(new String[]{"拦截", bean.toString(), msg.getType()}));
+					log.info(Arrays.toString(new String[]{"filter do", msg.getType(), bean.toString() }));
 					Bean params = (Bean) bean.get("params");
 					String clz = bean.get("class", "");
 					Filter<T> filter = getFilter(clz, params);

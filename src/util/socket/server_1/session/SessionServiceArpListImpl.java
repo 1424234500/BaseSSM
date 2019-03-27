@@ -1,6 +1,7 @@
 package util.socket.server_1.session;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -13,11 +14,10 @@ import util.JsonUtil;
 import util.pipe.Pipe;
 import util.pipe.PipeMgr;
 import util.pipe.PipeMgr.Type;
-import util.route.SubPub;
-import util.route.SubPubMgr;
-import util.socket.server_1.*;
-import util.socket.server_1.filter.*;
-import util.socket.server_1.plugin.*;
+import util.socket.server_1.Msg;
+import util.socket.server_1.MsgBuilder;
+import util.socket.server_1.filter.FilterFactory;
+import util.socket.server_1.plugin.PluginFactory;
 
 /**
  * 用戶连接管理
@@ -36,14 +36,25 @@ public class SessionServiceArpListImpl<T> implements SessionService<T> {
 
 	/**
 	 * 会话列表 Arp 	mac:<mac,ip>
+	 * 可通过key session.send定向发送消息
 	 */
     private Map<String, Session<T>> index = new ConcurrentHashMap<>();
     
     /**
      * 业务处理队列 消费
      */
-    private Pipe<MsgUp> pipe = PipeMgr.getPipe(Type.PIPE, "session");
-
+    private Pipe<Msg> pipe = PipeMgr.getPipe(Type.PIPE, "session");
+    
+    public String show() {
+    	String res = "\n------------show session - -------\n";
+    	int i = 0;
+    	for(Session<T> item : index.values()) {
+    		res += i + "\t " + item.toString() + "\n";
+    	}
+    	res += "------------show session - -------\n";
+    	return res;
+    }
+    
     @SuppressWarnings("unchecked")
 	public SessionServiceArpListImpl(){
     	String str = FileUtil.readByLines(ClassLoader.getSystemResource("").getPath() + "plugin.json", null);
@@ -52,9 +63,9 @@ public class SessionServiceArpListImpl<T> implements SessionService<T> {
 		FilterFactory.init((List<Bean>)bean.get("filters"));	
 		
 		
-    	pipe.startConsumer(1, new Fun<MsgUp>() {
-			public Object make(MsgUp msg) {
-				Session<T> session = index.get(msg.getFrom());
+    	pipe.startConsumer(1, new Fun<Msg>() {
+			public Object make(Msg msg) {
+				Session<T> session = index.get(msg.getFrom()); //根据socket key找到session
 				if(session != null) {
 					NDC.push(session.toString());
 					try {
@@ -132,7 +143,7 @@ public class SessionServiceArpListImpl<T> implements SessionService<T> {
 	 * 
 	 */
 	private void sessionData(Session<T> session, Object msgJsonStr) {
-		MsgUp msg = new MsgUp(msgJsonStr.toString(), session);
+		Msg msg = new Msg(msgJsonStr.toString(), session);
 		pipe.put(msg);
 	}
     

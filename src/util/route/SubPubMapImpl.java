@@ -1,21 +1,19 @@
 package util.route;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.*;
+import java.util.concurrent.*;
 
 import org.apache.log4j.Logger;
 
 public class SubPubMapImpl<T> implements SubPub<T>{
 //	private ExecutorService pool;
-	private Map<String, List<OnSubscribe<T>>> subscribeTable;
-	private static Logger log = Logger.getLogger("SubPubMap"); 
+	private Map<String, Set<OnSubscribe<T>>> subscribeTable;
+	private static Logger log = Logger.getLogger(SubPubMapImpl.class); 
 
 	
 	@Override
 	public Boolean publish(String channel, final T object) {
-		List<OnSubscribe<T>> list = subscribeTable.get(channel);
+		Set<OnSubscribe<T>> list = subscribeTable.get(channel);
 		if(list == null) {
 			log.warn("No subscriber channel: " + channel);
 		}else {
@@ -38,9 +36,9 @@ public class SubPubMapImpl<T> implements SubPub<T>{
 			log.error("No onSubscribe callback channel: " + channel);
 			return false;
 		}
-		List<OnSubscribe<T>> list = subscribeTable.get(channel);
+		Set<OnSubscribe<T>> list = subscribeTable.get(channel);
 		if(list == null) {
-			list = new CopyOnWriteArrayList<>();
+			list = new CopyOnWriteArraySet<>();
 			subscribeTable.put(channel, list);
 		}
 		return list.add(onSubscribe);
@@ -48,10 +46,10 @@ public class SubPubMapImpl<T> implements SubPub<T>{
 
 	@Override
 	public Boolean unSubscribe(String channel, OnSubscribe<T> onSubscribe) {
-		List<OnSubscribe<T>> list = subscribeTable.get(channel);
+		Set<OnSubscribe<T>> list = subscribeTable.get(channel);
 		if(list == null) {
-			list = new CopyOnWriteArrayList<>();
-			subscribeTable.put(channel, list);
+			log.error("unsubscribe of null?");
+			return false;
 		}
 		return list.remove(onSubscribe);
 	}

@@ -96,7 +96,7 @@ public class ClientNetty extends ClientFrame {
 
 	@Override
 	protected void stopImpl() {
-		 
+		 this.socket.close();
 	} 
 	
 	

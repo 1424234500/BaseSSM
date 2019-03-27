@@ -5,9 +5,8 @@ import org.apache.log4j.Logger;
 
 import util.Bean;
 import util.ClassUtil;
-import util.socket.server_1.MsgUp;
+import util.socket.server_1.Msg;
 import util.socket.server_1.SocketException;
-import util.socket.server_1.filter.FilterFactory;
 import util.socket.server_1.session.Session;
 
 public class PluginFactory {
@@ -15,10 +14,10 @@ public class PluginFactory {
 
 	private static Bean plugins;
 	
-	public static <T> void doPlugin(Session<T> session, MsgUp msg) throws SocketException {
+	public static <T> void doPlugin(Session<T> session, Msg msg) throws SocketException {
 		//按类别处理 业务 plugin  存储 加工 发送socket
 		Plugin<T> plugin = PluginFactory.getPlugin(msg.getType());
-		plugin.onData(session, msg);
+		plugin.onData(msg);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -27,7 +26,7 @@ public class PluginFactory {
 		if(bean == null) {
 			throw new SocketException("该插件不存在", type);
 		}
-		if( ! bean.get("on", false)) {
+		if( ! bean.get("on", true)) {
 			throw new SocketException("该插件已经关闭", type);
 		}
 		int limit = bean.get("limit", 0);

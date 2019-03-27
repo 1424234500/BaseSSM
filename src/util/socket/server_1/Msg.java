@@ -1,19 +1,7 @@
 package util.socket.server_1;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
 import util.Bean;
 import util.JsonUtil;
-import util.LangUtil;
-import util.MapListUtil;
-import util.Tools;
 import util.socket.server_1.session.Session;
 
 /**
@@ -49,50 +37,61 @@ import util.socket.server_1.session.Session;
  *	
  *
  */
-public class MsgUp extends Bean{
+@SuppressWarnings("unchecked")
+public class Msg extends Bean{
 	private static final long serialVersionUID = 1L;
-	final private static String SPLIT = ",";
+	final public static String SPLIT = ",";
 	
 	//系统上下文 函数调用控制
-	final private static String KEY_FROM = "from";
-	final private static String KEY_TO = "to";
+	final private static String KEY_TYPE = "type";	//plugin type
+	final private static String KEY_FROM = "sfrom";	//socket from
+	final private static String KEY_TO = "sto";		//socket to
+	final private static String KEY_USER_FROM = "from";	//user from
+	final private static String KEY_USER_TO = "to";		//user to
 	
-	final private static String KEY_TYPE = "type";
-	final private static String KEY_DATA = "data";
+	final private static String KEY_DATA = "data";	//msg data bean
 	
-	//业务上下文 
-	
-	
-	public MsgUp(String json) {
+	public Msg() {}
+	public Msg(String json) {
 		int t = JsonUtil.getType(json);
 		if(t == 1){
 			Bean bean = (Bean)JsonUtil.get(json);
 			this.setType(bean.get(KEY_TYPE, ""));
+			this.setUserTo(bean.get(KEY_USER_TO, ""));
+			this.setUserFrom(bean.get(KEY_USER_FROM, ""));
 			this.setData(bean.get(KEY_DATA));
 		}else {
 			this.setType("echo");
 			this.setData(new Bean().set("json", json));
 		}
 	}
-	public MsgUp(String json, Session<?> session) {
+	public Msg(String json, Session<?> session) {
 		this(json);
-		this.setFrom(session.getKey());//设置来源socket key session<T>
+		
+		//设置来源socket key session<T> 
+		this.setFrom(session.getKey());
+		
+		//设置userFrom当前用户 若消息包含了from 则不设置 允许顶替发消息
+		if(this.getUserFrom().length() == 0) {
+			this.setUserFrom(session.getUser());
+		}
+		
 	}
 	
 	
-	public MsgUp setFrom(String from) {
+	public Msg setFrom(String from) {
 		this.set(KEY_FROM, from);
 		return this;
 	}
-	public MsgUp setTo(String to) {
+	public Msg setTo(String to) {
 		this.set(KEY_TO, to);
 		return this;
 	}
-	public MsgUp setType(String type) {
+	public Msg setType(String type) {
 		this.set(KEY_TYPE, type);
 		return this;
 	}
-	public MsgUp setData(Object data) {
+	public Msg setData(Object data) {
 		this.set(KEY_DATA, data);
 		return this;
 	}
@@ -105,10 +104,26 @@ public class MsgUp extends Bean{
 	public String getType() {
 		return this.get(KEY_TYPE, "");
 	}
-	public Object getData() {
-		return this.get(KEY_DATA);
+	public <T> T getData() {
+		return (T)this.get(KEY_DATA);
 	}
 	
+	
+
+	public Msg setUserFrom(String from) {
+		this.set(KEY_USER_FROM, from);
+		return this;
+	}
+	public Msg setUserTo(String to) {
+		this.set(KEY_USER_TO, to);
+		return this;
+	}
+	public String[] getUserTo() {
+		return this.get(KEY_USER_TO, "").split(SPLIT);
+	}
+	public String getUserFrom() {
+		return this.get(KEY_USER_FROM, "");
+	}
 
 	
 }

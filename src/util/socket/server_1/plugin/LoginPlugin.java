@@ -1,8 +1,7 @@
 package util.socket.server_1.plugin;
 
 import util.Bean;
-import util.socket.server_1.*;
-import util.socket.server_1.session.*;
+import util.socket.server_1.Msg;
 
 public class LoginPlugin<T> extends Plugin<T>{
 
@@ -11,15 +10,17 @@ public class LoginPlugin<T> extends Plugin<T>{
 	}
 
 	/**
-	 * {type:login,data:{user:123,pwd:123456} }	
+	 * {type:login,sto:,sfrom:128.2.3.1\:9080,from:,to:,data:{user:123,pwd:123456} }	
 	 */
 	@Override
-	public void onData(Session<T> session, MsgUp msg) {
+	public void onData(Msg msg) {
 		Bean data = (Bean) msg.getData();
 		String userId = data.get("user", "");
 		String pwd = data.get("pwd", "");
 		
-		session.onLogin(data);
+		msg.setType("onlogin");
+//		session.onLogin(data);
+		pub.publish(msg.getFrom(), msg);
 		
 	}
 

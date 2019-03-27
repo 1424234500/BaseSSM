@@ -49,13 +49,13 @@ public class ClientUI extends JFrame  {
 		btSend = new JButton("发送");
 		btLogin = new JButton("登录");
 
-		jtfSend = new JTextField(20);
+		jtfSend = new JTextField(30);
 		jtfSend1 = new JTextField(6);
 		jtfSend2 = new JTextField(6);
-		jtfSend1.setText("raspberrypi");
-		jtfSend2.setText("0");
+		jtfSend1.setText("server_1");
+		jtfSend2.setText(Tools.getRandomNum(10, 99, 2));
 //		jtfSend.setText("{\"cmd\":12,\"value0\":\"group\",\"value1\":\"100000\",\"value2\":\"text\",\"value3\":\"2017-05-24 00:03:31\",\"value4\":\"消息 "+ Tools.getNowTimeL() +"\"}");
-		jtfSend.setText("{type:echo,data:dddd}");
+		jtfSend.setText("{type:message,to:\"all_socket\",from:222,data:{type:txt,body:hello} }");
 
 		taShow = new JTextArea();
 
@@ -95,20 +95,22 @@ public class ClientUI extends JFrame  {
 			public void actionPerformed(ActionEvent e) {
 				String sysKey = jtfSend1.getText();	//发往系统
 				String key = jtfSend2.getText();	//发往用户连接
-				Msg msg = new Msg();
-				msg.setMsgType(Msg.LOGIN);
-				msg.setToKey(key);
-				msg.setToSysKey(sysKey);
-				client.send(msg.getData());
-				
+//				Msg msg = new Msg();
+//				msg.setMsgType(Msg.LOGIN);
+//				msg.setToKey(key);
+//				msg.setToSysKey(sysKey);
+//				client.send(msg.getData());
+				client.send("{type:login,data:{user:" + key + ",pwd:123456} }");
 			}
 		});
 		jbshowrooms.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				out(client.show());
-				Msg msg = new Msg();
-				msg.setMsgType(Msg.SHOW);
-				client.send(msg.getData());
+//				Msg msg = new Msg();
+//				msg.setMsgType(Msg.SHOW);
+//				client.send(msg.getData());
+				
+				client.send("{type:monitor,data:{type:show} }");
 			}
 		});
 		jbtest.addActionListener(new ActionListener() {
@@ -147,7 +149,7 @@ public class ClientUI extends JFrame  {
 		final JScrollPane sp = new JScrollPane();
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		sp.setViewportView(this.taShow);
-		this.taShow.setEditable(false);
+		this.taShow.setEditable(true);
 		this.add(sp, BorderLayout.CENTER);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setBounds(80, 80, 780, 280);

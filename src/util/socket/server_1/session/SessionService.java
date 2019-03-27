@@ -18,6 +18,10 @@ package util.socket.server_1.session;
  * @param <T>
  */
 public interface SessionService<T> {
+	/**
+	 * 显示会话信息
+	 */
+	String show();
 
 	/**
 	 * 添加连接

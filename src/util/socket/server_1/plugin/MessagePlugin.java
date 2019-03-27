@@ -1,11 +1,7 @@
 package util.socket.server_1.plugin;
 
 import util.Bean;
-import util.route.SubPub;
-import util.route.SubPubMgr;
-import util.socket.server_1.MsgDown;
-import util.socket.server_1.MsgUp;
-import util.socket.server_1.session.Session;
+import util.socket.server_1.Msg;
 
 public  class MessagePlugin<T> extends Plugin<T>{
 
@@ -13,9 +9,9 @@ public  class MessagePlugin<T> extends Plugin<T>{
 		super(params);
 	}
 	/**
-	 * {type:message,data:{to:123,from:222,type:txt,body:hello} }	
+	 * {type:message,sto:,sfrom:128.2.3.1\:9080,to:123,from:222,data:{type:txt,body:hello} }	
 	 */
-	public void onData(Session<T> session, MsgUp bean) {
+	public void onData(Msg msg) {
 		//存储
 //		 *					{type:message,data:{to:123,from:222,type:txt,body:hello} }		
 //		 *					message 发给user/group 请求转发
@@ -23,13 +19,10 @@ public  class MessagePlugin<T> extends Plugin<T>{
 //		 *						data.from	发送方来源	u_123,s_admin
 //		 *						data.type	具体消息类型	text,image,voice,video,map
 //		 *						data.body
-		Bean data = (Bean) bean.getData();
-		MsgDown msg = new MsgDown();
-		msg.setData(data);
-		msg.setType(bean.getType());
-		String[] tos = msg.getDataTo().split(",");
+		//发送方设置去向 接收方只看到发送给自己
+		String[] tos = msg.getUserTo();
 		for(String to : tos) {
-			msg.setDataTo(to);
+			msg.setUserTo(to);
 			pub.publish(to, msg);
 		}
 		

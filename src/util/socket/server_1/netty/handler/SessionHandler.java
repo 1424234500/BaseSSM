@@ -21,7 +21,7 @@ import util.socket.server_1.session.*;
 	public class SessionHandler extends ChannelInboundHandlerAdapter {
 		private static Logger log = Logger.getLogger(PluginFactory.class); 
 
-		private static SessionService<ChannelHandlerContext> sessionService = new SessionServiceArpListImpl<ChannelHandlerContext>();
+		public static SessionService<ChannelHandlerContext> sessionService = new SessionServiceArpListImpl<ChannelHandlerContext>();
 		private class SocketNettyImpl extends Socket<ChannelHandlerContext>{
 			public SocketNettyImpl(ChannelHandlerContext socket) {
 				super(socket);
