@@ -25,7 +25,8 @@ public class MonitorPlugin<T> extends Plugin<T>{
 		if(bean.get("type", "").equals("show")) {
 			res = SessionHandler.sessionService.show();
 		}
-		msg.setData(new Bean().set("res", res).set("data", msg.getData()));
+		msg.setType("echo");
+		msg.setData(res);
 		pub.publish(msg.getFrom(), msg);
 	}
 

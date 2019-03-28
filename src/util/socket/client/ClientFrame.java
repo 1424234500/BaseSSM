@@ -11,7 +11,7 @@ public abstract class ClientFrame implements Client, InterfaceOut{
 	
 	
 	int reconnect = 20;	//重连次数
-	long sleeptime = 1000;//重连间隔
+	long sleeptime = 3000;//重连间隔
 	
 	ClientUI clientUi;
 	public ClientFrame(){
@@ -111,7 +111,6 @@ public abstract class ClientFrame implements Client, InterfaceOut{
 	 */
 	public void stop(){
 		this.stopImpl();
-		this.clientUi = null;
 	}
 
 	

@@ -41,7 +41,9 @@ public class SubPubMapImpl<T> implements SubPub<T>{
 			list = new CopyOnWriteArraySet<>();
 			subscribeTable.put(channel, list);
 		}
-		return list.add(onSubscribe);
+		Boolean res = list.add(onSubscribe);
+		log.info("subscribe " + onSubscribe.toString() + " " + channel + " " + res);
+		return res;
 	}
 
 	@Override
@@ -51,7 +53,10 @@ public class SubPubMapImpl<T> implements SubPub<T>{
 			log.error("unsubscribe of null?");
 			return false;
 		}
-		return list.remove(onSubscribe);
+
+		Boolean res = list.remove(onSubscribe);
+		log.info("unSubscribe " + onSubscribe.toString() + " " + channel + " " + res);
+		return res;
 	}
 	@Override
 	public void init(Integer threadSize) {

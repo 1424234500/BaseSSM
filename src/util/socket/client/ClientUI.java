@@ -6,6 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -15,14 +18,22 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import util.ThreadUtil;
+import util.TimeUtil;
 import util.Tools;
 import util.socket.server_0.Msg;
 
 public class ClientUI extends JFrame  {
-
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	AtomicLong count = new AtomicLong(0L);
+	ScheduledFuture<?> future;
+	
 	public JButton jbshowusers = new JButton("好友");
 	public JButton jbshowrooms = new JButton("会话");
-	public JButton jbtest = new JButton("自动喊话");
+	public JButton jbtest = new JButton("auto on");
 	public JCheckBox jcbscroll = new JCheckBox("锁定");
 
 	public JButton btStart;// 启动服务器
@@ -62,13 +73,12 @@ public class ClientUI extends JFrame  {
 
 		btStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (client != null) {
-					client.start();
+				if (btStart.getText().equals("启动")) {
 					btStart.setText("关闭");
+					client.start();
 				} else {
-					client.stop();
-					client = null;
 					btStart.setText("启动");
+					client.stop();
 				}
 			}
 
@@ -77,57 +87,49 @@ public class ClientUI extends JFrame  {
 		btSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String mmsg = ("" + jtfSend.getText());// 写入发送流到 客户端去
-				
-//				String sysKey = jtfSend1.getText();	//发往系统
-//				String key = jtfSend2.getText();	//发往用户连接
-//				Msg msg = new Msg();
-//				msg.setMsgType(Msg.DATA);
-//				msg.setToKey(key);
-//				msg.setToSysKey(sysKey);
-//				msg.setFromSysKey(sysKey);
-//				msg.put("data", mmsg);
-//				String obj = msg.getData();
 				String obj = mmsg;
 				client.send(obj);
 			}
 		});
 		btLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String sysKey = jtfSend1.getText();	//发往系统
 				String key = jtfSend2.getText();	//发往用户连接
-//				Msg msg = new Msg();
-//				msg.setMsgType(Msg.LOGIN);
-//				msg.setToKey(key);
-//				msg.setToSysKey(sysKey);
-//				client.send(msg.getData());
 				client.send("{type:login,data:{user:" + key + ",pwd:123456} }");
 			}
 		});
 		jbshowrooms.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				out(client.show());
-//				Msg msg = new Msg();
-//				msg.setMsgType(Msg.SHOW);
-//				client.send(msg.getData());
-				
 				client.send("{type:monitor,data:{type:show} }");
 			}
 		});
 		jbtest.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				
+				if(jbtest.getText().equals("auto on")) {
+					jbtest.setText("auto off");
+					count.set(0L);
+					future = ThreadUtil.scheduleAtFixedRate(new Runnable() {
+						public void run() {
+							count.addAndGet(1L);
+							client.send("{data:{type:txt,body:" + count.get() + "hello" + TimeUtil.getTimeSequence() + "},type:message,to:\"all_socket\"}");				
+						}
+					}, 1000, 100, TimeUnit.MILLISECONDS);
+				}else {
+					jbtest.setText("auto on");
+					future.cancel(true);
+				}
 			}
 
 			
 		});
 		jbshowusers.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				out(client.show());
 			}
 		});
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				 
+				 client.stop();
 			}
 		});
 		JPanel top = new JPanel(new FlowLayout());

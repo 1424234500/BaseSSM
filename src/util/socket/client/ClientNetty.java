@@ -16,26 +16,34 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import util.Tools;
 import util.setting.Setting;
 import util.socket.server_1.netty.handler.NettyDecoder;
 import util.socket.server_1.netty.handler.NettyEncoder;
 
 public class ClientNetty extends ClientFrame {
+	EventLoopGroup group;
+	Bootstrap b;
 	ChannelHandlerContext socket;
 	String serverIp = "127.0.0.1";
 	int serverPort = 8091; 
 	
 	ClientNetty(){
-		serverPort = Setting.get("socket_port_netty", 8092);
-		try {
-			serverIp = Setting.get("socket_ip", Tools.getServerIp(InetAddress.getLocalHost().getHostAddress()));
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-		serverIp = Setting.get("socket_ip", "127.0.0.1");
+		
+  
+//        
+//		serverPort = Setting.get("socket_port_netty", 8092);
+//		try {
+//			serverIp = Setting.get("socket_ip", Tools.getServerIp(InetAddress.getLocalHost().getHostAddress()));
+//		} catch (UnknownHostException e) {
+//			e.printStackTrace();
+//		}
+//		serverIp = Setting.get("socket_ip", "127.0.0.1");
 	}
 	ClientNetty(String ip, int port){
+		this();
 		this.serverIp = ip;
 		this.serverPort = port;
 	}
@@ -65,38 +73,45 @@ public class ClientNetty extends ClientFrame {
 	@Override
 	protected void startImpl() throws Exception {
 		out("Netty", serverIp, serverPort);
-		  // Configure the client.  
-        EventLoopGroup group = new NioEventLoopGroup();  
-        try {  
-            Bootstrap b = new Bootstrap();  
-            b.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true)  
-                .handler(new ChannelInitializer<SocketChannel>() {  
-                    @Override  
-                    public void initChannel(SocketChannel ch) throws Exception {  
-						ChannelPipeline p = ch.pipeline();
-						p.addLast("ping", new IdleStateHandler(10, 0, 0, TimeUnit.SECONDS)); 	//5s心跳包 
+		 // Configure the client.  
+        group = new NioEventLoopGroup();  
+        b = new Bootstrap();  
+        b.group(group)
+        .channel(NioSocketChannel.class) // (3)
+        .option(ChannelOption.SO_KEEPALIVE, true) // (4)
+        .option(ChannelOption.TCP_NODELAY, true)  
+        .handler(new ChannelInitializer<SocketChannel>() {  
+            @Override  
+            public void initChannel(SocketChannel ch) throws Exception {  
+				ChannelPipeline p = ch.pipeline();
+				p.addLast("ping", new IdleStateHandler(10, 0, 0, TimeUnit.SECONDS)); 	//5s心跳包 
 //						p.addLast(new LoggingHandler(LogLevel.INFO));
 //						p.addLast( new ObjectEncoder(),  new ObjectDecoder(ClassResolvers.cacheDisabled(null)))
-					    p.addLast(new NettyEncoder(), new NettyDecoder());  
-						p.addLast(new HandlerNetty());
-                    }  
-                });  
-  
-            // Start the client.  
-            ChannelFuture f = b.connect(serverIp, serverPort).sync();  
-  
-            // Wait until the connection is closed.  
-            f.channel().closeFuture().sync();  
-        }  
-        finally {  
-            // Shut down the event loop to terminate all threads.  
-            group.shutdownGracefully();  
-        }  
+			    p.addLast(new NettyEncoder(), new NettyDecoder());  
+				p.addLast(new HandlerNetty());
+            }  
+        });  
+        // Start the client.  
+        ChannelFuture f = b.connect(serverIp, serverPort).sync();  
+        f.addListener(new GenericFutureListener<Future<Object>>() {
+			@Override
+			public void operationComplete(Future<Object> arg0) throws Exception {
+				out("Netty operationComplete", serverIp, serverPort);
+			}
+        });
+        f.get();
+        // Wait until the connection is closed.  
+//        f.channel().closeFuture().sync();  
 	}
-
 	@Override
 	protected void stopImpl() {
-		 this.socket.close();
+		if(this.socket != null)
+			this.socket.close();
+
+        // Shut down the event loop to terminate all threads.  
+		if(group != null) {
+			group.shutdownGracefully(); 
+		}
 	} 
 	
 	

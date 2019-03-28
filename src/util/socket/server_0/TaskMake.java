@@ -72,7 +72,7 @@ public class TaskMake{
 					result.onTrue();
 				}
 			}catch(Exception e){
-//				e.printStackTrace();
+				e.printStackTrace();
 				out(TaskMake.this.doName + "异常," + Tools.calcTime(time) + "后重新读取", count++, e.toString());
 				ThreadUtil.sleep(time);
 				TaskMake.this.startTask();
