@@ -63,6 +63,22 @@ public class TimeUtil {
 		return sdf.format(d);
 	}
 	/**
+	 * 获取指定格式的时间yyyy-MM-dd HH:mm:ss:SSS
+	 */
+	public static String getTime(Date d, String format) {
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		return sdf.format(d);
+	}
+	/**
+	 * 获取指定格式的时间yyyy-MM-dd HH:mm:ss:SSS
+	 */
+	public static String getTime(long time, String format) {
+		Date d = new Date(time);
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		return sdf.format(d);
+	}
+	
+	/**
 	 * 获取差值几天的 指定格式的时间yyyy-MM-dd HH:mm:ss:SSS
 	 */
 	public static String getTime(String format, int detaDays) {

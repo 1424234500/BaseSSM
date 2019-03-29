@@ -71,10 +71,7 @@ class FactoryMethod{
  * Singleton.getInstance()
  */
 class Singleton {
-	/**
-	 * 私有构造器
-	 */
-    private Singleton(){}
+	
     static Singleton instance;
     
     /**
@@ -90,6 +87,12 @@ class Singleton {
         }  
         return instance;  
     }  
+    
+    
+    /**
+	 * 私有构造器
+	 */
+    private Singleton(){}
     /**
      * 私有静态内部类
      */
@@ -102,7 +105,6 @@ class Singleton {
     }
     /**
      * 内部类模式 可靠
-     * @return
      */
     public static Singleton getInstance(){           
         return SingletonFactory.instance;           

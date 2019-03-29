@@ -32,7 +32,8 @@ class SchedulerQuartzImpl implements util.scheduler.Scheduler {
 
 	@Override
 	public void start() throws Exception {
-		getScheduler().start();
+		if(!getScheduler().isStarted())
+			getScheduler().start();
 	}
 	@Override
 	public void pause() throws Exception {
@@ -40,7 +41,8 @@ class SchedulerQuartzImpl implements util.scheduler.Scheduler {
 	}
 	@Override
 	public void shutdown() throws Exception {
-		getScheduler().shutdown();
+		if(!getScheduler().isShutdown())
+			getScheduler().shutdown();
 	}
 	@Override
 	public void add(Task task) throws Exception {
@@ -49,6 +51,7 @@ class SchedulerQuartzImpl implements util.scheduler.Scheduler {
 		Trigger trigger = task.getTrigger();//makeTrigger(task);
 		// 将任务及其触发器放入调度器
 		scheduler.scheduleJob(jobDetail, trigger);	
+		start();
 	}
 	@Override
 	public void remove(Task task) throws Exception {

@@ -23,7 +23,7 @@ public interface Pipe<T>{
 	/**
 	 * 多线程消费 空闲间隔
 	 */
-	long SLEEP_THREAD = 100;
+	long SLEEP_THREAD = 50;
 	/**
 	 * 初始化管道
 	 * @param key

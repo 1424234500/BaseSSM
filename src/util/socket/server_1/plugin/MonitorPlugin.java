@@ -5,7 +5,7 @@ import util.socket.server_1.Msg;
 import util.socket.server_1.netty.handler.SessionHandler;
 
 /**
- * 监控 数据测试
+ * 数据监控工具
  * @author walker
  *
  * @param <T>
@@ -25,8 +25,15 @@ public class MonitorPlugin<T> extends Plugin<T>{
 		if(bean.get("type", "").equals("show")) {
 			res = SessionHandler.sessionService.show();
 		}
-		msg.setType("echo");
 		msg.setData(res);
+		
+		//模拟存储耗时
+		try {
+			Thread.sleep(10);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		pub.publish(msg.getFrom(), msg);
 	}
 

@@ -18,7 +18,7 @@ public class LoginPlugin<T> extends Plugin<T>{
 		String userId = data.get("user", "");
 		String pwd = data.get("pwd", "");
 		
-		msg.setType("onlogin");
+//		msg.setType("onlogin");
 //		session.onLogin(data);
 		pub.publish(msg.getFrom(), msg);
 		

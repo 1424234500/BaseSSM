@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import util.Tools;
-import util.socket.server_1.plugin.PluginFactory;
+import util.socket.server_1.plugin.PluginMgr;
 import util.socket.server_1.session.*;
 
 	/**
@@ -19,7 +19,7 @@ import util.socket.server_1.session.*;
 	 *
 	 */
 	public class SessionHandler extends ChannelInboundHandlerAdapter {
-		private static Logger log = Logger.getLogger(PluginFactory.class); 
+		private static Logger log = Logger.getLogger(PluginMgr.class); 
 
 		public static SessionService<ChannelHandlerContext> sessionService = new SessionServiceArpListImpl<ChannelHandlerContext>();
 		private class SocketNettyImpl extends Socket<ChannelHandlerContext>{
@@ -48,7 +48,7 @@ import util.socket.server_1.session.*;
 		}
 		
 		public void out(Object...objects) {
-			log.info(Arrays.toString(objects));
+			log.debug(Arrays.toString(objects));
 		}
 		
 		@Override
@@ -73,7 +73,6 @@ import util.socket.server_1.session.*;
 		public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
 			super.handlerAdded(ctx);
 			out("handlerAdded", ctx);
-			
 			sessionService.sessionAdd(new SocketNettyImpl(ctx));
 		}
 	
@@ -81,22 +80,20 @@ import util.socket.server_1.session.*;
 		public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
 			super.handlerRemoved(ctx);
 			out("handlerRemoved", ctx);
-			
 			sessionService.sessionRemove(new SocketNettyImpl(ctx));
 
 		}
 	
 		@Override
 		public void channelRead(ChannelHandlerContext ctx, Object msg) {
-			out("channelRead", msg); 
-			
+//			out("channelRead", msg); 
 			sessionService.sessionOnRead(new SocketNettyImpl(ctx), msg);
 		}
 	
 		@Override
 		public void channelReadComplete(ChannelHandlerContext ctx) {
 			ctx.flush();
-			out("channelReadComplete", ctx);
+//			out("channelReadComplete", ctx);
 		}
 	
 		@Override

@@ -1,22 +1,22 @@
-package util.socket.server_1.filter;
+package util.socket.server_1.plugin.aop;
 
 import util.Bean;
 import util.socket.server_1.Msg;
 import util.socket.server_1.session.Session;
 
-public class SizeFilter<T> extends Filter<T>{
+public class SizeAop<T> extends Aop<T>{
 	
-	SizeFilter(Bean params) {
+	SizeAop(Bean params) {
 		super(params);
 	}
 
 	@Override
-	public Boolean doFilter(Session<T> session, Msg msg) {
+	public Boolean doAop(Msg msg) {
 		boolean res = true;
 		int length = msg.toString().length();
 		int maxSize = this.params.get("size", 0);
 		if(maxSize > 0 && length > maxSize ) {
-			log.warn(this.params.get("tip", "") + " " + maxSize);
+			log.warn(this.params.get("tip", "") + " " + maxSize + " " + msg.getData().toString().substring(0, 20));
 			res = false;
 		}
 		return res;

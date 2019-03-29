@@ -21,7 +21,7 @@ import javax.swing.JTextField;
 import util.ThreadUtil;
 import util.TimeUtil;
 import util.Tools;
-import util.socket.server_0.Msg;
+import util.socket.server_1.Msg;
 
 public class ClientUI extends JFrame  {
 	/**
@@ -111,9 +111,15 @@ public class ClientUI extends JFrame  {
 					future = ThreadUtil.scheduleAtFixedRate(new Runnable() {
 						public void run() {
 							count.addAndGet(1L);
-							client.send("{data:{type:txt,body:" + count.get() + "hello" + TimeUtil.getTimeSequence() + "},type:message,to:\"all_socket\"}");				
+							Msg msg = new Msg();
+							msg.setType("message");
+							msg.setData("{type:txt,body:" + count.get() + "-up}");
+							msg.setUserTo("all_user");
+							msg.setTimeClient(System.currentTimeMillis());
+							client.send(msg.toString());
+//							client.send("{data:{type:txt,body:" + count.get() + "-up-" + TimeUtil.getTimeSequence() + "},type:message,to:\"all_user\"}");				
 						}
-					}, 1000, 100, TimeUnit.MILLISECONDS);
+					}, 1000, 10, TimeUnit.MILLISECONDS);
 				}else {
 					jbtest.setText("auto on");
 					future.cancel(true);

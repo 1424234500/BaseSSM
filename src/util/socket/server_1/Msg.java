@@ -8,34 +8,16 @@ import util.socket.server_1.session.Session;
  * socket 传递 消息结构 
  * 
  * who 发来了一条消息  session:socket:key
- * 			   msg
- * 					//由服务端设置
- * 					from key	来源			socket:key
- * 					to	 key	去向			socket:key
- * 					//由客户端发送
- * 					type plugin 函数调用		login,message
- * 					data onData 函数调用参数	bean
+ * {type:login,data:{user:walker,pwd:1234,device:xxxxx} }	
+ * {type:message,data:{user:walker,pwd:1234} }		
  * 
- * 					//plugin调用
- *					{type:login,data:{user:walker,pwd:1234,device:xxxxx} }		
- * 					login 登录操作  未登录只能调用此plugin 此时没有self userId
- * 						bean.user:000900
- * 						bean.pwd:123456
- * 						bean.device:asjfkajxkjakjdf
+ * 客户端写入数据
+ * 	type:login	登录请求
+ * 	data:{}		登录请求的参数
  * 
- *					{type:message,data:{user:walker,pwd:1234} }		
- *					message 发给user/group 请求转发
- *						data.to		发给目标用户	u_123,u_2323,g_xxx,s_all,s_online
- *						data.from	发送方来源	u_123,s_admin
- *						data.type	具体消息类型	text,image,voice,video,map
- *						data.body
- *
- *	ip mac路由模拟
- *	ip		user:id		login 			用户收发消息都用于user:id
- *	Arp Rarp  ip/id <-> mac/key
- *  mac		socket:key	onConnection	而机器转发都用于 socket:key
- *	
- *
+ * 	time_client	客户端发送时间
+ * 	
+ * 		
  */
 @SuppressWarnings("unchecked")
 public class Msg extends Bean{
@@ -43,9 +25,23 @@ public class Msg extends Bean{
 	final public static String SPLIT = ",";
 	
 	//系统上下文 函数调用控制
-	final private static String KEY_TYPE = "type";	//plugin type
+
+	//记录关键时间节点 统计计算
+	//time_client - 网络传输耗时 - time_receive - 队列等待耗时 - time_do - 业务处理耗时 - time_send
+	final private static String KEY_TIME_CLIENT = "time_client";	//client send time
+	final private static String KEY_TIME_RECEIVE = "time_reveive";	//server receive time to pipe
+	final private static String KEY_TIME_DO = "time_do";			//server consumer time
+	final private static String KEY_TIME_SEND = "time_send";		//server send time
+	
+	final private static String KEY_WAIT_SIZE = "wait_size";		//pipe 队列等待深度
+	final private static String KEY_INFO = "info";					//about
+
+	
+	//记录socket收发ip port key
 	final private static String KEY_FROM = "sfrom";	//socket from
 	final private static String KEY_TO = "sto";		//socket to
+	//记录业务 类型 参数
+	final private static String KEY_TYPE = "type";	//plugin type
 	final private static String KEY_USER_FROM = "from";	//user from
 	final private static String KEY_USER_TO = "to";		//user to
 	
@@ -56,10 +52,15 @@ public class Msg extends Bean{
 		int t = JsonUtil.getType(json);
 		if(t == 1){
 			Bean bean = (Bean)JsonUtil.get(json);
-			this.setType(bean.get(KEY_TYPE, ""));
+			this.putAll(bean);	//是否过滤非必须字段 
+			this.setType(bean.get(KEY_TYPE, ""));//确保type
 			this.setUserTo(bean.get(KEY_USER_TO, ""));
 			this.setUserFrom(bean.get(KEY_USER_FROM, ""));
 			this.setData(bean.get(KEY_DATA));
+			
+			if(this.getTimeClient() == 0) {//避免不传导致 计算异常
+				this.setTimeClient(System.currentTimeMillis());//确保type
+			}
 		}else {
 			this.setType("echo");
 			this.setData(new Bean().set("json", json));
@@ -124,6 +125,49 @@ public class Msg extends Bean{
 	public String getUserFrom() {
 		return this.get(KEY_USER_FROM, "");
 	}
-
 	
+
+	public Msg setTimeClient(long timeMill) {
+		this.set(KEY_TIME_CLIENT, timeMill);
+		return this;
+	}
+	public Long getTimeClient() {
+		return this.get(KEY_TIME_CLIENT, 0L);
+	}
+	public Msg setTimeReveive(long timeMill) {
+		this.set(KEY_TIME_RECEIVE, timeMill);
+		return this;
+	}
+	public Long getTimeReceive() {
+		return this.get(KEY_TIME_RECEIVE, 0L);
+	}
+	public Msg setTimeDo(long timeMill) {
+		this.set(KEY_TIME_DO, timeMill);
+		return this;
+	}
+	public Long getTimeDo() {
+		return this.get(KEY_TIME_DO, 0L);
+	}
+	public Msg setTimeSend(long timeMill) {
+		this.set(KEY_TIME_SEND, timeMill);
+		return this;
+	}
+	public Long getTimeSend() {
+		return this.get(KEY_TIME_SEND, 0L);
+	}
+	
+	public Msg setWaitSize(Long size) {
+		this.set(KEY_WAIT_SIZE, size);
+		return this;
+	}
+	public Long getWaitSize() {
+		return this.get(KEY_WAIT_SIZE, 0L);
+	}
+	public Msg setInfo(Object info) {
+		this.set(KEY_INFO, info);
+		return this;
+	}
+	public Object getInfo() {
+		return this.get(KEY_INFO);
+	}
 }

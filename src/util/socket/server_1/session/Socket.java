@@ -20,7 +20,7 @@ public abstract class Socket<T> {
 	public abstract void send(Object obj);
 	@Override
 	public String toString() {
-		return "Socket [key=" + key() + "]";
+		return "Socket[" + key() + "]";
 	}
 	
 	

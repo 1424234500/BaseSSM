@@ -217,7 +217,7 @@ public class RedisMgr   {
 	/**
 	 * 回调环绕执行redis 操作
 	 */
-	private <T> T doJedis(Fun<T> fun){
+	public <T> T doJedis(Fun<T> fun){
 		T res = null;
 		Jedis jedis = this.getJedis();
 		if(fun != null){
@@ -294,6 +294,7 @@ public class RedisMgr   {
 	public Set<String> getKeys(){
 		return keys;
 	}
+	
 	public static  RedisMgr getInstance() {
 		return SingletonFactory.instance;
 	}

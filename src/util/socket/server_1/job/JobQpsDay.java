@@ -1,9 +1,11 @@
-package util.scheduler.job;
+package util.socket.server_1.job;
+
+import org.quartz.JobExecutionContext;
 
 import util.Tools;
 import util.scheduler.TaskJob;
 
-public class JobTest extends TaskJob{
+public class JobQpsDay extends TaskJob{
 
 	@Override
 	public void run() {

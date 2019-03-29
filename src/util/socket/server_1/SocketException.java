@@ -18,7 +18,7 @@ public class SocketException extends Exception{
 	}
 	public SocketException(Object...objs){
 		this(Arrays.toString(objs));
-		log.warn(Arrays.toString(objs));
+		log.error(Arrays.toString(objs), this);
 	}
 	
 }

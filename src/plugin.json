@@ -1,11 +1,11 @@
 { 
 	"version"	:	1.0,
-	"about"	:	"这是一些说明\nasdlfjaslk asdf",
+	"about-plugins"	:	"plugin插件配置，不分顺序，一个消息只执行一个业务处理 type data，限流配置",
 	"plugins"	:	{
 		"login"	:	{
-			class	:	util.socket.server_1.plugin.LoginPlugin,
-			on		:	true,
-			limit	:	0,
+			"class"	:	"util.socket.server_1.plugin.LoginPlugin",
+			"on"	:	true,
+			"limit"	:	0,
 		},
 		"login1"	:	{
 			class	:	util.socket.server_1.plugin.Login,
@@ -18,6 +18,7 @@
 		},
 		"monitor"	:	{
 			class	:	util.socket.server_1.plugin.MonitorPlugin,
+			on		:	true,
 		},
 		"echo"	:	{
 			class	:	util.socket.server_1.plugin.EchoPlugin,
@@ -25,43 +26,39 @@
 			limit	:	0,
 		},
 	},
+	"about-before"	:	"执行plugin之前执行，拦截器，顺序执行，可配例外plugin，返回false则中断",
+	"before"	:	[
 	
-	filters	:	[
 		{
-			class	:	util.socket.server_1.filter.MonitorFilter,
+			class	:	util.socket.server_1.plugin.aop.SizeAop,
 			on		:	true,
-			params	:	{
-				tip	:	"监控",
-			},
-		},
-		{
-			class	:	util.socket.server_1.filter.AuthFilter,
-			on		:	false,
-			excludes	:	[
-				login,
-				login1,
-			],
-			params	:	{
-				str	:	aaaa,
-				tip	:	"未登录",
-			},
-		},
-		{
-			class	:	util.socket.server_1.filter.SizeFilter,
-			on		:	true,
-			excludes	:	[
-				test
-			],
+			excludes	:	[ echo,test, ],
 			params	:	{
 				size	:	2048,
 				tip		:	"最大长度不能超过",
 			},
 		},
+		{
+			class	:	util.socket.server_1.plugin.aop.AuthAop,
+			on		:	false,
+			excludes	:	[login,login1, ],
+			params	:	{
+				tip	:	"未登录",
+			},
+		},
 	
 	],
-
-
-
+	"about-after" : "执行plugin之后再执行，用于统计执行结果情况，监控计数配置位置 登录前？还是（有效）处理完后？可调整配置位置",
+	"after"	:	[
+		
+		{
+			class	:	util.socket.server_1.plugin.aop.CountAop,
+			on		:	true,
+			params	:	{
+				tip	:	"计数",
+			},
+		},
+	]
 
 }
 

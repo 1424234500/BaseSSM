@@ -10,9 +10,16 @@ import util.socket.server_1.Msg;
 import util.socket.server_1.MsgBuilder;
 
 /**
- * Arp ip:user mac:key转换绑定元
- *
- * @param <T>
+ * 会话 关联socket user
+ * 
+ * 订阅模式管理分发
+ * 
+ * 建立连接 订阅socket
+ * 		登录成功 订阅user
+ * 			订阅到消息 写入socket
+ * 		退出登录	取消订阅user
+ * 断开连接 取消订阅socket
+ * 
  */
 public class Session<T> implements OnSubscribe<Msg> {
 	private static Logger log = Logger.getLogger(Session.class); 
@@ -66,7 +73,7 @@ public class Session<T> implements OnSubscribe<Msg> {
 
 	@Override
 	public String toString() {
-		return "Session[key=" + getKey() + " user=" + getUser() + "]";
+		return "Session[" + getKey() + " " + getUser() + "]";
 	}
 	
 	 
@@ -108,15 +115,23 @@ public class Session<T> implements OnSubscribe<Msg> {
 	 */
 	@Override
 	public Type onSubscribe(Msg msg) {
-		log.debug("onSubscribe " + msg);
-		if(msg.getType().equals("onlogin")) {
+
+//		log.debug("onSubscribe " + msg);
+		if(msg.getType().equals("login")) {
 			this.onLogin((Bean) msg.getData());
-		}else if(msg.getType().equals("echo")) {
+		}else if(msg.getType().equals("monitor")) {
 			send(msg.getData());
 		}else {
 			msg.setTo(getKey());
 			send(msg);
 		}
+		//模拟写入socket耗时
+		try {
+			Thread.sleep(1);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		return Type.DEFAULT;
 	}
 	public void send(Object obj) {
