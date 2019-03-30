@@ -86,6 +86,8 @@ public class PipeListImpl<T> implements Pipe<T>{
 	@Override
 	public void startConsumer(int threadSize, final Fun<T> executer) {
 		log.warn("StartConsumer");
+		if(threadSize <= 0)return;
+
 		threadPool = Executors.newFixedThreadPool(threadSize);
 		for(int i = 0; i < threadSize; i++) {
 			final int now = i;

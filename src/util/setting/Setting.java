@@ -35,7 +35,7 @@ public class Setting {
 	
 	
 	
-	public static String settingFileName = "make.properties";
+	public static String settingFileName = ClassLoader.getSystemResource("").getPath() + "make.properties";
 	private static Properties proper ;
 	static  {
 		proper = new Properties();     
@@ -44,6 +44,7 @@ public class Setting {
         	FileUtil.mkfile(settingFileName);
             InputStream in = new BufferedInputStream (new FileInputStream(settingFileName));
             proper.load(in);     ///加载属性列表 
+            System.out.println(proper.toString());
             in.close(); 
         }
         catch(Exception e){

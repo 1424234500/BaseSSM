@@ -23,7 +23,7 @@ import util.TimeUtil;
 import util.Tools;
 import util.socket.server_1.Msg;
 
-public class ClientUI extends JFrame  {
+public class ClientUI extends JFrame implements UiCall {
 	/**
 	 * 
 	 */
@@ -45,9 +45,12 @@ public class ClientUI extends JFrame  {
 	public JTextArea taShow;// 信息展示
 	
 	Client client;
+	static int clientCount = 0;
+	static int clientNum = 4;
 	public ClientUI(Client cc, String name) {
 		super(name);
 		init(cc, name);
+		clientCount ++;
 	}
 	public ClientUI(Client cc) {
 		this(cc, "模拟客户端");
@@ -160,7 +163,7 @@ public class ClientUI extends JFrame  {
 		this.taShow.setEditable(true);
 		this.add(sp, BorderLayout.CENTER);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setBounds(80, 80, 780, 280);
+		this.setBounds(10, 120 + clientCount * 300 / clientNum, 780, 280);
 		this.setVisible(true);
 	//	test();
 	}

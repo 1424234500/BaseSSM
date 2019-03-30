@@ -51,13 +51,7 @@
 	"about-after" : "执行plugin之后再执行，用于统计执行结果情况，监控计数配置位置 登录前？还是（有效）处理完后？可调整配置位置",
 	"after"	:	[
 		
-		{
-			class	:	util.socket.server_1.plugin.aop.CountAop,
-			on		:	true,
-			params	:	{
-				tip	:	"计数",
-			},
-		},
+
 	]
 
 }

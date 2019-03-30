@@ -113,6 +113,8 @@ public class PipeRedisBroadcastImpl implements Pipe<String>{
 	@Override
 	public void startConsumer(int threadSize, final Fun<String> executer) {
 		log.warn("StartConsumer");
+		if(threadSize <= 0)return;
+
 		threadPool = Executors.newFixedThreadPool(threadSize);
 		Jedis jedis = redisPool.getJedis(this.key);
 		jedis.subscribe(new JedisPubSub() {

@@ -40,7 +40,8 @@ public class SocketNetty {
  
 
 	void start() throws Exception{
-		bossGroup = new NioEventLoopGroup(1); // (1)
+		int t = Setting.get("netty_thread", 1);
+		bossGroup = new NioEventLoopGroup(t); // (1)
         workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap(); // (2)

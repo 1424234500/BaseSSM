@@ -19,7 +19,7 @@ public interface Client{
 	public void stop();
 
 	
-	public void setUI(ClientUI cui);
+	public void setUI(UiCall cui);
 
 	public String show();
 

@@ -13,13 +13,12 @@ public abstract class ClientFrame implements Client, InterfaceOut{
 	int reconnect = 20;	//重连次数
 	long sleeptime = 3000;//重连间隔
 	
-	ClientUI clientUi;
+	UiCall clientUi;
 	public ClientFrame(){
 		reconnect = Setting.get("reconnect_count", 20);
 		sleeptime = Setting.get("reconnect_sleep", 1000);
 	}
-	@Override
-	public void setUI(ClientUI cui){
+	public void setUI(UiCall cui){
 		this.clientUi = cui;
 	}
 	public void out(Object...objects){

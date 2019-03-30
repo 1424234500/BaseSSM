@@ -10,9 +10,11 @@ import util.Fun;
 import util.pipe.Pipe;
 import util.pipe.PipeMgr;
 import util.pipe.PipeMgr.Type;
+import util.setting.Setting;
 import util.socket.server_1.Msg;
 import util.socket.server_1.MsgBuilder;
 import util.socket.server_1.plugin.PluginMgr;
+import util.socket.server_1.plugin.aop.CountModel;
 
 /**
  * 用戶连接管理
@@ -42,9 +44,12 @@ public class SessionServiceArpListImpl<T> implements SessionService<T> {
     private Map<String, Session<T>> index = new ConcurrentHashMap<>();
     
     /**
-     * 业务处理队列 消费
+     * 业务处理队列 
+     * 线程内部使用对象 避免再编码解码json
+     * 多进程可切换使用redis 编码解码string
      */
-    private Pipe<Msg> pipe = PipeMgr.getPipe(Type.PIPE, "session");
+//    private Pipe<Msg> pipe = PipeMgr.getPipe(Type.PIPE, "queue-msg");
+    private Pipe<String> pipe = PipeMgr.getPipe(Type.REDIS, "queue-msg");
     
     public String show() {
     	String res = "\n------------show session - -------\n";
@@ -58,9 +63,12 @@ public class SessionServiceArpListImpl<T> implements SessionService<T> {
     
     @SuppressWarnings("unchecked")
 	public SessionServiceArpListImpl(){
-    	pipe.startConsumer(1, new Fun<Msg>() {
-			public Object make(Msg msg) {
+    	PluginMgr.getInstance();//初始化任务
+    	pipe.startConsumer(Setting.get("netty_thread_consumer", 1), new Fun<String>() {
+			public Object make(String msg1) {
+				Msg msg = new Msg(msg1);
 				msg.setTimeDo(System.currentTimeMillis());
+				CountModel.getInstance().onWait(msg);
 				
 				Session<T> session = index.get(msg.getFrom()); //根据socket key找到session
 				if(session != null) {
@@ -75,6 +83,8 @@ public class SessionServiceArpListImpl<T> implements SessionService<T> {
 				}else {
 					log.error("该用户已不存在 " + msg.toString());
 				}
+				CountModel.getInstance().onDone(msg);
+
 				return true;
 			}
     	});
@@ -113,7 +123,10 @@ public class SessionServiceArpListImpl<T> implements SessionService<T> {
 			Msg msg = new Msg(obj.toString(), session);
 			msg.setWaitSize(pipe.size());
 			msg.setTimeReveive(System.currentTimeMillis());
-			pipe.put(msg);
+//			pipe.put(msg);
+			CountModel.getInstance().onNet(msg);
+			pipe.put(msg.toString());
+			
 		}else {//异常请求
 			log.error("receive msg from no user ? " + socket);
 			socket.send("receive msg from no user ? " + socket);

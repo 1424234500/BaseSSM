@@ -53,10 +53,10 @@ public class Msg extends Bean{
 		if(t == 1){
 			Bean bean = (Bean)JsonUtil.get(json);
 			this.putAll(bean);	//是否过滤非必须字段 
-			this.setType(bean.get(KEY_TYPE, ""));//确保type
-			this.setUserTo(bean.get(KEY_USER_TO, ""));
-			this.setUserFrom(bean.get(KEY_USER_FROM, ""));
-			this.setData(bean.get(KEY_DATA));
+//			this.setType(bean.get(KEY_TYPE, ""));//确保type
+//			this.setUserTo(bean.get(KEY_USER_TO, ""));
+//			this.setUserFrom(bean.get(KEY_USER_FROM, ""));
+//			this.setData(bean.get(KEY_DATA));
 			
 			if(this.getTimeClient() == 0) {//避免不传导致 计算异常
 				this.setTimeClient(System.currentTimeMillis());//确保type
