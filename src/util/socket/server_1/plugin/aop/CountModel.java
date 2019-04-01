@@ -16,7 +16,8 @@ import util.socket.server_1.Msg;
  * 
  * 
  * 1.开大netty线程,停止消费处理,增加客户端发送量,观测netty读取socket 存入redis的qps极限
- * 		1	
+ * 		netty连接线程数		客户端连接数		客户端发送qps
+ * 		1					20-2000			
  * 
  */
 public class CountModel {

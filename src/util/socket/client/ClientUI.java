@@ -56,9 +56,6 @@ public class ClientUI extends JFrame implements UiCall {
 		this(cc, "模拟客户端");
 	}
 	public void init(Client cc, String name){
-		this.client = cc;
-		this.client.setUI(this);
-		this.client.start(); 
 		btStart = new JButton("关闭");
 		btSend = new JButton("发送");
 		btLogin = new JButton("登录");
@@ -166,6 +163,10 @@ public class ClientUI extends JFrame implements UiCall {
 		this.setBounds(10, 120 + clientCount * 300 / clientNum, 780, 280);
 		this.setVisible(true);
 	//	test();
+
+		this.client = cc;
+		this.client.setUI(this);
+		this.client.start(); 
 	}
 
 	public void out(Object...objects) {
