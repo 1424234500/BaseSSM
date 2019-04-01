@@ -134,7 +134,7 @@ public class Msg extends Bean{
 	public Long getTimeClient() {
 		return this.get(KEY_TIME_CLIENT, 0L);
 	}
-	public Msg setTimeReveive(long timeMill) {
+	public Msg setTimeReceive(long timeMill) {
 		this.set(KEY_TIME_RECEIVE, timeMill);
 		return this;
 	}

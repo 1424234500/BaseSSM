@@ -47,15 +47,15 @@ public class ClientUI extends JFrame implements UiCall {
 	Client client;
 	static int clientCount = 0;
 	static int clientNum = 4;
-	public ClientUI(Client cc, String name) {
+	public ClientUI(Client cc, String name) throws Exception {
 		super(name);
 		init(cc, name);
 		clientCount ++;
 	}
-	public ClientUI(Client cc) {
+	public ClientUI(Client cc) throws Exception {
 		this(cc, "模拟客户端");
 	}
-	public void init(Client cc, String name){
+	public void init(Client cc, String name) throws Exception{
 		btStart = new JButton("关闭");
 		btSend = new JButton("发送");
 		btLogin = new JButton("登录");
@@ -75,7 +75,12 @@ public class ClientUI extends JFrame implements UiCall {
 			public void actionPerformed(ActionEvent e) {
 				if (btStart.getText().equals("启动")) {
 					btStart.setText("关闭");
-					client.start();
+					try {
+						client.start();
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				} else {
 					btStart.setText("启动");
 					client.stop();
@@ -88,19 +93,34 @@ public class ClientUI extends JFrame implements UiCall {
 			public void actionPerformed(ActionEvent e) {
 				String mmsg = ("" + jtfSend.getText());// 写入发送流到 客户端去
 				String obj = mmsg;
-				client.send(obj);
+				try {
+					client.send(obj);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		btLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String key = jtfSend2.getText();	//发往用户连接
-				client.send("{type:login,data:{user:" + key + ",pwd:123456} }");
+				try {
+					client.send("{type:login,data:{user:" + key + ",pwd:123456} }");
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		jbshowrooms.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				out(client.show());
-				client.send("{type:monitor,data:{type:show} }");
+				try {
+					client.send("{type:monitor,data:{type:show} }");
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		jbtest.addActionListener(new ActionListener() {
@@ -116,7 +136,11 @@ public class ClientUI extends JFrame implements UiCall {
 							msg.setData("{type:txt,body:" + count.get() + "-up}");
 							msg.setUserTo("all_user");
 							msg.setTimeClient(System.currentTimeMillis());
-							client.send(msg.toString());
+							try {
+								client.send(msg.toString());
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 //							client.send("{data:{type:txt,body:" + count.get() + "-up-" + TimeUtil.getTimeSequence() + "},type:message,to:\"all_user\"}");				
 						}
 					}, 1000, 10, TimeUnit.MILLISECONDS);
@@ -172,9 +196,9 @@ public class ClientUI extends JFrame implements UiCall {
 	public void out(Object...objects) {
 		String s = Tools.objects2string(objects);
 		if (s != null) {// 输出当服务端的界面上去显示
-			if (s.length() > 600)
+			if (s.length() > 60000)
 				s = Tools.tooLongCut(s); // 太长的数据 
-			if (this.taShow.getText().length() >= 14000) {
+			if (this.taShow.getText().length() >= 140000) {
 				this.taShow.setText("");
 			}
 			this.taShow.append(this.client.getClass().getName() + " " + s + "\n");

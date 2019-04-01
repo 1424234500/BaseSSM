@@ -74,7 +74,7 @@ public class ClientNetty extends ClientFrame {
 	protected void startImpl() throws Exception {
 		out("Netty", serverIp, serverPort);
 		 // Configure the client.  
-        group = new NioEventLoopGroup();  
+        group = new NioEventLoopGroup();
         b = new Bootstrap();  
         b.group(group)
         .channel(NioSocketChannel.class) // (3)
@@ -170,6 +170,21 @@ public class ClientNetty extends ClientFrame {
 			out("异常", cause);
 		}
 	
+	}
+
+
+
+
+
+
+	@Override
+	public boolean isStart() {
+		return b != null && !group.isShutdown();
+	}
+
+	@Override
+	public String toString() {
+		return socket != null? socket.toString():"aaaaaaaa";
 	}
 	
 		

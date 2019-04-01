@@ -220,10 +220,13 @@ public class RedisMgr   {
 	public <T> T doJedis(Fun<T> fun){
 		T res = null;
 		Jedis jedis = this.getJedis();
-		if(fun != null){
-			res = fun.make(jedis);
+		try {
+			if(fun != null){
+				res = fun.make(jedis);
+			}
+		}finally {
+			close(jedis);
 		}
-		close(jedis);
 		return res;
 	}
 	/**
@@ -260,13 +263,13 @@ public class RedisMgr   {
 		
 		JedisPoolConfig config = new JedisPoolConfig();
         // 设置最大连接数
-		config.setMaxTotal(cache.get("redis.maxTotal", 10));
+		config.setMaxTotal(cache.get("redis_maxTotal", 10));
 		//设置最大等待时间
-		config.setMaxWaitMillis(cache.get("redis.maxWaitMillis", 1000)); 
+		config.setMaxWaitMillis(cache.get("redis_maxWaitMillis", 1000)); 
         // 设置空闲连接
-        config.setMaxIdle(cache.get("redis.maxIdle", 3));
+        config.setMaxIdle(cache.get("redis_maxIdle", 3));
         
-		pool = new JedisPool(config, cache.get("redis.host", "localhost"));
+		pool = new JedisPool(config, cache.get("redis_host", "localhost"));
  
 		keys = new HashSet<String>();
 		mapJedisLong = new HashMap<>();

@@ -108,9 +108,9 @@ public class Setting {
 		proper.setProperty(key, value);
         ///保存属性到b.properties文件
 		try{
-	        FileOutputStream oFile = new FileOutputStream(settingFileName, false);//true表示追加打开
-	        proper.store(oFile, "Change at " + Tools.getNowTimeL());
-	        oFile.close();
+//	        FileOutputStream oFile = new FileOutputStream(settingFileName, false);//true表示追加打开
+//	        proper.store(oFile, "Change at " + Tools.getNowTimeL());
+//	        oFile.close();
 		}catch(Exception e){
 			e.printStackTrace();
 		}

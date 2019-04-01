@@ -17,13 +17,13 @@ public class TestCache{
 	int maxDo = 3000;
 	int nowDo = 0;
 	long lastTime = 0;
-	@Test
+//	@Test
 	public void test1(){
 		Cache<String> cache = null;
 		cache = CacheMgr.getInstance(Type.MAP);
 		testThread(cache);
 	}
-	@Test
+//	@Test
 	public void test2(){
 		Cache<String> cache = null;
 		cache = CacheMgr.getInstance(Type.EHCACHE);
@@ -49,6 +49,9 @@ public class TestCache{
 					testCache(this.getName(), cache);
 				}
 			}.start();
+		}
+		while(true) {
+			
 		}
 	}
 	

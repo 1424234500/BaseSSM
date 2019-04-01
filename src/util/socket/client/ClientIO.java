@@ -69,6 +69,10 @@ public class ClientIO extends ClientFrame {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	@Override
+	public boolean isStart() {
+		return socket != null && socket.isConnected() && !socket.isClosed();
 	} 
  
 }

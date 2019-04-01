@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 
 import util.Fun;
+import util.ThreadUtil;
 import util.pipe.Pipe;
 import util.pipe.PipeMgr;
 import util.pipe.PipeMgr.Type;
@@ -49,7 +50,7 @@ public class SessionServiceArpListImpl<T> implements SessionService<T> {
      * 多进程可切换使用redis 编码解码string
      */
 //    private Pipe<Msg> pipe = PipeMgr.getPipe(Type.PIPE, "queue-msg");
-    private Pipe<String> pipe = PipeMgr.getPipe(Type.REDIS, "queue-msg");
+    private Pipe<String> pipe = PipeMgr.getPipe(Type.REDIS, "stat:queue-msg");
     
     public String show() {
     	String res = "\n------------show session - -------\n";
@@ -67,9 +68,9 @@ public class SessionServiceArpListImpl<T> implements SessionService<T> {
     	pipe.startConsumer(Setting.get("netty_thread_consumer", 1), new Fun<String>() {
 			public Object make(String msg1) {
 				Msg msg = new Msg(msg1);
-				msg.setTimeDo(System.currentTimeMillis());
 				CountModel.getInstance().onWait(msg);
-				
+//				if(1==1)
+//				return 0;
 				Session<T> session = index.get(msg.getFrom()); //根据socket key找到session
 				if(session != null) {
 					NDC.push(session.toString());
@@ -83,6 +84,7 @@ public class SessionServiceArpListImpl<T> implements SessionService<T> {
 				}else {
 					log.error("该用户已不存在 " + msg.toString());
 				}
+//				ThreadUtil.sleep(50);
 				CountModel.getInstance().onDone(msg);
 
 				return true;
@@ -122,7 +124,6 @@ public class SessionServiceArpListImpl<T> implements SessionService<T> {
 		if(session != null) {
 			Msg msg = new Msg(obj.toString(), session);
 			msg.setWaitSize(pipe.size());
-			msg.setTimeReveive(System.currentTimeMillis());
 //			pipe.put(msg);
 			CountModel.getInstance().onNet(msg);
 			pipe.put(msg.toString());

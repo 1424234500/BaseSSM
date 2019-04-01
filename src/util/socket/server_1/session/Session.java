@@ -3,6 +3,7 @@ package util.socket.server_1.session;
 import org.apache.log4j.Logger;
 
 import util.Bean;
+import util.ThreadUtil;
 import util.route.SubPub;
 import util.route.SubPub.OnSubscribe;
 import util.route.SubPubMgr;
@@ -126,11 +127,7 @@ public class Session<T> implements OnSubscribe<Msg> {
 			send(msg);
 		}
 		//模拟写入socket耗时
-		try {
-			Thread.sleep(1);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+//		ThreadUtil.sleep(20);
 		
 		return Type.DEFAULT;
 	}

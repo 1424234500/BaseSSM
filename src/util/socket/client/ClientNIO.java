@@ -71,6 +71,10 @@ public class ClientNIO extends ClientFrame {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	@Override
+	public boolean isStart() {
+		return socket != null && socket.isConnected();
 	} 
  
 }

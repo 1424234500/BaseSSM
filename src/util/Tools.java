@@ -250,7 +250,8 @@ public class Tools {
 	}
 
 	/**
-	 * priorOrNext 0标识 在后面填充
+	 * (12, " ", 6, 0)
+	 * priorOrNext 1标识 在后面填充  0表示前面留空
 	 *
 	 */
 	public static String fillStringBy(String str, String by, int tolen, int priorOrNext) {

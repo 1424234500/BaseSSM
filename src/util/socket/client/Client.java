@@ -12,10 +12,10 @@ public interface Client{
 	 * 收到一个 服务端服务请求  转发给对应对象的 客户端
 	 * 把msg信息系统 用户转发出去
 	 */
-	public void send(String str);
+	public void send(String str) throws Exception;
 	
-	 
-	public void start();
+	public boolean isStart();
+	public void start() throws Exception;
 	public void stop();
 
 	

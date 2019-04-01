@@ -1,6 +1,7 @@
 package util.socket.server_1.plugin;
 
 import util.Bean;
+import util.ThreadUtil;
 import util.socket.server_1.Msg;
 
 public  class MessagePlugin<T> extends Plugin<T>{
@@ -25,7 +26,7 @@ public  class MessagePlugin<T> extends Plugin<T>{
 			msg.setUserTo(to);
 			pub.publish(to, msg);
 		}
-		
+
 	}
      
 

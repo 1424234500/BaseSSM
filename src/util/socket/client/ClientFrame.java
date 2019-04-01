@@ -10,8 +10,8 @@ public abstract class ClientFrame implements Client, InterfaceOut{
 
 	
 	
-	int reconnect = 20;	//重连次数
-	long sleeptime = 3000;//重连间隔
+	int reconnect = 1;	//重连次数
+	long sleeptime = 50;//重连间隔
 	
 	UiCall clientUi;
 	public ClientFrame(){
@@ -28,12 +28,12 @@ public abstract class ClientFrame implements Client, InterfaceOut{
  
 	//开始连接任务
 	@Override
-	public void start(){
+	public void start() throws Exception{
 		TaskMake task = new TaskMake(new TaskInterface() {
 			@Override
 			public void onTrue() {
 				out("连接成功");
-				read();
+//				read();
 			}
 			@Override
 			public void onFalse() {
@@ -48,19 +48,20 @@ public abstract class ClientFrame implements Client, InterfaceOut{
 				out(objects);
 			}
 		}, "连接服务器", sleeptime, reconnect);
-		task.startTask();
+//		task.startTask();
+		startImpl();
 	}  
 	//开始读取任务
-	protected void read(){
+	protected void read() throws Exception{
 		TaskMake taskMake = new TaskMake(new TaskInterface() {
 			@Override
 			public void onTrue() {
-				read();	//一个task(20延迟,最多连续两次异常读取)
+//				read();	//一个task(20延迟,最多连续两次异常读取)
 			}
 			@Override
 			public void onFalse() {	//多次异常读取后就认为失联
 				out("失联", show());
-				start();
+//				start();
 			}
 			@Override
 			public void doTask() throws Exception {
@@ -74,11 +75,15 @@ public abstract class ClientFrame implements Client, InterfaceOut{
 				out(objects);
 			}
 		}, "读取消息",1000, 5);	//最多5次读取
-		taskMake.startTask();
+//		taskMake.startTask();
+		String readLine = readImpl();
+		if(Tools.notNull(readLine)){
+			clientUi.onReceive(readLine);
+		}
 	}  
 	//开启发送任务
 	@Override
-	public void send(final String jsonstr){
+	public void send(final String jsonstr) throws Exception{
 		TaskMake task = new TaskMake(new TaskInterface() {
 			@Override
 			public void onTrue() {
@@ -97,7 +102,10 @@ public abstract class ClientFrame implements Client, InterfaceOut{
 				out(objects);
 			}
 		});
-		task.startTask();
+//		task.startTask();
+		sendImpl(jsonstr);
+		out("发送", jsonstr);
+
 	} 
 	
 	  

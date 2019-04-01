@@ -8,6 +8,7 @@ import org.quartz.JobExecutionContext;
 import redis.clients.jedis.Jedis;
 import util.Bean;
 import util.TimeUtil;
+import util.Tools;
 import util.database.RedisMgr;
 import util.database.RedisMgr.Fun;
 import util.scheduler.TaskJob;
@@ -43,18 +44,13 @@ public class JobQpsMinute extends TaskJob{
 //				obj.incrBy("stat:count:wait" + plugin, 1L);
 //				obj.incrBy("stat:count:done" + plugin, 1L);
 				
-				//生成qps 
-				//stat:qps:net:		+ plugin
-				//stat:qps:wait:	+ plugin
-				//stat:qps:done:	+ plugin
-				//生成ave 平均耗时
-				//stat:ave:net:		+ plugin
-				//stat:ave:wait:	+ plugin
-				//stat:ave:done:	+ plugin
+//stat:net:message	2019-12-12 n-qps 320  n-ave 29   w-qps 32  w-ave 32  d-qps 31 d-ave
 				
 				Long temp = System.currentTimeMillis();
 				Long detaTime = (temp - timeLast + 1) / 1000;
 				String timeStr = TimeUtil.getTime("yyyy-MM-dd HH:mm:ss");
+				
+				Bean typeBean = new Bean();
 
 				//时间区间detaTime60s，次数增长count200次，按类型net wait done 按接口message login 计算调用qps
 				for(String type : types) {	//net
@@ -70,11 +66,9 @@ public class JobQpsMinute extends TaskJob{
 						Long after = Long.parseLong(jedis.get(key));
 						Long count = after - before;
 						mapLastCountDetaItem.set(plugin, count);
-						if(count > 0 && detaTime > 0) {
-							Long qps = count / detaTime;	//stat:qps:net:message
-							jedis.lpush("stat:qps:" + type + ":" + plugin, timeStr + " " + qps);
-							log.warn("stat:qps:" + type + ":" + plugin + " " + timeStr + " " + qps);
-						}
+						detaTime = detaTime <= 0 ? 1 : detaTime;
+						Long qps = count / detaTime;	//message	*net:qps:232    
+						typeBean.put(plugin, typeBean.get(plugin, "")+ " " + type + " " + fill("qps " + qps));
 						mapLastCountItem.set(plugin, after);
 					}
 
@@ -87,23 +81,30 @@ public class JobQpsMinute extends TaskJob{
 						Long after = Long.parseLong(jedis.get(key));
 						Long cost = after - before;
 						Long count = mapLastCountDetaItem.get(plugin, 0L);
-						if(cost > 0 && count > 0) {
-							Long ave = cost / count;	//stat:ave:net:message
-							jedis.lpush("stat:ave:" + type + ":" + plugin, timeStr + " " + ave);
-							log.warn("stat:ave:" + type + ":" + plugin + " " + timeStr + " " + ave);
-						}
+						count = count <= 0 ? 1 : count;
+						Long ave = cost / count;	//*net:ave:322ms  
+						typeBean.put(plugin, typeBean.get(plugin, "") + " " + fill("ave " + ave));
+
 						mapLastTimeItem.set(plugin, after);
 					}
 				}
 				
-				
 
-				
-
+				//stat:net:message	2019-12-12 n-qps 320  n-ave 29   w-qps 32  w-ave 32  d-qps 31 d-ave
+				for(Object obj : typeBean.keySet()) {
+					String plugin = obj.toString();
+					String value = typeBean.get(plugin, "");
+					jedis.lpush("stat:" + plugin, timeStr + " " + value);
+					log.warn("stat:" + plugin + " " + timeStr + " " + value);
+				}
 				
 				timeLast = temp;
 
 				return null;
+			}
+
+			private String fill(String str) {
+				return Tools.fillStringBy(str, " ", 8, 1);
 			}
 
 		});
