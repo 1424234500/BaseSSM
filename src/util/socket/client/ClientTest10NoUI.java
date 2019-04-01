@@ -18,8 +18,10 @@ import util.socket.server_1.Msg;
 public class ClientTest10NoUI implements UiCall{
 	int dtime = 100;	//每次连接 登录间隔延时
 	int dtimesend = 100;	//每批次发送间隔
-	int dtimesendDeta = 0;	//减少量
-	int dtimenewconnection = 2000;	//每批次连接添加间隔 或者发送频率变更间隔
+	int dtimesendMax = 1000;
+	int flag = -1;
+	int dtimesendDeta = 50;	//减少量
+	int dtimenewconnection = 20000;	//每批次连接添加间隔 或者发送频率变更间隔
 	int num = 10;	//每批次添加连接
 	int countFalse = 0; 	//添加连接批次异常次数 5次之后停止 新连接 而开始加大发送消息评频率
 	int countFalseMax = 2;
@@ -39,7 +41,7 @@ public class ClientTest10NoUI implements UiCall{
 				while(!Thread.interrupted()) {
 					new Thread() {
 						public void run() {
-							Tools.out("开始发送批次", cc.size(), dtimesend);
+//							Tools.out("开始发送批次", cc.size(), dtimesend);
 							for(int i = cc.size() - 1; i >= 0; i--) {
 								Client client = cc.get(i);
 								if(client.isStart()) {
@@ -47,7 +49,8 @@ public class ClientTest10NoUI implements UiCall{
 										sendAllUser(client);
 									} catch (Exception e) {
 			//							e.printStackTrace();
-										
+										Tools.out( "发送失败 移除断开连接", i, client.toString());
+										cc.remove(i);
 									}
 								}else {
 									Tools.out( "移除断开连接", i, client.toString());
@@ -69,7 +72,7 @@ public class ClientTest10NoUI implements UiCall{
 			public void run() {
 				Tools.out("当前连接数" + cc.size(), countFalse);
 //				if(countFalse > countFalseMax)return;
-				
+
 				if(cc.size() < maxNum - num ) {
 					Tools.out("创建连接数" + num);
 					for(int i = 0; i < num; i++) {
@@ -85,7 +88,7 @@ public class ClientTest10NoUI implements UiCall{
 					}
 				}
 				int after = cc.size();
-				Tools.out("连接数", before, after, "完成", countFalse);
+				Tools.out("连接数", before, after, "完成", countFalse, "发送间隔", dtimesend);
 				if(after < before + num || after >= maxNum) {	
 					countFalse ++;
 					Tools.out("有部分失败新连接或者到了最大连接数", before, after, countFalse);
@@ -101,11 +104,15 @@ public class ClientTest10NoUI implements UiCall{
 		//开启增长一个批次的连接
 		ThreadUtilClient.scheduleWithFixedDelay(new Thread() {
 			public void run() {
-				int to = dtimesend - dtimesendDeta;
-				if(to > 10 && countFalse > countFalseMax) {
-					Tools.out("当前发送间隔",dtimesend,"降低间隔至", to);
-					dtimesend = to;
+				int to = dtimesend + flag * dtimesendDeta;
+
+				if(to <= 10 || to > dtimesendMax) {
+					flag = -1 * flag;
 				}
+				to = dtimesend + flag * dtimesendDeta;
+				Tools.out("当前发送间隔",dtimesend,"调整至", to);
+				dtimesend = to;
+				cc.remove(0);
 			}
 		}, 3000, dtimenewconnection, TimeUnit.MILLISECONDS);
 	}

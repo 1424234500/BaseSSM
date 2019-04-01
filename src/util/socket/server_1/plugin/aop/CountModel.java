@@ -35,7 +35,7 @@ import util.socket.server_1.Msg;
  * 					11			800/2000							300-400/2
  * 			8
  * 					11			1000/30								900/6
- * 
+ * 					100			1000/250							220/22
  */
 public class CountModel {
 	//time_client - 网络传输耗时 - time_receive - 队列等待耗时 - time_do - 业务处理耗时 - time_send

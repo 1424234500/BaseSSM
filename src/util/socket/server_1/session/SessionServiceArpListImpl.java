@@ -56,7 +56,7 @@ public class SessionServiceArpListImpl<T> implements SessionService<T> {
     	String res = "\n------------show session - -------\n";
     	int i = 0;
     	for(Session<T> item : index.values()) {
-    		res += i + "\t " + item.toString() + "\n";
+    		res += i++ + "\t " + item.toString() + "\n";
     	}
     	res += "------------show session - -------\n";
     	return res;

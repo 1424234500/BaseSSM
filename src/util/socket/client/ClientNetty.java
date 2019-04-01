@@ -165,7 +165,8 @@ public class ClientNetty extends ClientFrame {
 		public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
 			// Close the connection when an exception is raised.
 			cause.printStackTrace();
-			ctx.close();
+//			group.shutdownGracefully();
+//			ctx.close();
 //			out("exceptionCaught", ctx, cause);
 			out("异常", cause);
 		}
