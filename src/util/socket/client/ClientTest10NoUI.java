@@ -25,9 +25,16 @@ public class ClientTest10NoUI implements UiCall{
 			Thread.sleep(1000);
 		}
 		
-
-		
 	}
+	public void startSend(Client client) {
+		new Thread() {
+			public void run() {
+				
+				
+			}
+		}.start();
+	}
+	
 	private Client newConnect() {
 		Client res = new ClientNetty("127.0.0.1", 8092);
 		res.setUI(this);
