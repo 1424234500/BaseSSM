@@ -3,25 +3,25 @@
 	"about-plugins"	:	"plugin插件配置，不分顺序，一个消息只执行一个业务处理 type data，限流配置",
 	"plugins"	:	{
 		"login"	:	{
-			"class"	:	"util.socket.server_1.plugin.LoginPlugin",
+			"class"	:	"com.walker.socket.server_1.plugin.LoginPlugin",
 			"on"	:	true,
 			"limit"	:	0,
 		},
 		"login1"	:	{
-			class	:	util.socket.server_1.plugin.Login,
+			class	:	com.walker.socket.server_1.plugin.Login,
 			on		:	false,
 			limit	:	1,
 		},
 		"message"	:	{
-			class	:	util.socket.server_1.plugin.MessagePlugin,
+			class	:	com.walker.socket.server_1.plugin.MessagePlugin,
 			on		:	true,
 		},
 		"monitor"	:	{
-			class	:	util.socket.server_1.plugin.MonitorPlugin,
+			class	:	com.walker.socket.server_1.plugin.MonitorPlugin,
 			on		:	true,
 		},
 		"echo"	:	{
-			class	:	util.socket.server_1.plugin.EchoPlugin,
+			class	:	com.walker.socket.server_1.plugin.EchoPlugin,
 			on		:	true,
 			limit	:	0,
 		},
@@ -30,7 +30,7 @@
 	"before"	:	[
 	
 		{
-			class	:	util.socket.server_1.plugin.aop.SizeAop,
+			class	:	com.walker.socket.server_1.plugin.aop.SizeAop,
 			on		:	true,
 			excludes	:	[ echo,test, ],
 			params	:	{
@@ -39,7 +39,7 @@
 			},
 		},
 		{
-			class	:	util.socket.server_1.plugin.aop.AuthAop,
+			class	:	com.walker.socket.server_1.plugin.aop.AuthAop,
 			on		:	false,
 			excludes	:	[login,login1, ],
 			params	:	{

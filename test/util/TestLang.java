@@ -2,6 +2,12 @@ package util;
 
 import org.junit.Test;
 
+import com.walker.common.util.Bean;
+import com.walker.common.util.Call;
+import com.walker.common.util.ClassUtil;
+import com.walker.common.util.LangUtil;
+import com.walker.common.util.Tools;
+
 public class TestLang {
 
 	@Test

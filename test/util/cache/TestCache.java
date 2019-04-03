@@ -2,7 +2,10 @@ package util.cache;
 
 import org.junit.Test;
 
-import util.Tools;
+import com.walker.common.util.Tools;
+import com.walker.core.cache.Cache;
+import com.walker.core.cache.CacheMgr;
+import com.walker.core.cache.Type;
 
 /**
  * 测试多线程下 各种缓存性能

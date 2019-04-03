@@ -2,9 +2,11 @@ package util;
 
 import org.junit.Test;
 
-import util.pipe.Pipe;
-import util.pipe.PipeException;
-import util.pipe.PipeMgr;
+import com.walker.common.util.Fun;
+import com.walker.common.util.Tools;
+import com.walker.core.pipe.Pipe;
+import com.walker.core.pipe.PipeException;
+import com.walker.core.pipe.PipeMgr;
 
 public class TestPipeConsumer {
 	

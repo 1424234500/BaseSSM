@@ -2,8 +2,10 @@ package util;
 
 import org.junit.Test;
 
-import util.ThreadUtil.Type;
-import util.demo.ThreadSyncCreatorCoster;
+import com.walker.common.demo.ThreadSyncCreatorCoster;
+import com.walker.common.util.ThreadUtil;
+import com.walker.common.util.Tools;
+import com.walker.common.util.ThreadUtil.Type;
 
 public class TestCreatorCsumer {
 	int newThread = 1;

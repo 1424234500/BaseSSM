@@ -2,6 +2,10 @@ package util;
 
 import org.junit.Test;
 
+import com.walker.common.util.Bean;
+import com.walker.common.util.HttpUtil;
+import com.walker.common.util.Tools;
+
 public class TestHttpUtils {
 
 	@Test

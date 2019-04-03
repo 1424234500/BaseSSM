@@ -2,9 +2,9 @@ package util;
 
 import org.junit.Test;
 
-import util.scheduler.Scheduler;
-import util.scheduler.SchedulerMgr;
-import util.scheduler.Task;
+import com.walker.core.scheduler.Scheduler;
+import com.walker.core.scheduler.SchedulerMgr;
+import com.walker.core.scheduler.Task;
 
 public class TestSchedu {
 	

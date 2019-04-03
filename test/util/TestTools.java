@@ -7,8 +7,12 @@ import java.util.List;
 import org.junit.Test;
 
 import com.sun.org.apache.xml.internal.security.utils.XMLUtils;
-
-import util.annotation.TrackerMgr;
+import com.walker.common.util.Bean;
+import com.walker.common.util.MapListUtil;
+import com.walker.common.util.Page;
+import com.walker.common.util.Tools;
+import com.walker.common.util.XmlUtil;
+import com.walker.core.annotation.TrackerMgr;
 
 public class TestTools {
 
@@ -81,7 +85,7 @@ public class TestTools {
 	@Test
 	public void testSeria(){
 		java.util.HashMap map = new java.util.HashMap();
-		util.SerializeUtil.serialize(map);
+		com.walker.common.util.SerializeUtil.serialize(map);
 	}
 	@Test
 	public void testAnnoStart(){

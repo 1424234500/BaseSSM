@@ -4,6 +4,11 @@ import java.math.BigInteger;
 
 import org.junit.Test;
 
+import com.walker.common.util.Fun;
+import com.walker.common.util.MD5;
+import com.walker.common.util.ThreadUtil;
+import com.walker.common.util.Tools;
+
 public class TestMd5 {
 
 	@Test

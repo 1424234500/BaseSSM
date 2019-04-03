@@ -2,8 +2,10 @@ package util;
 
 import org.junit.Test;
 
+import com.walker.common.util.Tools;
+import com.walker.core.database.RedisMgr;
+
 import redis.clients.jedis.Jedis;
-import util.database.RedisMgr;
 
 public class TestRedis {
 

@@ -1,10 +1,11 @@
 package util.annotation;
 
-import util.annotation.DBConstraints;
-import util.annotation.DBSQLInteger;
-import util.annotation.DBSQLString;
-import util.annotation.DBTable;
-import util.annotation.UseCase;
+import com.walker.core.annotation.DBConstraints;
+import com.walker.core.annotation.DBSQLInteger;
+import com.walker.core.annotation.DBSQLString;
+import com.walker.core.annotation.DBTable;
+import com.walker.core.annotation.Test;
+import com.walker.core.annotation.UseCase;
 
 
 @DBTable(name = "STUDENT")

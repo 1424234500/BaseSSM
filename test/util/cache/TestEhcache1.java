@@ -2,8 +2,11 @@ package util.cache;
 
 import org.junit.Test;
 
-import util.ThreadUtil;
-import util.Tools;
+import com.walker.common.util.ThreadUtil;
+import com.walker.common.util.Tools;
+import com.walker.core.cache.Cache;
+import com.walker.core.cache.CacheMgr;
+import com.walker.core.cache.Type;
 
 public class TestEhcache1 {
 	@Test

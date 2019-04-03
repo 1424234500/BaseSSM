@@ -10,11 +10,14 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import util.Bean;
-import util.MapListUtil;
-import util.Tools;
-import util.cache.CacheMapImpl;
-import util.cache.CacheRedisImpl;
+import com.walker.common.util.Bean;
+import com.walker.common.util.MapListUtil;
+import com.walker.common.util.Tools;
+import com.walker.core.cache.Cache;
+import com.walker.core.cache.CacheMapImpl;
+import com.walker.core.cache.CacheMgr;
+import com.walker.core.cache.CacheRedisImpl;
+import com.walker.core.cache.Type;
 public class CacheMapImplTest extends CacheRedisImpl {
 //	static Cache<String> cache = new CacheEhcacheImpl();
 //	static{

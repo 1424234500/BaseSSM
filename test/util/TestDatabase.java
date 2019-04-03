@@ -2,7 +2,10 @@ package util;
 
 import org.junit.Test;
 
-import util.database.Dao;
+import com.walker.common.util.Bean;
+import com.walker.common.util.ThreadUtil;
+import com.walker.common.util.Tools;
+import com.walker.core.database.Dao;
 
 public class TestDatabase {
 	public void test0(int size){

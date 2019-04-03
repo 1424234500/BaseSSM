@@ -8,7 +8,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.junit.Test;
 
-import util.ThreadUtil.Type;
+import com.walker.common.util.ThreadUtil;
+import com.walker.common.util.Tools;
+import com.walker.common.util.ThreadUtil.Type;
 
 public class TestThread {
 

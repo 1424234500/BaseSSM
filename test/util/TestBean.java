@@ -8,6 +8,9 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.walker.common.util.Bean;
+import com.walker.common.util.Tools;
+
 public class TestBean {
 
 	@Test
