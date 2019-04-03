@@ -10,7 +10,7 @@
 	<!-- 可配置于classPath:dubbo.properties -->
 	
 	
-    <!-- name提供方应用名 owner负责人 -->
+    <!-- name提供方应用名 owner负责人 aa-->
 	<dubbo:application name="dubbo_ssm_provider" owner="cph" logger="log4j"  />
 	
 	<!-- 提供服务端口 -->
